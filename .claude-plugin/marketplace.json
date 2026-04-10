@@ -1,0 +1,29 @@
+{
+  "name": "infisical-ai-skills",
+  "owner": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "metadata": {
+    "description": "Official Infisical skills for AI coding agents — correct SDK usage, auth methods, Docker/K8s integration, and more.",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "infisical-setup",
+      "source": "./infisical-setup",
+      "description": "Interactive setup guide for integrating Infisical into your projects — CLI, Docker, Kubernetes, CI/CD, SDKs, and machine identity auth.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "secrets", "secret-management", "sdk", "docker", "kubernetes", "cicd"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "devops", "infrastructure"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "infisical-setup",
+  "description": "Interactive setup guide for integrating Infisical into your projects — CLI, Docker, Kubernetes, CI/CD, SDKs, and machine identity auth.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "secrets", "secret-management", "sdk", "docker", "kubernetes", "cicd"]
+}
