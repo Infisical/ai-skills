@@ -1,0 +1,13 @@
+{
+  "name": "infisical-dynamic-secrets",
+  "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across 27 providers.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/dynamic-secrets",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "secrets", "dynamic-secrets", "database", "postgresql", "mysql", "redis", "aws-iam", "ssh"]
+}

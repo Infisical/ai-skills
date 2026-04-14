@@ -1,0 +1,13 @@
+{
+  "name": "infisical-agent",
+  "description": "Guide for configuring the Infisical Agent — a client daemon that manages auth token lifecycle and renders secrets to files via Go templates.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/infisical-agent/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "secrets", "agent", "sidecar", "templates", "kubernetes", "docker", "ecs"]
+}

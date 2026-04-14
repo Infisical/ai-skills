@@ -5,8 +5,8 @@
     "email": "support@infisical.com"
   },
   "metadata": {
-    "description": "Official Infisical skills for AI coding agents — correct SDK usage, auth methods, Docker/K8s integration, and more.",
-    "version": "1.0.0",
+    "description": "Official Infisical skills for AI coding agents — correct SDK usage, auth methods, secret syncs, dynamic secrets, agent config, and more.",
+    "version": "1.1.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -24,6 +24,51 @@
       "keywords": ["infisical", "secrets", "secret-management", "sdk", "docker", "kubernetes", "cicd"],
       "category": "developer-tools",
       "tags": ["secrets", "security", "devops", "infrastructure"]
+    },
+    {
+      "name": "infisical-secret-syncs",
+      "source": "./infisical-secret-syncs",
+      "description": "Guide for configuring Infisical Secret Syncs to push secrets to 38+ third-party services including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, and HashiCorp Vault.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/integrations/secret-syncs",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "secrets", "secret-syncs", "aws", "gcp", "azure", "github", "vercel", "vault"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "devops", "integrations"]
+    },
+    {
+      "name": "infisical-dynamic-secrets",
+      "source": "./infisical-dynamic-secrets",
+      "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across 27 providers.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/dynamic-secrets",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "secrets", "dynamic-secrets", "database", "postgresql", "mysql", "redis", "aws-iam", "ssh"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "database", "credentials"]
+    },
+    {
+      "name": "infisical-agent",
+      "source": "./infisical-agent",
+      "description": "Guide for configuring the Infisical Agent — a client daemon that manages auth token lifecycle and renders secrets to files via Go templates.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/infisical-agent/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "secrets", "agent", "sidecar", "templates", "kubernetes", "docker", "ecs"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "devops", "agent"]
     }
   ]
 }
