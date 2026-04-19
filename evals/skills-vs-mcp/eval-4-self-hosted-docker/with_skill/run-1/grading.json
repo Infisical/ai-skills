@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"encryption-key","text":"ENCRYPTION_KEY hex 16-byte with openssl command","passed":true,"evidence":"openssl rand -hex 16, 16 bytes = 32 hex characters"},
+  {"id":"auth-secret","text":"AUTH_SECRET base64 32-byte with openssl command","passed":true,"evidence":"openssl rand -base64 32"},
+  {"id":"db-connection","text":"DB_CONNECTION_URI for PostgreSQL","passed":true,"evidence":"DB_CONNECTION_URI in compose environment"},
+  {"id":"redis-url","text":"REDIS_URL","passed":true,"evidence":"REDIS_URL in compose environment"},
+  {"id":"site-url","text":"SITE_URL with protocol","passed":true,"evidence":"SITE_URL: ${SITE_URL}"},
+  {"id":"key-warning","text":"Warns about ENCRYPTION_KEY backup","passed":true,"evidence":"ENCRYPTION_KEY cannot be recovered if lost, back them up immediately"}
+],"score":8,"max_score":8}

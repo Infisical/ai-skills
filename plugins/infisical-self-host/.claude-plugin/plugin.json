@@ -1,0 +1,13 @@
+{
+  "name": "infisical-self-host",
+  "description": "Guide for self-hosting Infisical — Docker, Kubernetes Helm, environment variables, ENCRYPTION_KEY setup, FIPS compliance, scaling, and production hardening.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/self-hosting/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "self-hosted", "docker", "kubernetes", "helm", "deployment", "fips"]
+}

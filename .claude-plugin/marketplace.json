@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Official Infisical skills for AI coding agents — correct SDK usage, auth methods, secret syncs, dynamic secrets, agent config, and more.",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -69,6 +69,51 @@
       "keywords": ["infisical", "secrets", "agent", "sidecar", "templates", "kubernetes", "docker", "ecs"],
       "category": "developer-tools",
       "tags": ["secrets", "security", "devops", "agent"]
+    },
+    {
+      "name": "infisical-terraform",
+      "source": "./infisical-terraform",
+      "description": "Guide for using the Infisical Terraform Provider — HCL resources, ephemeral secrets, data sources, project roles, and Terraform Cloud OIDC integration.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/integrations/frameworks/terraform",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "terraform", "hcl", "ephemeral", "iac", "terraform-cloud", "oidc"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "iac", "terraform"]
+    },
+    {
+      "name": "infisical-api",
+      "source": "./infisical-api",
+      "description": "Guide for the Infisical REST API — authentication, secrets CRUD (v4), projects, identities, pagination, and rate limits.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/api-reference/overview/introduction",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "api", "rest", "secrets", "endpoints", "authentication", "bearer-token"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "api", "rest"]
+    },
+    {
+      "name": "infisical-self-host",
+      "source": "./infisical-self-host",
+      "description": "Guide for self-hosting Infisical — Docker, Kubernetes Helm, environment variables, ENCRYPTION_KEY setup, FIPS compliance, scaling, and production hardening.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/self-hosting/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": ["infisical", "self-hosted", "docker", "kubernetes", "helm", "deployment", "fips"],
+      "category": "developer-tools",
+      "tags": ["secrets", "security", "deployment", "self-hosted"]
     }
   ]
 }

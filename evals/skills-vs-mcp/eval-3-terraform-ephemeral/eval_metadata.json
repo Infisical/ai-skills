@@ -1,0 +1,12 @@
+{
+  "eval_name": "terraform-ephemeral-secrets",
+  "prompt": "I want to use Terraform to fetch secrets from Infisical without them being stored in the Terraform state file. Show me the full HCL configuration.",
+  "assertions": [
+    {"id": "correct-provider-source", "text": "Uses `source = \"infisical/infisical\"` in required_providers block", "weight": 1},
+    {"id": "ephemeral-resource", "text": "Uses `ephemeral \"infisical_secret\"` resource (not `data \"infisical_secrets\"`)", "weight": 2},
+    {"id": "terraform-version", "text": "Mentions Terraform v1.10+ requirement for ephemeral resources", "weight": 1},
+    {"id": "machine-identity-auth", "text": "Uses machine identity authentication (universal auth or OIDC, not service tokens)", "weight": 2},
+    {"id": "correct-params", "text": "Includes env_slug and workspace_id parameters in the ephemeral resource", "weight": 1},
+    {"id": "no-state-benefit", "text": "Explains that ephemeral resources prevent secrets from being stored in state files", "weight": 1}
+  ]
+}

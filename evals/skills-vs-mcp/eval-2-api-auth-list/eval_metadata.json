@@ -1,0 +1,12 @@
+{
+  "eval_name": "api-auth-and-list-secrets",
+  "prompt": "Write curl commands to authenticate with Infisical's REST API using a machine identity and then list all secrets in my project's dev environment.",
+  "assertions": [
+    {"id": "correct-auth-endpoint", "text": "Uses POST to `/api/v1/auth/universal-auth/login` with clientId and clientSecret in body", "weight": 2},
+    {"id": "bearer-token", "text": "Uses the returned accessToken as `Authorization: Bearer <token>` header", "weight": 1},
+    {"id": "correct-secrets-endpoint", "text": "Uses GET `/api/v4/secrets` (not v1, v2, or v3)", "weight": 2},
+    {"id": "required-params", "text": "Includes projectId and environment query parameters", "weight": 1},
+    {"id": "no-service-tokens", "text": "Does not use service tokens or deprecated auth methods", "weight": 1},
+    {"id": "content-type", "text": "Includes Content-Type: application/json header on POST requests", "weight": 1}
+  ]
+}

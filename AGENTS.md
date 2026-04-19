@@ -33,3 +33,27 @@
 **Location:** `skills/infisical-agent/SKILL.md`
 
 **Use when:** You need the Infisical Agent to inject secrets into containers or VMs without modifying application code. Covers YAML config format, all 6 auth methods, template functions (`listSecrets`, `getSecretByName`, `dynamicSecret`), sinks, polling, and deployment patterns for Docker, ECS, and Kubernetes.
+
+### infisical-terraform
+
+**Description:** Guide for using the Infisical Terraform Provider — HCL resources, ephemeral secrets, data sources, project roles, and Terraform Cloud OIDC integration.
+
+**Location:** `skills/infisical-terraform/SKILL.md`
+
+**Use when:** You need to manage Infisical secrets or configuration via Terraform. Covers provider setup, ephemeral resources (secrets never in state), data sources, project roles with permissions_v2, access approval policies, and OIDC auth for Terraform Cloud.
+
+### infisical-api
+
+**Description:** Guide for the Infisical REST API — authentication, secrets CRUD (v4), projects, identities, pagination, and rate limits.
+
+**Location:** `skills/infisical-api/SKILL.md`
+
+**Use when:** You need to call the Infisical API directly. Covers Universal Auth login, Bearer token usage, /api/v4/secrets endpoints, project and identity management, pagination (offset/limit), rate limits by plan tier, and deprecated endpoints to avoid.
+
+### infisical-self-host
+
+**Description:** Guide for self-hosting Infisical — Docker, Kubernetes Helm, environment variables, ENCRYPTION_KEY setup, FIPS compliance, scaling, and production hardening.
+
+**Location:** `skills/infisical-self-host/SKILL.md`
+
+**Use when:** You need to deploy or manage a self-hosted Infisical instance. Covers Docker standalone, Docker Compose, Kubernetes Helm chart, required environment variables, FIPS 140-3 compliance, PostgreSQL/Redis requirements, horizontal scaling, high availability, and production hardening.

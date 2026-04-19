@@ -1,0 +1,13 @@
+{
+  "name": "infisical-terraform",
+  "description": "Guide for using the Infisical Terraform Provider — HCL resources, ephemeral secrets, data sources, project roles, and Terraform Cloud OIDC integration.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/integrations/frameworks/terraform",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "terraform", "hcl", "ephemeral", "iac", "terraform-cloud", "oidc"]
+}

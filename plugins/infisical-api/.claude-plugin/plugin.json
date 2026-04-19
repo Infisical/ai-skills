@@ -1,0 +1,13 @@
+{
+  "name": "infisical-api",
+  "description": "Guide for the Infisical REST API — authentication, secrets CRUD (v4), projects, identities, pagination, and rate limits.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/api-reference/overview/introduction",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": ["infisical", "api", "rest", "secrets", "endpoints", "authentication", "bearer-token"]
+}

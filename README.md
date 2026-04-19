@@ -1,14 +1,47 @@
 # Infisical AI Skills
 
-Official [Agent Skills](https://agentskills.io) for [Infisical](https://infisical.com) — the open-source secret management platform.
+Give your AI coding agent accurate knowledge about [Infisical](https://infisical.com) — the open-source secret management platform.
 
-These skills give AI coding agents accurate, up-to-date knowledge about Infisical's platform — SDKs, CLI, secret syncs, dynamic secrets, the Infisical Agent, Docker, Kubernetes, CI/CD, and auth methods. Without them, AI tools frequently hallucinate wrong package names, deprecated auth patterns, incorrect function signatures, and broken configurations.
+## Recommended: Connect our Docs MCP
 
-## Install
+The fastest way to stop your AI from hallucinating about Infisical is to connect our docs MCP server. It works with any MCP-compatible agent, auto-updates when our docs change, and requires zero maintenance.
 
-### Universal (45+ agents)
+**URL:** `https://infisical.com/docs/mcp`
 
-Works with Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Windsurf, Gemini CLI, and more:
+**Claude Code:**
+```bash
+claude mcp add --transport http infisical-docs https://infisical.com/docs/mcp
+```
+
+**Cursor / Windsurf:** Add to your MCP settings:
+```json
+{
+  "mcpServers": {
+    "infisical-docs": {
+      "url": "https://infisical.com/docs/mcp"
+    }
+  }
+}
+```
+
+**VS Code / Copilot:** Add to `.vscode/mcp.json`:
+```json
+{
+  "servers": {
+    "infisical-docs": {
+      "url": "https://infisical.com/docs/mcp"
+    }
+  }
+}
+```
+
+Any MCP-compatible client can connect with that URL.
+
+## Alternative: Agent Skills
+
+If your tool doesn't support MCP, or you want offline/local context, you can install these skills instead. They follow the [Agent Skills](https://agentskills.io) open standard and work across 45+ AI tools.
+
+### Universal install
 
 ```bash
 npx skills add Infisical/ai-skills
@@ -18,10 +51,6 @@ npx skills add Infisical/ai-skills
 
 ```bash
 /plugin marketplace add Infisical/ai-skills
-/plugin install infisical-setup@infisical-ai-skills
-/plugin install infisical-secret-syncs@infisical-ai-skills
-/plugin install infisical-dynamic-secrets@infisical-ai-skills
-/plugin install infisical-agent@infisical-ai-skills
 ```
 
 ### Manual
@@ -78,17 +107,61 @@ Guide for the Infisical Agent client daemon. Covers:
 - **Deployment patterns** — Docker Compose sidecar, AWS ECS sidecar, K8s init container, K8s sidecar
 - **Advanced** — Polling intervals, on-change commands, exit-after-auth, caching
 
+### infisical-terraform
+
+Guide for the Infisical Terraform Provider. Covers:
+
+- **Ephemeral resources** — Terraform 1.10+ secrets that never land in state files
+- **Provider setup** — `infisical/infisical` source, Universal Auth and OIDC authentication
+- **Data sources** — Traditional approach for older Terraform versions (with state storage caveats)
+- **Project roles** — `permissions_v2` format with subject/action structure
+- **Terraform Cloud** — OIDC integration for zero-credential CI/CD pipelines
+
+### infisical-api
+
+Guide for the Infisical REST API. Covers:
+
+- **Authentication** — Universal Auth login, Bearer token usage, all machine identity auth methods
+- **Secrets CRUD** — `/api/v4/secrets` endpoints (v1/v2/v3 are deprecated)
+- **Projects & identities** — Project management, environments, members, groups, folders
+- **Pagination** — `offset`/`limit` (default 20, max 100)
+- **Rate limits** — Cloud-only limits by plan tier; self-hosted has no limits
+
+### infisical-self-host
+
+Guide for self-hosting Infisical. Covers:
+
+- **Docker** — Standalone container and Docker Compose production stack
+- **Kubernetes** — Helm chart from Cloudsmith registry, secrets, scaling, security
+- **Environment variables** — `ENCRYPTION_KEY` (hex 16-byte), `AUTH_SECRET` (base64 32-byte), database, Redis
+- **Scaling & HA** — Stateless horizontal scaling, PostgreSQL read replicas, Redis Sentinel
+- **FIPS compliance** — FIPS 140-2 mode via separate image and `FIPS_ENABLED=true`
+
 ## Eval results
 
-Every skill is A/B tested to prove it actually reduces hallucination. See [`evals/`](evals/) for full data.
+Every skill is A/B tested against a no-context baseline. We also ran a head-to-head comparison of Skills vs the Docs MCP. See [`evals/`](evals/) for full data.
 
-| Skill | With Skill | Without Skill | Delta |
-|-------|-----------|--------------|-------|
+### Skills vs no context
+
+| Skill | With Skill | Without | Delta |
+|-------|-----------|---------|-------|
 | infisical-setup | 100% | 50% | **+50pp** |
 | infisical-secret-syncs | 100% | 39% | **+61pp** |
 | infisical-dynamic-secrets | 94% | 67% | **+28pp** |
 | infisical-agent | 100% | 33% | **+67pp** |
-| **Overall** | **98%** | **46%** | **+52pp** |
+
+### Skills vs MCP vs no context
+
+| Test case | No context | MCP (best-case) | Skills |
+|-----------|-----------|-----------------|--------|
+| Python SDK | 0% | 100% | 100% |
+| Node.js SDK | 33% | 100% | 100% |
+| API endpoints | 38% | 100% | 100% |
+| Terraform ephemeral | 13% | 100% | 100% |
+| Self-hosted Docker | 38% | 88% | 100% |
+| **Average** | **24%** | **98%** | **100%** |
+
+Both approaches dramatically reduce hallucination. The MCP is recommended because it auto-updates with the docs and requires no maintenance.
 
 ## Why this exists
 

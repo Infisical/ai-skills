@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-package","text":"Uses npm install @infisical/sdk","passed":true,"evidence":"npm install @infisical/sdk"},
+  {"id":"correct-import","text":"Imports InfisicalSDK from @infisical/sdk","passed":false,"evidence":"Imports InfisicalClient instead of InfisicalSDK"},
+  {"id":"correct-constructor","text":"Uses new InfisicalSDK()","passed":false,"evidence":"Uses new InfisicalClient({auth: {universalAuth: ...}}) — wrong class and constructor pattern"},
+  {"id":"correct-auth","text":"Authenticates via client.auth().universalAuth.login()","passed":false,"evidence":"Auth credentials passed in constructor config, not via separate login call"},
+  {"id":"correct-list","text":"Uses client.secrets().listSecrets()","passed":false,"evidence":"Uses client.listSecrets() — wrong method chain"},
+  {"id":"no-deprecated","text":"No deprecated patterns","passed":true,"evidence":"No service tokens mentioned"}
+],"score":3,"max_score":9}

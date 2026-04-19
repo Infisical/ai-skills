@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-auth-endpoint","text":"POST /api/v1/auth/universal-auth/login","passed":true,"evidence":"POST https://app.infisical.com/api/v1/auth/universal-auth/login"},
+  {"id":"bearer-token","text":"Uses Bearer token","passed":true,"evidence":"Authorization: Bearer your-access-token"},
+  {"id":"correct-secrets-endpoint","text":"GET /api/v4/secrets","passed":true,"evidence":"GET https://app.infisical.com/api/v4/secrets?projectId=...&environment=dev"},
+  {"id":"required-params","text":"Includes projectId and environment params","passed":true,"evidence":"projectId and environment as query parameters"},
+  {"id":"no-service-tokens","text":"No service tokens","passed":true,"evidence":"Uses machine identity Universal Auth"},
+  {"id":"content-type","text":"Content-Type: application/json","passed":true,"evidence":"Content-Type: application/json on POST"}
+],"score":8,"max_score":8}

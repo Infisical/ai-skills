@@ -1,0 +1,87 @@
+{
+  "eval_name": "skills-vs-mcp-head-to-head",
+  "description": "Compares three conditions for preventing Infisical-related hallucinations: (1) Baseline (no context), (2) MCP best-case (raw doc content simulating perfect Mintlify MCP retrieval), (3) Skills (curated SKILL.md + references)",
+  "date": "2026-04-17",
+  "model": "claude-sonnet-4-6",
+  "conditions": ["baseline", "mcp_best_case", "with_skill"],
+  "test_cases": [
+    {
+      "eval": "eval-0-python-sdk",
+      "prompt": "Python SDK install + init + auth + fetch secrets",
+      "baseline_score": 0,
+      "mcp_score": 9,
+      "skill_score": 9,
+      "max_score": 9,
+      "baseline_pct": 0,
+      "mcp_pct": 100,
+      "skill_pct": 100,
+      "baseline_hallucinations": ["pip install infisical-python", "from infisical import InfisicalClient", "InfisicalClient class", "API key auth option"],
+      "mcp_hallucinations": [],
+      "skill_hallucinations": []
+    },
+    {
+      "eval": "eval-1-nodejs-sdk",
+      "prompt": "Node.js SDK Express setup",
+      "baseline_score": 3,
+      "mcp_score": 9,
+      "skill_score": 9,
+      "max_score": 9,
+      "baseline_pct": 33,
+      "mcp_pct": 100,
+      "skill_pct": 100,
+      "baseline_hallucinations": ["InfisicalClient instead of InfisicalSDK", "Wrong constructor pattern", "Wrong auth flow", "Wrong method chain"],
+      "mcp_hallucinations": [],
+      "skill_hallucinations": []
+    },
+    {
+      "eval": "eval-2-api-auth-list",
+      "prompt": "REST API curl auth + list secrets",
+      "baseline_score": 3,
+      "mcp_score": 8,
+      "skill_score": 8,
+      "max_score": 8,
+      "baseline_pct": 38,
+      "mcp_pct": 100,
+      "skill_pct": 100,
+      "baseline_hallucinations": ["/api/v1/auth/machine-identity/login (wrong endpoint)", "/api/v3/projects/.../secrets (wrong version, wrong path)"],
+      "mcp_hallucinations": [],
+      "skill_hallucinations": []
+    },
+    {
+      "eval": "eval-3-terraform-ephemeral",
+      "prompt": "Terraform secrets without state storage",
+      "baseline_score": 1,
+      "mcp_score": 8,
+      "skill_score": 8,
+      "max_score": 8,
+      "baseline_pct": 13,
+      "mcp_pct": 100,
+      "skill_pct": 100,
+      "baseline_hallucinations": ["Uses data source + sensitive outputs instead of ephemeral resources", "Secrets still stored in state", "Service token auth pattern", "No TF 1.10 mention"],
+      "mcp_hallucinations": [],
+      "skill_hallucinations": []
+    },
+    {
+      "eval": "eval-4-self-hosted-docker",
+      "prompt": "Production docker-compose with encryption setup",
+      "baseline_score": 3,
+      "mcp_score": 7,
+      "skill_score": 8,
+      "max_score": 8,
+      "baseline_pct": 38,
+      "mcp_pct": 88,
+      "skill_pct": 100,
+      "baseline_hallucinations": ["No openssl generation commands", "No ENCRYPTION_KEY backup warning", "32-char description without specifics"],
+      "mcp_hallucinations": ["Missing explicit ENCRYPTION_KEY unrecoverable warning"],
+      "skill_hallucinations": []
+    }
+  ],
+  "summary": {
+    "baseline_avg_pct": 24.4,
+    "mcp_avg_pct": 97.6,
+    "skill_avg_pct": 100.0,
+    "mcp_vs_baseline_delta": "+73.2pp",
+    "skill_vs_baseline_delta": "+75.6pp",
+    "skill_vs_mcp_delta": "+2.4pp"
+  }
+}

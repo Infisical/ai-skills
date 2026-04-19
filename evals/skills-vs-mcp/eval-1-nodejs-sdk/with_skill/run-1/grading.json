@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-package","text":"Uses npm install @infisical/sdk","passed":true,"evidence":"npm install @infisical/sdk"},
+  {"id":"correct-import","text":"Imports InfisicalSDK","passed":true,"evidence":"import { InfisicalSDK } from '@infisical/sdk'"},
+  {"id":"correct-constructor","text":"Uses new InfisicalSDK()","passed":true,"evidence":"new InfisicalSDK({siteUrl: ...})"},
+  {"id":"correct-auth","text":"client.auth().universalAuth.login()","passed":true,"evidence":"client.auth().universalAuth.login({clientId, clientSecret})"},
+  {"id":"correct-list","text":"client.secrets().listSecrets()","passed":true,"evidence":"client.secrets().listSecrets({environment, projectId, secretPath})"},
+  {"id":"no-deprecated","text":"No deprecated patterns","passed":true,"evidence":"Warns about deprecated Service Tokens and recommends zero-secret auth"}
+],"score":9,"max_score":9}

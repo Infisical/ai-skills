@@ -1,0 +1,12 @@
+{
+  "eval_name": "nodejs-sdk-setup",
+  "prompt": "Set up the Infisical Node.js SDK in my Express app to load secrets when the server starts. Show me installation, initialization, authentication, and how to list all secrets.",
+  "assertions": [
+    {"id": "correct-package", "text": "Uses `npm install @infisical/sdk` (not `infisical-node`, `infisical`, or `@infisical/client`)", "weight": 2},
+    {"id": "correct-import", "text": "Imports `InfisicalSDK` from `@infisical/sdk` (not `InfisicalClient`)", "weight": 2},
+    {"id": "correct-constructor", "text": "Uses `new InfisicalSDK()` with siteUrl (not `new InfisicalClient()`)", "weight": 2},
+    {"id": "correct-auth", "text": "Authenticates via `client.auth().universalAuth.login()` with clientId/clientSecret", "weight": 1},
+    {"id": "correct-list", "text": "Uses `client.secrets().listSecrets()` with environment and projectId parameters", "weight": 1},
+    {"id": "no-deprecated", "text": "Does not use service tokens, ST_ prefixed tokens, or deprecated SDK patterns", "weight": 1}
+  ]
+}

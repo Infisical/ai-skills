@@ -1,0 +1,12 @@
+{
+  "eval_name": "python-sdk-setup",
+  "prompt": "I'm building a Flask web app and need to fetch secrets from Infisical at runtime using their Python SDK. Show me how to install the SDK, initialize it, authenticate, and fetch all secrets for my dev environment.",
+  "assertions": [
+    {"id": "correct-package", "text": "Uses `pip install infisicalsdk` (not `infisical-python`, `infisical`, or `python-infisical`)", "weight": 2},
+    {"id": "correct-import", "text": "Imports from `infisical_sdk` (e.g., `from infisical_sdk import InfisicalSDKClient`)", "weight": 2},
+    {"id": "correct-class", "text": "Uses `InfisicalSDKClient` class (not `InfisicalClient`)", "weight": 2},
+    {"id": "machine-identity-auth", "text": "Authenticates via machine identity (universal_auth.login with client_id/client_secret)", "weight": 1},
+    {"id": "correct-method", "text": "Uses `client.secrets.list_secrets()` or `client.secrets.get_secret_by_name()` with project_id and environment_slug", "weight": 1},
+    {"id": "no-deprecated", "text": "Does not use service tokens, API keys, or deprecated InfisicalClient patterns", "weight": 1}
+  ]
+}

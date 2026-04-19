@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-provider-source","text":"source = infisical/infisical","passed":true,"evidence":"source = \"infisical/infisical\""},
+  {"id":"ephemeral-resource","text":"Uses ephemeral infisical_secret resource","passed":false,"evidence":"Uses data infisical_secrets with sensitive outputs instead of ephemeral resources — values still stored in state"},
+  {"id":"terraform-version","text":"Mentions Terraform v1.10+","passed":false,"evidence":"No mention of Terraform version requirement for ephemeral resources"},
+  {"id":"machine-identity-auth","text":"Machine identity auth","passed":false,"evidence":"Uses token = var.infisical_token (service token pattern)"},
+  {"id":"correct-params","text":"env_slug and workspace_id params","passed":false,"evidence":"Uses different resource type entirely — data source not ephemeral"},
+  {"id":"no-state-benefit","text":"Explains no-state benefit of ephemeral","passed":false,"evidence":"Mentions sensitive = true on outputs but this does NOT prevent state storage — secrets still in state"}
+],"score":1,"max_score":8}

@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-package","text":"Uses pip install infisicalsdk","passed":false,"evidence":"Uses pip install infisical-python (hallucinated deprecated package)"},
+  {"id":"correct-import","text":"Imports from infisical_sdk","passed":false,"evidence":"Uses from infisical import InfisicalClient (wrong module)"},
+  {"id":"correct-class","text":"Uses InfisicalSDKClient class","passed":false,"evidence":"Uses InfisicalClient (deprecated class name)"},
+  {"id":"machine-identity-auth","text":"Authenticates via machine identity universal_auth.login","passed":false,"evidence":"Uses client.auth() with wrong auth pattern, mentions API keys as option"},
+  {"id":"correct-method","text":"Uses client.secrets.list_secrets()","passed":false,"evidence":"Uses wrong method pattern from deprecated SDK"},
+  {"id":"no-deprecated","text":"No deprecated patterns","passed":false,"evidence":"Mentions API keys as authentication option"}
+],"score":0,"max_score":9}

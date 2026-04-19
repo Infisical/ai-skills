@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"correct-provider-source","text":"source = infisical/infisical","passed":true,"evidence":"source = \"infisical/infisical\""},
+  {"id":"ephemeral-resource","text":"Uses ephemeral infisical_secret","passed":true,"evidence":"ephemeral \"infisical_secret\" \"database_password\""},
+  {"id":"terraform-version","text":"Terraform v1.10+","passed":true,"evidence":"required_version = \">= 1.10\""},
+  {"id":"machine-identity-auth","text":"Machine identity auth","passed":true,"evidence":"auth { universal { client_id, client_secret } }"},
+  {"id":"correct-params","text":"env_slug and workspace_id","passed":true,"evidence":"env_slug, workspace_id, folder_path present"},
+  {"id":"no-state-benefit","text":"Explains no-state benefit","passed":true,"evidence":"Secret values never persist in your Terraform state file"}
+],"score":8,"max_score":8}

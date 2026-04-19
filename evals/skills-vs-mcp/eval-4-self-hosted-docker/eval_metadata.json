@@ -1,0 +1,12 @@
+{
+  "eval_name": "self-hosted-docker-compose",
+  "prompt": "Give me a production-ready docker-compose.yml for self-hosting Infisical with proper encryption and security setup. Include all required environment variables.",
+  "assertions": [
+    {"id": "encryption-key", "text": "Includes ENCRYPTION_KEY as hex 16-byte value, mentions `openssl rand -hex 16`", "weight": 2},
+    {"id": "auth-secret", "text": "Includes AUTH_SECRET as base64 32-byte value, mentions `openssl rand -base64 32`", "weight": 2},
+    {"id": "db-connection", "text": "Includes DB_CONNECTION_URI pointing to PostgreSQL", "weight": 1},
+    {"id": "redis-url", "text": "Includes REDIS_URL for Redis connection", "weight": 1},
+    {"id": "site-url", "text": "Includes SITE_URL with absolute URL including protocol", "weight": 1},
+    {"id": "key-warning", "text": "Warns about ENCRYPTION_KEY importance — backup it up, cannot recover if lost", "weight": 1}
+  ]
+}

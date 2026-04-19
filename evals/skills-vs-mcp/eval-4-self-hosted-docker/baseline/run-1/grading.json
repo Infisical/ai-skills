@@ -1,0 +1,8 @@
+{"assertions":[
+  {"id":"encryption-key","text":"ENCRYPTION_KEY hex 16-byte with openssl command","passed":false,"evidence":"Has ENCRYPTION_KEY but says 32-character hex, does not mention openssl rand -hex 16"},
+  {"id":"auth-secret","text":"AUTH_SECRET base64 32-byte with openssl command","passed":false,"evidence":"Has AUTH_SECRET but no generation command provided"},
+  {"id":"db-connection","text":"DB_CONNECTION_URI for PostgreSQL","passed":true,"evidence":"DB_CONNECTION_URI: postgres://... present"},
+  {"id":"redis-url","text":"REDIS_URL","passed":true,"evidence":"REDIS_URL: redis://... present"},
+  {"id":"site-url","text":"SITE_URL with protocol","passed":true,"evidence":"SITE_URL: ${SITE_URL:-https://infisical.example.com}"},
+  {"id":"key-warning","text":"Warns about ENCRYPTION_KEY backup","passed":false,"evidence":"No explicit warning about backup or unrecoverable key loss"}
+],"score":3,"max_score":8}
