@@ -7,14 +7,20 @@ This guide covers all environment variables used to configure Infisical self-hos
 ### ENCRYPTION_KEY
 **Required** – Master encryption key for all secrets at rest.
 
-- **Format**: 16 bytes as hex (32 hex characters)
-- **Example**: `a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8`
-- **Generation**: `openssl rand -hex 16`
+**The format depends on whether FIPS mode is enabled.**
+
+| Mode | Format | Generation |
+|------|--------|-----------|
+| Standard | 16-byte hex string (32 hex chars) | `openssl rand -hex 16` |
+| **FIPS-enabled** | **256-bit base64-encoded key** | `openssl rand -base64 32` |
+
+- **Standard example**: `a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8`
 - **Critical Notes**:
   - Cannot be recovered if lost
   - Must be stable across deployments and upgrades
   - Rotate using Infisical's key rotation procedures (enterprise feature)
   - Back up securely in a separate location
+  - Do not carry a hex key into a FIPS deployment — generate a base64 256-bit key instead
 
 ### AUTH_SECRET
 **Required** – Secret key for signing session tokens and JWTs.
@@ -65,16 +71,71 @@ Optional – JSON array of read-only database replicas.
 
 ## Redis Configuration
 
+Redis is a **required, persistent datastore** — not merely a cache. It holds the background job
+queue, distributed locks, cross-instance coordination state for scheduled jobs, and rate-limit
+counters. A running instance is degraded for as long as Redis is unreachable.
+
+**The instance will not start unless exactly one of these is set:** `REDIS_URL`,
+`REDIS_SENTINEL_HOSTS`, or `REDIS_CLUSTER_HOSTS`. All three topologies are supported —
+standalone, Sentinel, and Cluster.
+
 ### REDIS_URL
-**Required** – Redis connection string.
+Redis connection string — the standalone option.
 
 - **Format**: `redis://[:password@]host:port[/db]` or `rediss://...` for TLS
 - **Examples**:
   - Standard: `redis://redis.example.com:6379`
   - With auth: `redis://:password@redis.example.com:6379`
   - TLS: `rediss://redis.example.com:6380`
-- **Requirements**: Redis 6.2 or newer
-- **Important**: Redis Cluster mode is NOT supported; use standalone or Sentinel
+- **Requirements**: Redis 6.x or 7.x; at least 6.2 is advised
+
+### Redis Cluster
+
+#### REDIS_CLUSTER_HOSTS
+Comma-separated list of Redis Cluster `host:port` pairs.
+
+- **Example**: `192.168.65.254:26379,192.168.65.254:26380`
+
+#### REDIS_CLUSTER_ENABLE_TLS
+Enable TLS on the cluster connection.
+
+- **Format**: `true` or `false`
+- **Default**: `false`
+
+#### REDIS_CLUSTER_AWS_ELASTICACHE_DNS_LOOKUP_MODE
+DNS lookup mode for AWS ElastiCache cluster endpoints.
+
+- **Default**: `false`
+
+### TLS with a private CA
+
+If your Redis server uses a certificate signed by a private CA or a self-signed certificate, point
+`NODE_EXTRA_CA_CERTS` at the CA file:
+
+```bash
+REDIS_URL=rediss://your-redis-host:6379
+NODE_EXTRA_CA_CERTS=/path/to/ca.crt
+```
+
+For Sentinel or Cluster, enable TLS with `REDIS_SENTINEL_ENABLE_TLS` or
+`REDIS_CLUSTER_ENABLE_TLS` respectively.
+
+### Required Redis server settings
+
+These are configured on the Redis server itself, not via Infisical environment variables:
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| `maxmemory-policy` | `noeviction` | **Required.** Redis holds queue and coordination state; evicting keys under memory pressure would silently drop work |
+| Persistence | AOF, or RDB snapshots at minimum | Pending secret rotations, syncs, and webhook deliveries live in Redis — a Redis that returns empty loses them |
+
+Include Redis in your backup strategy, and give it the same availability target as the Infisical
+instances themselves. A single unreplicated Redis is a single point of failure for the whole
+deployment.
+
+Sizing is modest: 2 vCPU, 4 GB RAM, and a 30 GB SSD suffices for small deployments.
+
+An **active-passive** setup is recommended. Active-active has not been tested.
 
 ### Redis Sentinel (High Availability)
 
@@ -207,16 +268,26 @@ License key for Infisical Enterprise features.
 - **Format**: Provided by Infisical upon enterprise subscription
 - **Features Enabled**: SAML, RBAC advanced features, audit logs, IP allowlisting, etc.
 
-## FIPS 140-2 Compliance
+## FIPS 140-3 Compliance
 
-FIPS mode is enabled using the `infisical/infisical:latest-fips` image with additional Node.js configuration.
+Infisical is compliant with **FIPS 140-3**, using validated cryptographic modules for all
+encryption operations within the FIPS boundary.
+
+FIPS mode requires the **separate `infisical/infisical-fips` Docker image** — an Enterprise-only
+image on its own Docker Hub repository. It is not a tag on the standard `infisical/infisical`
+repository.
+
+```bash
+docker pull infisical/infisical-fips
+```
 
 ### FIPS_ENABLED
-Enable FIPS 140-2 mode.
+Enable FIPS 140-3 mode.
 
 - **Format**: `true` or `false`
 - **Default**: `false`
-- **Requirement**: Must use `infisical/infisical:latest-fips` image
+- **Requirement**: Must use the `infisical/infisical-fips` image
+- **Also required**: `ENCRYPTION_KEY` must be a 256-bit base64 key (`openssl rand -base64 32`), not the standard hex format
 
 ### NODE_OPTIONS
 Node.js runtime options for FIPS compliance.
@@ -267,17 +338,21 @@ Allow connections to internal IP addresses (useful for Kubernetes).
 
 ## Summary: Minimal Configuration
 
-For a minimal production deployment, these environment variables are required:
+A minimal self-hosted instance needs at least `ENCRYPTION_KEY`, `AUTH_SECRET`,
+`DB_CONNECTION_URI`, and `REDIS_URL` defined. Add `SITE_URL` and SMTP for a usable production
+deployment:
 
 ```bash
-# Security
-ENCRYPTION_KEY="<16-byte-hex>"
+# Security — generate with:
+#   openssl rand -hex 16     (standard)
+#   openssl rand -base64 32  (FIPS mode, and for AUTH_SECRET)
+ENCRYPTION_KEY="<16-byte-hex>"        # 256-bit base64 if FIPS_ENABLED=true
 AUTH_SECRET="<base64-32-byte>"
 
-# Database
+# Database (PostgreSQL 14+; tested on 16)
 DB_CONNECTION_URI="postgresql://user:pass@host:5432/infisical"
 
-# Redis
+# Redis — required; server must have maxmemory-policy=noeviction
 REDIS_URL="redis://host:6379"
 
 # Web

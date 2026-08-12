@@ -12,19 +12,24 @@ GET /api/v4/secrets
 
 ### Query Parameters
 
-| Parameter | Type | Required | Default | Max | Description |
-|-----------|------|----------|---------|-----|-------------|
-| projectId | string | Yes | - | - | ID of the project |
-| environment | string | Yes | - | - | Environment slug (e.g., "dev", "prod") |
-| secretPath | string | No | "/" | - | Secret folder path (e.g., "/database", "/") |
-| offset | integer | No | 0 | - | Number of items to skip for pagination |
-| limit | integer | No | 20 | 100 | Number of items to return per page |
-| viewSecretValue | boolean | No | false | - | Include plaintext secret values in response |
-| expandSecretReferences | boolean | No | false | - | Expand secret references (e.g., `${OTHER_SECRET}`) |
-| recursive | boolean | No | false | - | Include secrets from all subdirectories |
-| includeImports | boolean | No | false | - | Include secrets from imported secret environments |
-| tagSlugs | string | No | - | - | Comma-separated tag slugs to filter by |
-| metadataFilter | string | No | - | - | JSON filter for metadata-based search |
+**This endpoint is not paginated.** It returns every secret at the requested path and accepts
+no `offset` or `limit`.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| projectId | string | Yes | - | ID of the project |
+| environment | string | Yes | - | Environment slug (e.g., "dev", "prod") |
+| secretPath | string | No | "/" | Secret folder path (e.g., "/database", "/") |
+| viewSecretValue | boolean | No | **true** | Return plaintext values; `false` hides them |
+| expandSecretReferences | boolean | No | **true** | Expand secret references (e.g., `${OTHER_SECRET}`) |
+| recursive | boolean | No | false | Include secrets from all subdirectories |
+| includeImports | boolean | No | **true** | Include secrets from imported environments |
+| includePersonalOverrides | boolean | No | false | Include personal secret overrides |
+| tagSlugs | string | No | - | Comma-separated tag slugs to filter by |
+| metadataFilter | string | No | - | `key=k1,value=v1\|key=k2,value=v2` — max 10 pairs |
+
+Note `viewSecretValue`, `expandSecretReferences`, and `includeImports` default to **true**, not
+false.
 
 ### Response
 
@@ -33,15 +38,18 @@ GET /api/v4/secrets
   "secrets": [
     {
       "id": "secret-id-uuid",
+      "_id": "secret-id-uuid",
       "version": 1,
-      "workspace": "workspace-id",
-      "project": "project-id",
+      "workspace": "project-id",
       "environment": "dev",
       "secretPath": "/",
-      "secretName": "DATABASE_URL",
+      "secretKey": "DATABASE_URL",
       "secretValue": "postgres://user:pass@localhost/db",
+      "secretValueHidden": false,
       "secretComment": "Production database connection",
       "type": "shared",
+      "skipMultilineEncoding": false,
+      "secretMetadata": [],
       "tags": [
         {
           "id": "tag-id",
@@ -51,20 +59,34 @@ GET /api/v4/secrets
         }
       ],
       "createdAt": "2026-04-16T10:30:00.000Z",
-      "updatedAt": "2026-04-16T10:30:00.000Z",
-      "createdBy": "user-id"
+      "updatedAt": "2026-04-16T10:30:00.000Z"
     }
   ],
-  "total": 42,
-  "offset": 0,
-  "limit": 20
+  "imports": [
+    {
+      "secretPath": "/shared",
+      "environment": "dev",
+      "secrets": []
+    }
+  ]
 }
 ```
+
+Key points on the shape:
+- The secret's key field is **`secretKey`**, not `secretName`
+- The project field is **`workspace`**; there is no `project` field
+- There is no `total`, `offset`, `limit`, or `items` key
+- `imports` is present when `includeImports` is on
+- May return **304 Not Modified** with an empty body on a conditional request
 
 ### Example
 
 ```bash
-curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&offset=0&limit=20&viewSecretValue=true' \
+curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Include subfolders, hide values (key names only)
+curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&recursive=true&viewSecretValue=false' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -83,6 +105,11 @@ GET /api/v4/secrets/{secretName}
 | projectId | string | Yes | - | ID of the project |
 | environment | string | Yes | - | Environment slug |
 | secretPath | string | No | "/" | Secret folder path |
+| type | string | No | `shared` | `shared` or `personal` |
+| version | integer | No | - | Fetch a specific historical version |
+| viewSecretValue | boolean | No | **true** | Return plaintext value; `false` hides it |
+| expandSecretReferences | boolean | No | **true** | Expand `${OTHER_SECRET}` references |
+| includeImports | boolean | No | **true** | Resolve the secret through imports if not found locally |
 
 ### Response
 
@@ -90,19 +117,19 @@ GET /api/v4/secrets/{secretName}
 {
   "secret": {
     "id": "secret-id-uuid",
+    "_id": "secret-id-uuid",
     "version": 1,
-    "workspace": "workspace-id",
-    "project": "project-id",
+    "workspace": "project-id",
     "environment": "dev",
     "secretPath": "/",
-    "secretName": "API_KEY",
+    "secretKey": "API_KEY",
     "secretValue": "sk_live_abc123def456ghi789",
+    "secretValueHidden": false,
     "secretComment": "Third-party API key",
     "type": "shared",
-    "tags": [],
+    "skipMultilineEncoding": false,
     "createdAt": "2026-04-16T10:30:00.000Z",
-    "updatedAt": "2026-04-16T10:30:00.000Z",
-    "createdBy": "user-id"
+    "updatedAt": "2026-04-16T10:30:00.000Z"
   }
 }
 ```
@@ -132,7 +159,10 @@ POST /api/v4/secrets/{secretName}
 | secretValue | string | Yes | The secret value (plaintext) |
 | type | string | No | "shared" or "personal" (default: "shared") |
 | tagIds | array | No | List of tag IDs to attach |
-| secretComment | string | No | Comment/description for the secret |
+| secretComment | string | No | Comment/description for the secret (default: "") |
+| secretMetadata | array | No | Key/value metadata pairs attached to the secret |
+
+The secret's key comes from the `{secretName}` path segment, not the body.
 
 ### Response
 
@@ -140,22 +170,24 @@ POST /api/v4/secrets/{secretName}
 {
   "secret": {
     "id": "secret-id-uuid",
+    "_id": "secret-id-uuid",
     "version": 1,
-    "workspace": "workspace-id",
-    "project": "project-id",
+    "workspace": "project-id",
     "environment": "dev",
     "secretPath": "/",
-    "secretName": "NEW_SECRET",
+    "secretKey": "NEW_SECRET",
     "secretValue": "super-secret-value",
     "secretComment": "My new secret",
     "type": "shared",
-    "tags": [],
     "createdAt": "2026-04-16T10:30:00.000Z",
-    "updatedAt": "2026-04-16T10:30:00.000Z",
-    "createdBy": "user-id"
+    "updatedAt": "2026-04-16T10:30:00.000Z"
   }
 }
 ```
+
+If the project has a secret approval policy covering this path, the response is instead
+`{ "approval": { ... } }` and no secret is written until the request is approved. Handle both
+shapes.
 
 ### Example
 
@@ -191,10 +223,15 @@ PATCH /api/v4/secrets/{secretName}
 | secretValue | string | No | New secret value |
 | secretComment | string | No | Updated comment/description |
 | tagIds | array | No | Updated list of tag IDs |
+| secretMetadata | array | No | Replacement key/value metadata pairs |
+| newSecretName | string | No | Rename the secret |
+| skipMultilineEncoding | boolean | No | Toggle multiline encoding |
+| type | string | No | "shared" or "personal" (default: "shared") |
 
 ### Response
 
-Same as Create Secret response.
+Same as Create Secret response — including the `{ "approval": { ... } }` variant when a secret
+approval policy applies.
 
 ### Example
 
@@ -207,6 +244,19 @@ curl -X PATCH 'https://us.infisical.com/api/v4/secrets/DATABASE_PASSWORD' \
     "environment": "dev",
     "secretPath": "/",
     "secretValue": "new-secure-password"
+  }'
+```
+
+Renaming a secret uses `newSecretName` while the path segment stays the current name:
+
+```bash
+curl -X PATCH 'https://us.infisical.com/api/v4/secrets/OLD_NAME' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectId": "abc123",
+    "environment": "dev",
+    "newSecretName": "NEW_NAME"
   }'
 ```
 
@@ -232,7 +282,11 @@ DELETE /api/v4/secrets/{secretName}
 {
   "secret": {
     "id": "secret-id-uuid",
-    "secretName": "DELETED_SECRET"
+    "secretKey": "DELETED_SECRET",
+    "workspace": "project-id",
+    "environment": "dev",
+    "version": 3,
+    "type": "shared"
   }
 }
 ```
@@ -244,43 +298,42 @@ curl -X DELETE 'https://us.infisical.com/api/v4/secrets/OLD_SECRET?projectId=abc
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## Batch Delete Secrets
+## Batch Create / Update / Delete Secrets
 
-### Endpoint
+### Endpoints
 
 ```
+POST   /api/v4/secrets/batch
+PATCH  /api/v4/secrets/batch
 DELETE /api/v4/secrets/batch
 ```
 
-### Request Body
+All three take a `secrets` **array of objects**, keyed by `secretKey`. There is no `secretIds`
+field.
 
-```json
-{
-  "projectId": "string",
-  "environment": "string",
-  "secretPath": "string",
-  "secretIds": ["uuid1", "uuid2", "uuid3"]
-}
+### Batch create
+
+```bash
+curl -X POST 'https://us.infisical.com/api/v4/secrets/batch' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectId": "abc123",
+    "environment": "dev",
+    "secretPath": "/",
+    "secrets": [
+      { "secretKey": "SECRET_1", "secretValue": "value1", "secretComment": "first" },
+      { "secretKey": "SECRET_2", "secretValue": "value2" }
+    ]
+  }'
 ```
 
-### Response
+Per-secret fields: `secretKey` (required), `secretValue` (required), `secretComment`,
+`tagIds`, `secretMetadata`.
 
-```json
-{
-  "deletedSecrets": [
-    {
-      "id": "uuid1",
-      "secretName": "SECRET_1"
-    },
-    {
-      "id": "uuid2",
-      "secretName": "SECRET_2"
-    }
-  ]
-}
-```
+### Batch delete
 
-### Example
+Identify secrets by key, not ID:
 
 ```bash
 curl -X DELETE 'https://us.infisical.com/api/v4/secrets/batch' \
@@ -290,9 +343,37 @@ curl -X DELETE 'https://us.infisical.com/api/v4/secrets/batch' \
     "projectId": "abc123",
     "environment": "dev",
     "secretPath": "/",
-    "secretIds": ["id1-uuid", "id2-uuid"]
+    "secrets": [
+      { "secretKey": "SECRET_1" },
+      { "secretKey": "SECRET_2" }
+    ]
   }'
 ```
+
+### Response
+
+```json
+{
+  "secrets": [
+    { "id": "uuid1", "secretKey": "SECRET_1", "workspace": "project-id", "environment": "dev" },
+    { "id": "uuid2", "secretKey": "SECRET_2", "workspace": "project-id", "environment": "dev" }
+  ]
+}
+```
+
+As with single-secret writes, a project with a secret approval policy returns
+`{ "approval": { ... } }` instead.
+
+## Other Secret Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/v4/secrets/id/{secretId}` | Fetch a secret by its UUID instead of its key |
+| `POST /api/v4/secrets/move` | Move secrets between folders or environments |
+| `POST /api/v4/secrets/duplicate` | Copy secrets to another folder or environment |
+| `GET /api/v4/secrets/{secretName}/secret-reference-tree` | Inspect what a secret's references resolve to |
+| `GET /api/v4/secrets/{secretName}/reference-dependency-tree` | Inspect which secrets depend on this one |
+| `POST /api/v4/secrets/backfill-secret-references` | Rebuild the reference index for a project |
 
 ## Important Notes
 
@@ -327,12 +408,18 @@ curl -X DELETE 'https://us.infisical.com/api/v4/secrets/batch' \
 
 ### Pagination
 
-- Always specify `offset` and `limit` for predictable results
-- Default limit is 20; maximum is 100
-- Use `total` to determine remaining items: `hasMore = (offset + limit) < total`
+- **There is no pagination on `/api/v4/secrets`.** `offset` and `limit` are not accepted and have
+  no effect. The endpoint returns every secret at the requested path in one response.
+- To reduce the result set, scope with `secretPath`, keep `recursive=false`, or filter with
+  `tagSlugs` / `metadataFilter`.
+- Pagination does exist on other collection endpoints (identities, memberships, certificates),
+  which return `{ <resource>: [...], "totalCount": n }`. See
+  [Pagination and Rate Limits](./pagination-and-rate-limits.md).
 
 ### Performance
 
-- For listing many secrets (>1000), use pagination with `limit=100`
-- Avoid `viewSecretValue=true` on large lists unless values are needed
-- Use `recursive=false` by default for better performance
+- Set `viewSecretValue=false` when you only need key names
+- Keep `recursive=false` unless you genuinely need subfolders — recursive reads across a deep
+  tree are the main cost driver on this endpoint
+- Set `expandSecretReferences=false` if you don't need `${SECRET}` resolution
+- Use the `/batch` endpoints for writes; secret endpoints share a single `secretsLimit` quota

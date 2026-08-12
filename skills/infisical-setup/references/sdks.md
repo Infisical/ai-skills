@@ -6,14 +6,19 @@ All SDKs cache secrets and fall back to cached values if requests fail. If no ca
 
 ## Quick reference
 
+There are **nine** official SDKs.
+
 | Language | Package | Min version |
 |----------|---------|-------------|
-| Node.js | `@infisical/sdk` | Node 20+ (v5+) |
+| Node.js | `@infisical/sdk` | Node 20+ (v5+); Node 14+ on v4 |
 | Python | `infisicalsdk` | Python 3.7+ |
 | Go | `github.com/infisical/go-sdk` | Go 1.19+ |
 | Java | `com.infisical:sdk` | Java 11+ |
 | .NET | `Infisical.Sdk` | .NET 6+ |
-| Ruby | `infisical-sdk` | Ruby 2.7+ |
+| Ruby | `infisical-sdk` (require `"infisical"`) | Ruby 3.0.0+ |
+| PHP | `infisical/php-sdk` (Composer) | — |
+| Rust | `infisical` (crates.io) | — |
+| C++ | `Infisical/infisical-cpp-sdk` (CMake) | C++17+ (GCC 8+/clang 3.8+) |
 
 ## Node.js
 
@@ -58,7 +63,9 @@ await client.secrets().createSecret({
 });
 ```
 
-Also supports: `updateSecret`, `deleteSecret`, dynamic secrets (leases), KMS encrypt/decrypt.
+The Node SDK is the most complete. Its method categories are: `auth`, `secrets`,
+`dynamicSecrets` (including `dynamicSecrets().leases`), `projects`, `environments`, `folders`,
+and `kms` (key management, encryption, and signing).
 
 ## Python
 
@@ -191,29 +198,167 @@ var secrets = await client.Secrets().ListAsync(new ListSecretsOptions {
 
 ## Ruby
 
+Requires Ruby 3.0.0 or higher.
+
 ```bash
 gem install infisical-sdk
 ```
 
+Or in a Gemfile: `gem "infisical-sdk"`
+
+Note the gem is named `infisical-sdk` but the **require path is `"infisical"`**:
+
 ```ruby
-require 'infisical-sdk'
+require "infisical"
 
-client = InfisicalSDK::InfisicalClient.new('https://app.infisical.com')
-
-client.auth.universal_auth(
-    client_id: 'CLIENT_ID',
-    client_secret: 'CLIENT_SECRET'
+client = Infisical::Client.new(
+  site_url: "https://app.infisical.com" # Optional, defaults to https://app.infisical.com
 )
 
+client.auth.universal_auth_login(
+  client_id: ENV.fetch("INFISICAL_CLIENT_ID"),
+  client_secret: ENV.fetch("INFISICAL_CLIENT_SECRET")
+)
+
+# Secret name is the first POSITIONAL argument, not a keyword
 secret = client.secrets.get(
-    secret_name: 'API_KEY',
-    project_id: '<project-id>',
-    environment: 'prod'
+  "API_KEY",
+  project_id: "<project-id>",
+  environment: "prod"
 )
 puts secret.secret_value
+
+# List secrets
+secrets = client.secrets.list(
+  project_id: "<project-id>",
+  environment: "dev",
+  secret_path: "/"
+)
 ```
 
-Cache default: 5 minutes. Set to 0 to disable.
+Client options: `site_url` and `timeout` (seconds, default 10).
+
+Other methods: `client.secrets.create(name, value, opts)`, `client.secrets.update(name, opts)`,
+`client.secrets.delete(name, opts)`. A missing secret raises `Infisical::NotFoundError`.
+
+**Common mistakes to avoid:**
+- `require 'infisical-sdk'` — wrong, it is `require "infisical"`
+- `InfisicalSDK::InfisicalClient.new(...)` — wrong, it is `Infisical::Client.new(site_url:)`
+- `client.auth.universal_auth(...)` — wrong, it is `universal_auth_login(...)`
+- `client.secrets.get(secret_name: "X", ...)` — wrong, the name is positional
+
+## PHP
+
+```bash
+composer require infisical/php-sdk
+```
+
+```php
+<?php
+
+use Infisical\SDK\InfisicalSDK;
+
+$sdk = new InfisicalSDK('https://app.infisical.com');
+
+$sdk->auth()->universalAuth()->login(
+    "your-machine-identity-client-id",
+    "your-machine-identity-client-secret"
+);
+
+$params = new \Infisical\SDK\Models\ListSecretsParameters(
+    environment: "dev",
+    secretPath: "/",
+    projectId: "your-project-id"
+);
+
+$secrets = $sdk->secrets()->list($params);
+```
+
+Covers `auth` and `secrets`.
+
+## Rust
+
+```bash
+cargo add infisical
+```
+
+```rust
+use infisical::{AuthMethod, Client, InfisicalError};
+use infisical::secrets::GetSecretRequest;
+
+async fn fetch_secret() -> Result<(), InfisicalError> {
+    let mut client = Client::builder()
+        .base_url("https://app.infisical.com") // Optional
+        .build()
+        .await?;
+
+    let auth_method = AuthMethod::new_universal_auth("<client-id>", "<client-secret>");
+    client.login(auth_method).await?;
+
+    // Required params go to builder(); optional ones are builder methods
+    let request = GetSecretRequest::builder("API_KEY", "<project-id>", "dev")
+        .path("/")
+        .build();
+
+    let secret = client.secrets().get(request).await?;
+    println!("Fetched key: {}", secret.secret_key);
+
+    Ok(())
+}
+```
+
+Builder pattern for both the client and each request.
+
+## C++
+
+Compatible with C++17 and later. Depends on `cURL` and OpenSSL. Install via CMake
+`FetchContent`:
+
+```cmake
+FetchContent_Declare(
+  infisical
+  GIT_REPOSITORY https://github.com/Infisical/infisical-cpp-sdk.git
+  GIT_TAG 1.0.0 # Replace with the desired version
+)
+FetchContent_MakeAvailable(infisical)
+
+target_link_libraries(my_app PRIVATE infisical OpenSSL::SSL OpenSSL::Crypto)
+target_include_directories(my_app PRIVATE ${infisical_SOURCE_DIR}/include)
+```
+
+```cpp
+#include <iostream>
+#include <libinfisical/InfisicalClient.h>
+
+int main() {
+  try {
+    Infisical::InfisicalClient client(
+        Infisical::ConfigBuilder()
+            .withHostUrl("https://app.infisical.com")
+            .withAuthentication(
+                Infisical::AuthenticationBuilder()
+                    .withUniversalAuth("<client-id>", "<client-secret>")
+                    .build())
+            .build());
+
+    const auto options = Infisical::Input::GetSecretOptionsBuilder()
+                             .withEnvironment("dev")
+                             .withProjectId("<project-id>")
+                             .withSecretKey("API_KEY")
+                             .build();
+
+    const auto secret = client.secrets().getSecret(options);
+    std::cout << secret.getSecretKey() << std::endl;
+  } catch (const Infisical::InfisicalError &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
+  return 0;
+}
+```
+
+Everything lives in the `Infisical` namespace and uses a builder pattern for all input. Values
+are returned as classes with getter methods.
 
 ## When to use SDK vs. CLI
 
@@ -229,14 +374,21 @@ Cache default: 5 minutes. Set to 0 to disable.
 
 ## Auth method availability by SDK
 
-All SDKs support Universal Auth. Cloud-native auth varies:
+All nine SDKs support Universal Auth. Cloud-native auth varies — the Go SDK has the broadest
+coverage. Verify against the SDK's own docs before promising a method:
 
-| Auth method | Node | Python | Go | Java | .NET | Ruby |
-|------------|------|--------|-----|------|------|------|
-| Universal Auth | Yes | Yes | Yes | Yes | Yes | Yes |
-| AWS IAM | Yes | Yes | Yes | — | — | Yes |
-| GCP | — | — | Yes | — | — | Yes |
-| Azure | — | — | Yes | — | — | Yes |
-| Kubernetes | — | — | Yes | — | — | Yes |
-| OIDC | — | Yes | — | — | — | — |
-| LDAP | — | Yes | Yes | — | Yes | — |
+| Auth method | Node | Python | Go | Java | .NET | Ruby | PHP | Rust | C++ |
+|------------|------|--------|-----|------|------|------|-----|------|-----|
+| Universal Auth | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| AWS IAM | Yes | Yes | Yes | — | — | — | — | — | — |
+| GCP ID Token | — | — | Yes | — | — | — | — | — | — |
+| Azure | — | — | Yes | — | — | — | — | — | — |
+| Kubernetes | — | — | Yes | — | — | — | — | — | — |
+| JWT | — | — | Yes | — | — | — | — | — | — |
+| OCI | — | — | Yes | — | — | — | — | — | — |
+| OIDC | — | Yes | — | — | — | — | — | — | — |
+| LDAP | — | Yes | Yes | Yes | Yes | — | — | — | — |
+
+If a workload needs a platform-native auth method its SDK doesn't implement, use the CLI or the
+Infisical Agent instead, or authenticate against the REST API directly and pass the resulting
+access token to the SDK.

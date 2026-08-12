@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "agent-ssh-dynamic-secret-template",
+  "skill": "infisical-agent",
+  "skill_files": [
+    "SKILL.md",
+    "references/agent-config.md",
+    "references/template-functions.md"
+  ],
+  "prompt": "I have an SSH dynamic secret configured in Infisical named 'prod-ssh' in project 'my-project', env 'prod'. Write the Infisical Agent template that renders the signed SSH certificate and private key to disk, plus the agent config. I need to log in as the 'deploy' principal.",
+  "assertions": [
+    "Passes principals as the 6th argument to dynamicSecret",
+    "Renders PRIVATE_KEY and SIGNED_KEY fields",
+    "Uses YAML agent config with the infisical: root key",
+    "Uses destination-path for template output"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Recommends AliCloud Auth",
+      "passed": false,
+      "evidence": "MISSING required /AliCloud Auth|alicloud-auth|Alibaba Cloud Auth/"
+    },
+    {
+      "text": "Gives the correct login endpoint",
+      "passed": false,
+      "evidence": "MISSING required //api/v1/auth/alicloud-auth/login/"
+    },
+    {
+      "text": "Mentions Allowed ARNs as the configured allowlist",
+      "passed": false,
+      "evidence": "MISSING required /Allowed ARNs|allowed ARNs|ARNs/"
+    },
+    {
+      "text": "States there are 13 auth methods",
+      "passed": false,
+      "evidence": "MISSING required /\\b13\\b/"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "timing": {
+    "total_duration_seconds": 14.6
+  }
+}

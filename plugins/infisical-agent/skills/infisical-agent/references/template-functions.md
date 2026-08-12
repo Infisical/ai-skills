@@ -104,7 +104,7 @@ analytics_host = "{{ .Value }}"
 Create and auto-renew a dynamic secret lease. **Use for database credentials, cloud IAM tokens, etc.**
 
 ```
-dynamicSecret "<project-slug>" "<environment-slug>" "<secret-path>" "<dynamic-secret-name>" "<lease-ttl>"
+dynamicSecret "<project-slug>" "<environment-slug>" "<secret-path>" "<dynamic-secret-name>" "<lease-ttl>" "<optional-principals>"
 ```
 
 **Parameters:**
@@ -115,15 +115,17 @@ dynamicSecret "<project-slug>" "<environment-slug>" "<secret-path>" "<dynamic-se
 | secret-path | string | `/`, `/database`, etc. |
 | dynamic-secret-name | string | Name of the dynamic secret (e.g., `postgres-creds`) |
 | lease-ttl | string | Lease duration (e.g., `1m`, `1h`, `24h`) |
+| principals | string | Comma-separated principals. **Optional in general, but REQUIRED for SSH dynamic secrets.** Each must be in the dynamic secret's allowed-principals list |
 
 **Returns:** Object with keys specific to the dynamic secret type:
 - SQL databases: `DB_USERNAME`, `DB_PASSWORD`
 - AWS IAM: `ACCESS_KEY`, `SECRET_ACCESS_KEY`, `SESSION_TOKEN` (if temporary)
 - Redis: `DB_USERNAME`, `DB_PASSWORD`
+- SSH: `PRIVATE_KEY`, `SIGNED_KEY`
 
 **Key behaviors:**
 - Automatically renews credentials before expiration
-- Deduplication: Multiple templates with identical dynamic secret configs share one lease
+- Deduplication: Multiple templates with identical dynamic secret configs share one lease, and that same lease is written to every configured destination path
 - Revoked on shutdown if `revoke-credentials-on-shutdown: true`
 
 **Example — PostgreSQL credentials:**
@@ -142,6 +144,17 @@ REDIS_USER={{ .DB_USERNAME }}
 REDIS_PASS={{ .DB_PASSWORD }}
 {{ end }}
 ```
+
+**Example — SSH certificate (note the required 6th argument):**
+```go
+{{ with dynamicSecret "my-project" "dev" "/" "my-ssh-secret" "1h" "root,deploy" }}
+{{ .PRIVATE_KEY }}
+{{ .SIGNED_KEY }}
+{{- end }}
+```
+
+Omitting `principals` for an SSH dynamic secret fails the lease — it is only optional for the
+other provider types.
 
 ---
 

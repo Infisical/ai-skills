@@ -95,8 +95,14 @@ variable "infisical_machine_identity_id" {
 }
 
 provider "infisical" {
-  identity_id                   = var.infisical_machine_identity_id
-  token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id                     = var.infisical_machine_identity_id
+      token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+    }
+  }
 }
 ```
 
@@ -153,21 +159,27 @@ variable "infisical_workspace_id" {
 
 # main.tf
 provider "infisical" {
-  identity_id                   = var.infisical_machine_identity_id
-  token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id                     = var.infisical_machine_identity_id
+      token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+    }
+  }
 }
 
 # Fetch secrets without storing them in state
 ephemeral "infisical_secret" "db_password" {
+  name         = "DATABASE_PASSWORD"
   workspace_id = var.infisical_workspace_id
   env_slug     = "prod"
-  secret_key   = "DATABASE_PASSWORD"
 }
 
 ephemeral "infisical_secret" "api_key" {
+  name         = "API_KEY"
   workspace_id = var.infisical_workspace_id
   env_slug     = "prod"
-  secret_key   = "API_KEY"
 }
 
 # Use secrets in resource configuration
@@ -235,8 +247,14 @@ CircleCI also supports OIDC token generation. Configure it similarly:
 
 ```hcl
 provider "infisical" {
-  identity_id                   = var.infisical_machine_identity_id
-  token_environment_variable_name = "CIRCLE_OIDC_TOKEN"
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id                     = var.infisical_machine_identity_id
+      token_environment_variable_name = "CIRCLE_OIDC_TOKEN"
+    }
+  }
 }
 ```
 

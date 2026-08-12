@@ -1,0 +1,26 @@
+{
+  "eval_id": 7,
+  "eval_name": "dynamic-secrets-elasticache-tailscale",
+  "skill": "infisical-dynamic-secrets",
+  "skill_files": [
+    "SKILL.md",
+    "references/overview.md",
+    "references/nosql-and-cache.md",
+    "references/ssh-and-kubernetes.md"
+  ],
+  "prompt": "Does Infisical support dynamic secrets for AWS ElastiCache and for Tailscale? If so, what do I need to configure for each, and are there any restrictions I should know about with the Tailscale one?",
+  "assertions": [
+    "Confirms AWS ElastiCache is a supported provider",
+    "Confirms Tailscale is a supported provider",
+    "Notes ElastiCache needs creation/revocation statements and clusterName",
+    "Notes Tailscale blocks privilege-escalation scopes"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

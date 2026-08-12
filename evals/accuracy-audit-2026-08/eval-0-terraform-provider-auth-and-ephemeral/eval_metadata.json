@@ -1,0 +1,25 @@
+{
+  "eval_id": 0,
+  "eval_name": "terraform-provider-auth-and-ephemeral",
+  "skill": "infisical-terraform",
+  "skill_files": [
+    "SKILL.md",
+    "references/provider-setup.md",
+    "references/resources-and-data-sources.md"
+  ],
+  "prompt": "Using the Infisical Terraform provider, write a complete configuration that authenticates with a machine identity via Universal Auth and fetches a secret called DATABASE_PASSWORD from the prod environment so that the value never lands in Terraform state. Show the full HCL.",
+  "assertions": [
+    "Nests credentials inside an auth block (auth = { universal = { client_id, client_secret } })",
+    "Uses `name` as the ephemeral secret's key attribute, not `secret_key`",
+    "Uses an ephemeral resource (not a data source) so the value stays out of state",
+    "Declares the provider source as infisical/infisical"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

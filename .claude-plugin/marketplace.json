@@ -28,7 +28,7 @@
     {
       "name": "infisical-secret-syncs",
       "source": "./infisical-secret-syncs",
-      "description": "Guide for configuring Infisical Secret Syncs to push secrets to 38+ third-party services including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, and HashiCorp Vault.",
+      "description": "Guide for configuring Infisical Secret Syncs to push secrets to all 48 supported destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Snowflake, and Databricks.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -43,7 +43,7 @@
     {
       "name": "infisical-dynamic-secrets",
       "source": "./infisical-dynamic-secrets",
-      "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across 27 providers.",
+      "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across all 30 providers.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"

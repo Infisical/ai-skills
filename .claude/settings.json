@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/jakehulberg/Documents/infisical-ai-skills pull)"
+    ]
+  }
+}

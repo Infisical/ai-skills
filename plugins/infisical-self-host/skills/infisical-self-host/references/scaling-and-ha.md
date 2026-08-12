@@ -235,7 +235,22 @@ DB_READ_REPLICAS='[
 
 ## Redis High Availability
 
-Infisical supports Redis Sentinel for high availability. Cluster mode is NOT supported.
+Infisical supports three Redis topologies — standalone (`REDIS_URL`), Sentinel
+(`REDIS_SENTINEL_HOSTS`), and Cluster (`REDIS_CLUSTER_HOSTS`). Exactly one must be configured or
+the instance will not start.
+
+**Active-passive is the recommended setup.** Active-active has not been tested and may produce
+undocumented behavior.
+
+Because Redis holds the job queue, distributed locks, and coordination state — not just cache —
+treat it as a first-class availability dependency:
+
+- Set `maxmemory-policy` to **`noeviction`**. Required: evicting keys would silently drop queued work
+- Enable persistence (AOF, or RDB snapshots at minimum) and include Redis in backups
+- Give Redis the same availability target as the app tier; an unreplicated Redis is a single point of failure for the whole deployment
+
+Sentinel is the most common HA choice, covered below. For Cluster, set `REDIS_CLUSTER_HOSTS` to a
+comma-separated list of `host:port` pairs and optionally `REDIS_CLUSTER_ENABLE_TLS`.
 
 ### Redis Sentinel Setup
 

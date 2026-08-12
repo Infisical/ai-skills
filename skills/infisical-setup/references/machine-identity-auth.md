@@ -30,15 +30,20 @@ A machine identity is like an IAM User (AWS), Service Account (GCP), or Service 
 
 **Decision tree** — recommend based on the user's platform:
 
+There are **13** auth methods. Pick based on the user's platform:
+
 | Platform | Auth method | Why |
 |----------|------------|-----|
 | **AWS** (EC2, Lambda, ECS, Fargate, EKS) | AWS Auth | Zero-secret — uses IAM role, no credentials to manage |
 | **Kubernetes** | Kubernetes Auth | Zero-secret — uses pod service account token |
 | **GCP** (Compute, Cloud Run, GKE, Cloud Functions) | GCP Auth | Zero-secret — uses GCP identity token |
 | **Azure** (VMs, ACI, App Service, AKS) | Azure Auth | Zero-secret — uses managed identity |
+| **Alibaba Cloud** (ECS, ACK, Function Compute) | AliCloud Auth | Zero-secret — uses Alibaba Cloud RAM identity |
+| **Oracle Cloud** (OCI compute, OKE) | OCI Auth | Zero-secret — uses OCI instance/resource principal |
 | **GitHub Actions** | OIDC Auth | Zero-secret — uses GitHub's built-in OIDC token |
-| **GitLab CI** | OIDC Auth | Zero-secret — uses GitLab's CI_JOB_JWT |
-| **Any OIDC provider** | OIDC Auth | Zero-secret — uses provider's JWT |
+| **GitLab CI** | OIDC Auth | Zero-secret — uses GitLab's `id_tokens` |
+| **Any OIDC provider** | OIDC Auth | Zero-secret — uses provider's JWT, verified via discovery |
+| **Custom JWT issuer (non-OIDC)** | JWT Auth | Verifies a JWT against a static public key or JWKS endpoint |
 | **SPIFFE/SPIRE** | SPIFFE Auth | Zero-secret — uses JWT-SVID |
 | **mTLS environments** | TLS Cert Auth | Uses X.509 client certificate |
 | **Enterprise LDAP/AD** | LDAP Auth | Uses LDAP bind credentials |
@@ -109,6 +114,34 @@ For GCP workloads. Two modes:
 
 For Azure workloads with managed identities. Configure: Tenant ID, Resource, Allowed Service Principal IDs.
 
+### AliCloud Auth
+
+Authenticates an Alibaba Cloud RAM **user account**. The client signs a request with its
+Alibaba Cloud credentials; Infisical verifies the identity with Alibaba Cloud and then checks it
+against the configured allowlist.
+
+**Setup:**
+1. Add AliCloud Auth to the machine identity
+2. Configure **Allowed ARNs** — a comma-separated list of trusted Alibaba Cloud ARNs
+
+**Login endpoint:** `POST /api/v1/auth/alicloud-auth/login`
+
+### OCI Auth
+
+Authenticates an Oracle Cloud Infrastructure **user**. The client signs a
+`/20160918/users/{userId}` request with the OCI user's API signing private key (via the OCI SDK),
+then sends the signed headers plus the user OCID to Infisical, which verifies them with OCI.
+
+**Setup:**
+1. Add OCI Auth to the machine identity
+2. Configure **Tenancy OCID** — all authenticating users must belong to this tenancy
+3. Configure **Allowed Usernames** — a comma-separated list of trusted OCI users
+
+Note this is user/API-key based, not an instance-principal flow, so the OCI signing key does need
+to be available to the workload.
+
+**Login endpoint:** `POST /api/v1/auth/oci-auth/login`
+
 ### OIDC Auth
 
 For any OIDC-compliant provider (GitHub Actions, GitLab CI, custom IdPs). Verifies JWTs against the provider's discovery endpoint.
@@ -117,6 +150,25 @@ For any OIDC-compliant provider (GitHub Actions, GitLab CI, custom IdPs). Verifi
 1. Add OIDC Auth to the machine identity
 2. Configure: Discovery URL, Bound Issuer, Bound Audiences, Bound Subject, Bound Claims
 3. The workload sends its OIDC JWT to Infisical for verification
+
+### JWT Auth
+
+For custom JWT issuers that don't expose an OIDC discovery document. Infisical verifies the JWT
+signature against either a static public key you paste in or a JWKS endpoint you point it at,
+then enforces bound claims.
+
+**Setup:**
+1. Add JWT Auth to the machine identity
+2. Choose the verification source:
+   - **Static**: one or more PEM-encoded RSA or ECDSA public keys (include the BEGIN/END markers)
+   - **JWKS**: a JWKS URL serving the public keys. Infisical needs network access to this endpoint
+3. Configure: Bound Issuer, Bound Audiences, Bound Subject, Bound Claims
+
+**JWT Auth vs OIDC Auth:** use OIDC Auth when the issuer publishes a standard
+`.well-known/openid-configuration` discovery document. Use JWT Auth when it doesn't and you need
+to supply the key or JWKS URL yourself.
+
+**Login endpoint:** `POST /api/v1/auth/jwt-auth/login`
 
 ### Token Auth
 

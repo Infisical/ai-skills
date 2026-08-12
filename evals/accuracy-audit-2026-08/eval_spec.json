@@ -1,0 +1,253 @@
+{
+  "iteration": "accuracy-audit-2026-08",
+  "ground_truth_commit": "caa698e100",
+  "evals": [
+    {
+      "eval_id": 0,
+      "eval_name": "terraform-provider-auth-and-ephemeral",
+      "skill": "infisical-terraform",
+      "skill_files": ["SKILL.md", "references/provider-setup.md", "references/resources-and-data-sources.md"],
+      "prompt": "Using the Infisical Terraform provider, write a complete configuration that authenticates with a machine identity via Universal Auth and fetches a secret called DATABASE_PASSWORD from the prod environment so that the value never lands in Terraform state. Show the full HCL.",
+      "assertions": [
+        {
+          "text": "Nests credentials inside an auth block (auth = { universal = { client_id, client_secret } })",
+          "must_match": ["auth\\s*=?\\s*\\{[\\s\\S]{0,200}universal", "^ {4,}client_id\\s*="],
+          "must_not_match": ["^ {0,3}client_id\\s*="]
+        },
+        {
+          "text": "Uses `name` as the ephemeral secret's key attribute, not `secret_key`",
+          "must_match": ["ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?\\bname\\s*="],
+          "must_not_match": ["ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?secret_key\\s*="]
+        },
+        {
+          "text": "Uses an ephemeral resource (not a data source) so the value stays out of state",
+          "must_match": ["ephemeral\\s+\"infisical_secret\""],
+          "must_not_match": []
+        },
+        {
+          "text": "Declares the provider source as infisical/infisical",
+          "must_match": ["source\\s*=\\s*\"infisical/infisical\""],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "ruby-sdk-fetch-secret",
+      "skill": "infisical-setup",
+      "skill_files": ["SKILL.md", "references/sdks.md"],
+      "prompt": "Show me how to fetch a secret named API_KEY from the prod environment of my Infisical project using the official Ruby SDK. Include installation, client setup, authentication with a machine identity, and reading the value.",
+      "assertions": [
+        {
+          "text": "Requires the correct path: require \"infisical\" (not 'infisical-sdk')",
+          "must_match": ["require\\s+[\"']infisical[\"']"],
+          "must_not_match": ["require\\s+[\"']infisical-sdk[\"']"]
+        },
+        {
+          "text": "Instantiates Infisical::Client (not InfisicalSDK::InfisicalClient)",
+          "must_match": ["Infisical::Client\\.new"],
+          "must_not_match": ["InfisicalSDK::InfisicalClient"]
+        },
+        {
+          "text": "Calls universal_auth_login (not universal_auth)",
+          "must_match": ["universal_auth_login"],
+          "must_not_match": []
+        },
+        {
+          "text": "Passes the secret name positionally to secrets.get",
+          "must_match": ["secrets\\.get\\(\\s*[\"']API_KEY[\"']"],
+          "must_not_match": ["secrets\\.get\\([\\s\\S]{0,40}secret_name:"]
+        },
+        {
+          "text": "Installs the infisical-sdk gem",
+          "must_match": ["gem\\s+(install\\s+)?[\"']?infisical-sdk"],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "api-list-all-secrets",
+      "skill": "infisical-api",
+      "skill_files": ["SKILL.md", "references/secrets-endpoints.md", "references/pagination-and-rate-limits.md"],
+      "prompt": "I need to retrieve every secret in an Infisical project environment, including secrets in subfolders, using the REST API directly with curl. Show me the exact request and explain how to handle paging through large result sets.",
+      "assertions": [
+        {
+          "text": "Does not invent offset/limit pagination on /api/v4/secrets",
+          "must_match": [],
+          "must_not_match": ["v4/secrets\\?[^\"'\\s]*\\b(offset|limit)="]
+        },
+        {
+          "text": "States that the list-secrets endpoint is not paginated",
+          "must_match": ["not paginated|no pagination|isn't paginated|is not paginated|does not (support|use) pagination|returns (all|every)"],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses recursive=true to include subfolders",
+          "must_match": ["recursive=true|recursive[\"']?\\s*[:=]\\s*true"],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses the v4 endpoint",
+          "must_match": ["/api/v4/secrets"],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not claim the response has a `total` pagination field",
+          "must_match": [],
+          "must_not_match": ["\"total\"\\s*:"]
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "secret-sync-github-env-and-vercel",
+      "skill": "infisical-secret-syncs",
+      "skill_files": ["SKILL.md", "references/sync-overview.md", "references/github-vercel-cloudflare.md"],
+      "prompt": "Via the Infisical API, I want to create two secret syncs: one pushing to a GitHub repository *environment*'s secrets, and one pushing to a Vercel project. Give me the exact destination and options field values for each, including the initial sync behavior enum values.",
+      "assertions": [
+        {
+          "text": "Uses repository-environment as the GitHub environment scope value",
+          "must_match": ["repository-environment"],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses the correct initial sync behavior enum values (source/destination, not provider-named)",
+          "must_match": ["import-prioritize-(source|destination)|overwrite-destination"],
+          "must_not_match": ["import-prioritize-infisical|import-prioritize-vercel|import-prioritize-github"]
+        },
+        {
+          "text": "Notes GitHub cannot import (overwrite-destination only)",
+          "must_match": ["overwrite-destination"],
+          "must_not_match": []
+        },
+        {
+          "text": "Includes teamId for the Vercel sync",
+          "must_match": ["teamId"],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not use the long-form GitHub visibility values",
+          "must_match": [],
+          "must_not_match": ["all-repositories|private-repositories|selected-repositories"]
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "agent-ssh-dynamic-secret-template",
+      "skill": "infisical-agent",
+      "skill_files": ["SKILL.md", "references/agent-config.md", "references/template-functions.md"],
+      "prompt": "I have an SSH dynamic secret configured in Infisical named 'prod-ssh' in project 'my-project', env 'prod'. Write the Infisical Agent template that renders the signed SSH certificate and private key to disk, plus the agent config. I need to log in as the 'deploy' principal.",
+      "assertions": [
+        {
+          "text": "Passes principals as the 6th argument to dynamicSecret",
+          "must_match": ["dynamicSecret\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]*deploy[^\"]*\""],
+          "must_not_match": []
+        },
+        {
+          "text": "Renders PRIVATE_KEY and SIGNED_KEY fields",
+          "must_match": ["\\.PRIVATE_KEY", "\\.SIGNED_KEY"],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses YAML agent config with the infisical: root key",
+          "must_match": ["^\\s*infisical:"],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses destination-path for template output",
+          "must_match": ["destination-path"],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "self-host-fips-deployment",
+      "skill": "infisical-self-host",
+      "skill_files": ["SKILL.md", "references/environment-variables.md", "references/docker-deployment.md"],
+      "prompt": "I need to deploy a self-hosted Infisical instance in FIPS-compliant mode with Docker. Tell me which image to pull, which FIPS standard Infisical is compliant with, which environment variables to set, and exactly how to generate the encryption key.",
+      "assertions": [
+        {
+          "text": "Uses the separate infisical/infisical-fips image, not a :latest-fips tag",
+          "must_match": ["infisical/infisical-fips"],
+          "must_not_match": ["infisical/infisical:latest-fips|infisical:.*-fips\\b"]
+        },
+        {
+          "text": "States FIPS 140-3 (not 140-2)",
+          "must_match": ["FIPS 140-3"],
+          "must_not_match": ["FIPS 140-2"]
+        },
+        {
+          "text": "Generates ENCRYPTION_KEY as base64 256-bit for FIPS mode",
+          "must_match": ["openssl rand -base64 32"],
+          "must_not_match": []
+        },
+        {
+          "text": "Sets FIPS_ENABLED=true",
+          "must_match": ["FIPS_ENABLED"],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "alicloud-machine-identity-auth",
+      "skill": "infisical-setup",
+      "skill_files": ["SKILL.md", "references/machine-identity-auth.md"],
+      "prompt": "My workload runs on Alibaba Cloud. Which Infisical machine identity auth method should I use, what do I configure on the identity, and what is the login endpoint? Also, how many machine identity auth methods does Infisical support in total?",
+      "assertions": [
+        {
+          "text": "Recommends AliCloud Auth",
+          "must_match": ["AliCloud Auth|alicloud-auth|Alibaba Cloud Auth"],
+          "must_not_match": []
+        },
+        {
+          "text": "Gives the correct login endpoint",
+          "must_match": ["/api/v1/auth/alicloud-auth/login"],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions Allowed ARNs as the configured allowlist",
+          "must_match": ["Allowed ARNs|allowed ARNs|ARNs"],
+          "must_not_match": []
+        },
+        {
+          "text": "States there are 13 auth methods",
+          "must_match": ["\\b13\\b"],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "dynamic-secrets-elasticache-tailscale",
+      "skill": "infisical-dynamic-secrets",
+      "skill_files": ["SKILL.md", "references/overview.md", "references/nosql-and-cache.md", "references/ssh-and-kubernetes.md"],
+      "prompt": "Does Infisical support dynamic secrets for AWS ElastiCache and for Tailscale? If so, what do I need to configure for each, and are there any restrictions I should know about with the Tailscale one?",
+      "assertions": [
+        {
+          "text": "Confirms AWS ElastiCache is a supported provider",
+          "must_match": ["aws-elasticache|AWS ElastiCache"],
+          "must_not_match": ["(not|isn't|does not|doesn't) support(ed)?[^.]{0,40}ElastiCache"]
+        },
+        {
+          "text": "Confirms Tailscale is a supported provider",
+          "must_match": ["tailscale|Tailscale"],
+          "must_not_match": ["(not|isn't|does not|doesn't) support(ed)?[^.]{0,40}Tailscale"]
+        },
+        {
+          "text": "Notes ElastiCache needs creation/revocation statements and clusterName",
+          "must_match": ["creationStatement|creation statement"],
+          "must_not_match": []
+        },
+        {
+          "text": "Notes Tailscale blocks privilege-escalation scopes",
+          "must_match": ["blocked|block|escalat|not allowed|prohibit"],
+          "must_not_match": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Requires the correct path: require \"infisical\" (not 'infisical-sdk')",
+      "passed": false,
+      "evidence": "MISSING required /require\\s+[\"']infisical[\"']/ | FOUND forbidden /require\\s+[\"']infisical-sdk[\"']/ -> 'require \"infisical-sdk\"'"
+    },
+    {
+      "text": "Instantiates Infisical::Client (not InfisicalSDK::InfisicalClient)",
+      "passed": false,
+      "evidence": "MISSING required /Infisical::Client\\.new/ | OK absent /InfisicalSDK::InfisicalClient/"
+    },
+    {
+      "text": "Calls universal_auth_login (not universal_auth)",
+      "passed": false,
+      "evidence": "MISSING required /universal_auth_login/"
+    },
+    {
+      "text": "Passes the secret name positionally to secrets.get",
+      "passed": false,
+      "evidence": "MISSING required /secrets\\.get\\(\\s*[\"']API_KEY[\"']/ | OK absent /secrets\\.get\\([\\s\\S]{0,40}secret_name:/"
+    },
+    {
+      "text": "Installs the infisical-sdk gem",
+      "passed": true,
+      "evidence": "OK required /gem\\s+(install\\s+)?[\"']?infisical-sdk/ -> 'gem \"infisical-sdk'"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "timing": {
+    "total_duration_seconds": 64.9
+  }
+}

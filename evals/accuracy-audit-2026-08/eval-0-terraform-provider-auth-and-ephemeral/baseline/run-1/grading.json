@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Nests credentials inside an auth block (auth = { universal = { client_id, client_secret } })",
+      "passed": false,
+      "evidence": "MISSING required /auth\\s*=?\\s*\\{[\\s\\S]{0,200}universal/ | MISSING required /^ {4,}client_id\\s*=/ | OK absent /^ {0,3}client_id\\s*=/"
+    },
+    {
+      "text": "Uses `name` as the ephemeral secret's key attribute, not `secret_key`",
+      "passed": false,
+      "evidence": "MISSING required /ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?\\bname\\s*=/ | OK absent /ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?secret_key\\s*=/"
+    },
+    {
+      "text": "Uses an ephemeral resource (not a data source) so the value stays out of state",
+      "passed": false,
+      "evidence": "MISSING required /ephemeral\\s+\"infisical_secret\"/"
+    },
+    {
+      "text": "Declares the provider source as infisical/infisical",
+      "passed": false,
+      "evidence": "MISSING required /source\\s*=\\s*\"infisical/infisical\"/"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "timing": {
+    "total_duration_seconds": 75.9
+  }
+}

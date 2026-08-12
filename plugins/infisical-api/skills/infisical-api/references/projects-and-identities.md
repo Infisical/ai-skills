@@ -14,10 +14,12 @@ GET /api/v1/projects
 
 #### Query Parameters
 
-| Parameter | Type | Default | Max | Description |
-|-----------|------|---------|-----|-------------|
-| offset | integer | 0 | - | Number of items to skip |
-| limit | integer | 20 | 100 | Number of items to return |
+This endpoint is **not paginated**. It returns every project the caller can see.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| includeRoles | boolean | false | Include the caller's roles on each project |
+| type | string | - | Filter by project type: `secret-manager`, `cert-manager`, `kms`, `secret-scanning`, `pam` |
 
 #### Response
 
@@ -28,19 +30,27 @@ GET /api/v1/projects
       "id": "project-id-uuid",
       "name": "My Project",
       "slug": "my-project",
+      "environments": [
+        { "id": "env-id", "slug": "dev", "name": "Development" }
+      ],
       "createdAt": "2026-04-01T10:00:00.000Z",
       "updatedAt": "2026-04-16T10:30:00.000Z",
       "version": 1
     }
-  ],
-  "total": 5
+  ]
 }
 ```
+
+No `total` key — the array is complete.
 
 #### Example
 
 ```bash
-curl -X GET 'https://us.infisical.com/api/v1/projects?offset=0&limit=20' \
+curl -X GET 'https://us.infisical.com/api/v1/projects' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Only secret-manager projects, with roles
+curl -X GET 'https://us.infisical.com/api/v1/projects?type=secret-manager&includeRoles=true' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -208,26 +218,31 @@ curl -X GET 'https://us.infisical.com/api/v1/projects/abc123/environments' \
 
 Manage who has access to a project and their role.
 
-### List Project Members
+### List Project Users
 
 #### Endpoint
 
 ```
-GET /api/v1/projects/{projectId}/memberships
+GET /api/v1/projects/{projectId}/users
 ```
+
+The older `/api/v1/workspace/{workspaceId}/memberships` route is deprecated — use
+`/projects/{projectId}/users`.
 
 #### Query Parameters
 
-| Parameter | Type | Default | Max |
-|-----------|------|---------|-----|
-| offset | integer | 0 | - |
-| limit | integer | 20 | 100 |
+Not paginated.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| includeGroupMembers | boolean | false | Include users who have access via a group |
+| roles | string | - | Comma-separated role slugs to filter by |
 
 #### Response
 
 ```json
 {
-  "memberships": [
+  "users": [
     {
       "id": "membership-id",
       "projectId": "project-id",
@@ -236,17 +251,18 @@ GET /api/v1/projects/{projectId}/memberships
         "id": "user-id",
         "email": "user@example.com"
       },
-      "role": "admin"
+      "roles": [{ "role": "admin" }]
     }
-  ],
-  "total": 3
+  ]
 }
 ```
+
+The envelope key is `users`, and there is no `total`.
 
 #### Example
 
 ```bash
-curl -X GET 'https://us.infisical.com/api/v1/projects/abc123/memberships' \
+curl -X GET 'https://us.infisical.com/api/v1/projects/abc123/users?includeGroupMembers=true' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -256,41 +272,55 @@ Machine identities allow non-human accounts to authenticate and access secrets.
 
 ### List Identities
 
-#### Endpoint
+There are two relevant list endpoints. Pick based on scope:
 
-```
-GET /api/v1/identities
-```
-
-#### Query Parameters
-
-| Parameter | Type | Default | Max | Description |
-|-----------|------|---------|-----|-------------|
-| offset | integer | 0 | - | Number to skip |
-| limit | integer | 20 | 100 | Number to return |
+| Endpoint | Scope | Paginated |
+|----------|-------|-----------|
+| `GET /api/v1/organization/identities` | All identities in the org | Yes — `offset`, `limit` (default 20, max 1000) |
+| `GET /api/v1/projects/{projectId}/identities` | Identities attached to a project | Yes — `offset`, `limit` (default 20, max 1000) |
+| `GET /api/v1/identities?orgId={orgId}` | Org identity memberships | No — requires `orgId`, returns all |
 
 #### Response
+
+All three return the collection under `identities` plus a `totalCount`:
 
 ```json
 {
   "identities": [
     {
-      "id": "identity-id-uuid",
-      "name": "Production API",
+      "id": "membership-id",
+      "identity": {
+        "id": "identity-id-uuid",
+        "name": "Production API",
+        "hasDeleteProtection": false,
+        "authMethods": ["universal-auth"]
+      },
       "createdAt": "2026-04-01T10:00:00.000Z",
       "updatedAt": "2026-04-16T10:30:00.000Z"
     }
   ],
-  "total": 1
+  "totalCount": 1
 }
 ```
+
+The count field is `totalCount`, not `total`.
 
 #### Example
 
 ```bash
-curl -X GET 'https://us.infisical.com/api/v1/identities?offset=0&limit=20' \
+# Org-wide, paginated
+curl -X GET 'https://us.infisical.com/api/v1/organization/identities?offset=0&limit=100' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Scoped to a project
+curl -X GET 'https://us.infisical.com/api/v1/projects/abc123/identities?offset=0&limit=100' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+
+#### Search Identities
+
+For filtered lookups, `POST /api/v1/identities/search` accepts a JSON body with `offset`
+(default 0) and `limit` (default 50, max 100) plus a `search` filter object.
 
 ### Get Identity
 

@@ -1,6 +1,6 @@
 ---
 name: infisical-secret-syncs
-description: "Guide for configuring Infisical Secret Syncs to push secrets from Infisical to third-party services. Covers 38+ sync destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Cloudflare, and more. Use this skill when someone asks about: syncing secrets to AWS/GCP/Azure, pushing secrets to GitHub Actions, Vercel environment variables, secret sync setup, App Connections, mapping behavior, key schemas, or 'how do I get my Infisical secrets into [service]'."
+description: "Guide for configuring Infisical Secret Syncs to push secrets from Infisical to third-party services. Covers all 48 sync destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Cloudflare, Snowflake, Databricks, Railway, and more. Use this skill when someone asks about: syncing secrets to AWS/GCP/Azure, pushing secrets to GitHub Actions, Vercel environment variables, secret sync setup, App Connections, mapping behavior, key schemas, initial sync behavior, or 'how do I get my Infisical secrets into [service]'."
 ---
 
 # Infisical Secret Syncs Guide
@@ -30,8 +30,11 @@ Read the relevant reference file(s) for the user's destination, then walk them t
 ## Guiding principles
 
 - **App Connection first.** Every sync requires an App Connection with correct permissions. Verify this exists before configuring the sync.
-- **Recommend Key Schemas.** Always suggest using a key schema (e.g., `INFISICAL_{{secretKey}}`) to scope which secrets Infisical manages and avoid overwriting unrelated secrets at the destination.
+- **Use the exact API enum values.** UI labels and wire values differ. Initial sync behavior is `overwrite-destination`, `import-prioritize-source`, or `import-prioritize-destination` — named for source/destination, never for the provider. There is no `import-prioritize-infisical` or `import-prioritize-vercel`.
+- **Recommend Key Schemas.** Always suggest a key schema (e.g., `INFISICAL_{{secretKey}}`). It must contain exactly one `{{secretKey}}`; `{{environment}}` is optional. Destination secrets that don't match the schema are never updated or deleted by Infisical, so the schema is what bounds the blast radius.
 - **Infisical is the source of truth.** Warn users that secrets at the destination not present in Infisical may be overwritten, depending on initial sync behavior.
-- **Import when migrating.** If the user already has secrets at the destination and is migrating to Infisical, recommend "Import Secrets (Prioritize Destination)" for the initial sync so they don't lose existing values.
+- **Import when migrating.** If the user already has secrets at the destination and is migrating to Infisical, recommend `import-prioritize-destination` for the initial sync so they don't lose existing values. Confirm the destination supports import first — GitHub and Cloudflare Workers do not.
 - **Auto-sync is default.** Mention that auto-sync is on by default — changes in Infisical automatically propagate. They can disable it for manual-only syncing.
-- **Warn about provider quirks.** Azure Key Vault converts underscores to hyphens. GitHub doesn't support importing secrets. Vercel can't import sensitive env vars.
+- **Mapping behavior is AWS Secrets Manager only.** `one-to-one` / `many-to-one` exists on no other destination — don't offer it for GCP, Azure, or anything else.
+- **Warn about provider quirks.** Azure Key Vault converts underscores to hyphens. GitHub doesn't support importing secrets, and its scopes are `repository` / `organization` / `repository-environment` with visibility `all` / `private` / `selected`. Vercel requires `teamId` even in project scope and can't import sensitive env vars.
+- **48 destinations, and no Jenkins sync.** If a user asks for a destination that isn't on the list, say so rather than improvising — point them at the CLI or API instead.

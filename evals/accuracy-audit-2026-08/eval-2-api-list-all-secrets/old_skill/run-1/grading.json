@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Does not invent offset/limit pagination on /api/v4/secrets",
+      "passed": false,
+      "evidence": "FOUND forbidden /v4/secrets\\?[^\"'\\s]*\\b(offset|limit)=/ -> 'v4/secrets?projectId=PROJECT_ID&environment=dev&secretPath=/&recursive=true&viewSecretValue=true&off'"
+    },
+    {
+      "text": "States that the list-secrets endpoint is not paginated",
+      "passed": false,
+      "evidence": "MISSING required /not paginated|no pagination|isn't paginated|is not paginated|does not (support|use) pagination|returns (all|every)/"
+    },
+    {
+      "text": "Uses recursive=true to include subfolders",
+      "passed": true,
+      "evidence": "OK required /recursive=true|recursive[\"']?\\s*[:=]\\s*true/ -> 'recursive=true'"
+    },
+    {
+      "text": "Uses the v4 endpoint",
+      "passed": true,
+      "evidence": "OK required //api/v4/secrets/ -> '/api/v4/secrets'"
+    },
+    {
+      "text": "Does not claim the response has a `total` pagination field",
+      "passed": false,
+      "evidence": "FOUND forbidden /\"total\"\\s*:/ -> '\"total\":'"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "timing": {
+    "total_duration_seconds": 19.9
+  }
+}

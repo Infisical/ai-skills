@@ -1,0 +1,25 @@
+{
+  "eval_id": 1,
+  "eval_name": "ruby-sdk-fetch-secret",
+  "skill": "infisical-setup",
+  "skill_files": [
+    "SKILL.md",
+    "references/sdks.md"
+  ],
+  "prompt": "Show me how to fetch a secret named API_KEY from the prod environment of my Infisical project using the official Ruby SDK. Include installation, client setup, authentication with a machine identity, and reading the value.",
+  "assertions": [
+    "Requires the correct path: require \"infisical\" (not 'infisical-sdk')",
+    "Instantiates Infisical::Client (not InfisicalSDK::InfisicalClient)",
+    "Calls universal_auth_login (not universal_auth)",
+    "Passes the secret name positionally to secrets.get",
+    "Installs the infisical-sdk gem"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

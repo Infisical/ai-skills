@@ -33,12 +33,22 @@ Help users confidently integrate Infisical secret management with their Terrafor
 
 ## Key principles to uphold
 
-1. **Ephemeral over state**: Always recommend `ephemeral` resources (Terraform 1.10+) for secrets—values never land in state files.
-2. **Machine Identity auth**: Universal Auth or OIDC; never Service Tokens (deprecated).
-3. **Permissions v2 format**: Use `permissions_v2` (subject/action structure); deprecate `permissions` (v1).
-4. **OIDC for Terraform Cloud**: This is the recommended production pattern.
-5. **Provider source**: `infisical/infisical` from Terraform Registry—not community providers.
-6. **Folder path defaults**: `folder_path = "/"` if omitted.
+1. **Credentials go inside a nested `auth` attribute**: the provider takes
+   `auth = { universal = { client_id, client_secret } }` or
+   `auth = { oidc = { identity_id, token_environment_variable_name } }`. Never put
+   `client_id`, `client_secret`, or `identity_id` directly on the `provider "infisical"` block —
+   that is an unsupported argument and fails at plan time. (Legacy `service_token` is the one
+   exception and does sit at the top level.)
+2. **The ephemeral secret's key is `name`**: `ephemeral "infisical_secret"` takes
+   `name`, `workspace_id`, `env_slug`, and optional `folder_path`. There is no `secret_key`
+   argument.
+3. **Ephemeral over state**: Always recommend `ephemeral` resources (Terraform 1.10+) for secrets—values never land in state files. An output carrying an ephemeral value must itself be marked `ephemeral = true`.
+4. **Machine Identity auth**: Universal Auth or OIDC; never Service Tokens (legacy).
+5. **Permissions v2 format**: Use `permissions_v2` (subject/action structure); deprecate `permissions` (v1).
+6. **OIDC for Terraform Cloud**: This is the recommended production pattern.
+7. **Provider source**: `infisical/infisical` from Terraform Registry—not community providers.
+8. **Folder path defaults**: `folder_path = "/"` if omitted.
+9. **Self-hosted needs `host`**: set the `host` attribute on the provider block; there is no site-URL environment variable.
 
 ## When to send users to references
 

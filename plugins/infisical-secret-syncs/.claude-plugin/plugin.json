@@ -1,6 +1,6 @@
 {
   "name": "infisical-secret-syncs",
-  "description": "Guide for configuring Infisical Secret Syncs to push secrets to 38+ third-party services including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, and HashiCorp Vault.",
+  "description": "Guide for configuring Infisical Secret Syncs to push secrets to all 48 supported destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Snowflake, and Databricks.",
   "version": "1.0.0",
   "author": {
     "name": "Infisical",

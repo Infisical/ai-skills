@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Does not invent offset/limit pagination on /api/v4/secrets",
+      "passed": true,
+      "evidence": "OK absent /v4/secrets\\?[^\"'\\s]*\\b(offset|limit)=/"
+    },
+    {
+      "text": "States that the list-secrets endpoint is not paginated",
+      "passed": false,
+      "evidence": "MISSING required /not paginated|no pagination|isn't paginated|is not paginated|does not (support|use) pagination|returns (all|every)/"
+    },
+    {
+      "text": "Uses recursive=true to include subfolders",
+      "passed": true,
+      "evidence": "OK required /recursive=true|recursive[\"']?\\s*[:=]\\s*true/ -> 'recursive=true'"
+    },
+    {
+      "text": "Uses the v4 endpoint",
+      "passed": false,
+      "evidence": "MISSING required //api/v4/secrets/"
+    },
+    {
+      "text": "Does not claim the response has a `total` pagination field",
+      "passed": true,
+      "evidence": "OK absent /\"total\"\\s*:/"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "timing": {
+    "total_duration_seconds": 58.7
+  }
+}

@@ -14,15 +14,18 @@ The `ephemeral` resource is the **recommended way** to fetch secrets in Terrafor
 
 ```hcl
 ephemeral "infisical_secret" "example" {
+  name         = "DATABASE_PASSWORD"
   workspace_id = "your-workspace-id"
   env_slug     = "prod"
-  secret_key   = "DATABASE_PASSWORD"
   folder_path  = "/" # Optional, defaults to "/"
 }
 
+# Ephemeral values cannot be persisted, so an output carrying one must be
+# marked ephemeral too.
 output "db_password" {
   value     = ephemeral.infisical_secret.example.value
   sensitive = true
+  ephemeral = true
 }
 ```
 
@@ -30,11 +33,14 @@ output "db_password" {
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
+| `name` | string | Name (key) of the secret to retrieve |
 | `workspace_id` | string | ID of the Infisical workspace |
 | `env_slug` | string | Environment slug (e.g., "dev", "staging", "prod") |
-| `secret_key` | string | Name of the secret to retrieve |
 | `folder_path` | string | Path within the environment (optional, defaults to "/") |
 | `value` | string (computed) | The secret value (only available during apply, never stored in state) |
+
+> The secret's key is `name`, not `secret_key`. Using `secret_key` fails with an
+> unsupported-argument error.
 
 ### JSON Secrets
 
@@ -42,22 +48,25 @@ For JSON-formatted secrets, use `jsondecode()` to parse the value:
 
 ```hcl
 ephemeral "infisical_secret" "api_config" {
+  name         = "API_CONFIG"
   workspace_id = "your-workspace-id"
   env_slug     = "prod"
-  secret_key   = "API_CONFIG"
 }
 
 locals {
   config = jsondecode(ephemeral.infisical_secret.api_config.value)
 }
 
+# Anything derived from an ephemeral value is itself ephemeral.
 output "api_key" {
   value     = local.config.api_key
   sensitive = true
+  ephemeral = true
 }
 
 output "api_url" {
-  value = local.config.api_url
+  value     = local.config.api_url
+  ephemeral = true
 }
 ```
 
@@ -66,15 +75,15 @@ output "api_url" {
 ```hcl
 # Fetch secret and use it to configure a provider
 ephemeral "infisical_secret" "aws_access_key" {
+  name         = "AWS_ACCESS_KEY_ID"
   workspace_id = "your-workspace-id"
   env_slug     = "prod"
-  secret_key   = "AWS_ACCESS_KEY_ID"
 }
 
 ephemeral "infisical_secret" "aws_secret_key" {
+  name         = "AWS_SECRET_ACCESS_KEY"
   workspace_id = "your-workspace-id"
   env_slug     = "prod"
-  secret_key   = "AWS_SECRET_ACCESS_KEY"
 }
 
 provider "aws" {
@@ -351,15 +360,18 @@ resource "infisical_access_approval_policy" "prod_database" {
 terraform {
   required_providers {
     infisical = {
-      source  = "infisical/infisical"
-      version = "~> 0.13"
+      source = "infisical/infisical"
     }
   }
 }
 
 provider "infisical" {
-  client_id     = var.infisical_client_id
-  client_secret = var.infisical_client_secret
+  auth = {
+    universal = {
+      client_id     = var.infisical_client_id
+      client_secret = var.infisical_client_secret
+    }
+  }
 }
 
 variable "infisical_client_id" {
@@ -374,9 +386,9 @@ variable "infisical_client_secret" {
 
 # Fetch production database password (never in state)
 ephemeral "infisical_secret" "db_password" {
+  name         = "DATABASE_PASSWORD"
   workspace_id = "ws-abc123"
   env_slug     = "prod"
-  secret_key   = "DATABASE_PASSWORD"
 }
 
 # Define developer role with permission to read secrets

@@ -54,7 +54,25 @@ curl -X GET https://us.infisical.com/api/v4/secrets?projectId=PROJECT_ID&environ
 
 ## Alternative Auth Methods
 
-Infisical supports additional authentication methods for machine identities:
+Infisical supports **13** machine identity auth methods in total. All of them live under
+`/api/v1/auth/<method>/login` and all return the same `{ accessToken, expiresIn,
+accessTokenMaxTTL, tokenType }` response.
+
+| Method | Login endpoint |
+|--------|----------------|
+| Universal Auth | `POST /api/v1/auth/universal-auth/login` |
+| Token Auth | (no login — the token is used directly as the Bearer token) |
+| Kubernetes Auth | `POST /api/v1/auth/kubernetes-auth/login` |
+| GCP Auth | `POST /api/v1/auth/gcp-auth/login` |
+| AliCloud Auth | `POST /api/v1/auth/alicloud-auth/login` |
+| AWS Auth | `POST /api/v1/auth/aws-auth/login` |
+| Azure Auth | `POST /api/v1/auth/azure-auth/login` |
+| TLS Cert Auth | `POST /api/v1/auth/tls-cert-auth/login` |
+| OCI Auth | `POST /api/v1/auth/oci-auth/login` |
+| OIDC Auth | `POST /api/v1/auth/oidc-auth/login` |
+| JWT Auth | `POST /api/v1/auth/jwt-auth/login` |
+| LDAP Auth | `POST /api/v1/auth/ldap-auth/login` |
+| SPIFFE Auth | `POST /api/v1/auth/spiffe-auth/login` |
 
 ### AWS Auth
 
@@ -111,6 +129,44 @@ POST /api/v1/auth/ldap-auth/login
 ```
 
 Login with LDAP credentials. Enterprise directory integration.
+
+### AliCloud Auth
+
+```
+POST /api/v1/auth/alicloud-auth/login
+```
+
+Login with an Alibaba Cloud RAM identity. For workloads on Alibaba Cloud.
+
+### OCI Auth
+
+```
+POST /api/v1/auth/oci-auth/login
+```
+
+Login with an Oracle Cloud Infrastructure principal. For workloads on OCI.
+
+### TLS Cert Auth
+
+```
+POST /api/v1/auth/tls-cert-auth/login
+```
+
+Login by presenting an X.509 client certificate, verified against a configured CA. For mTLS
+environments.
+
+### SPIFFE Auth
+
+```
+POST /api/v1/auth/spiffe-auth/login
+```
+
+Login with a JWT-SVID, verified against the SPIRE trust bundle. For SPIFFE/SPIRE workloads.
+
+### Token Auth
+
+Token Auth has no login exchange — the token created in the UI is used directly as the Bearer
+token. Management endpoints for tokens live under `/api/v1/auth/token-auth/`.
 
 ## Token Refresh
 

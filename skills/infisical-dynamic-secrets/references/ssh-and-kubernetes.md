@@ -1,4 +1,6 @@
-# Dynamic Secrets: SSH Certificates & Kubernetes
+# Dynamic Secrets: SSH, Kubernetes, LDAP & SaaS Providers
+
+Covers `ssh`, `kubernetes`, `ldap`, `github`, `tailscale`, `ibm-api-connect`, and `totp`.
 
 ## SSH Certificates
 
@@ -41,11 +43,26 @@ This writes the CA to `/etc/ssh/infisical_ca.pub`, adds `TrustedUserCAKeys` to s
 
 ### Lease Generation
 - Specify TTL (within Max TTL)
-- Specify principals (subset of Allowed Principals)
+- **Specify principals — this is required.** Every SSH lease must pass at least one principal in
+  `config.principals`, and each must appear in the dynamic secret's Allowed Principals list.
+  Omitting them fails with "SSH lease requires at least one principal in config.principals";
+  requesting one outside the list fails with "Requested principals not in allowed list".
 
 ### Lease Returns
-- **Private Key** (downloadable as `key.pem`)
-- **Signed Certificate** (downloadable as `cert.pub`)
+| Field | Description |
+|-------|-------------|
+| `PRIVATE_KEY` | The ephemeral private key (downloadable as `key.pem`) |
+| `SIGNED_KEY` | The CA-signed certificate (downloadable as `cert.pub`) |
+
+In an Infisical Agent template these are `{{ .PRIVATE_KEY }}` and `{{ .SIGNED_KEY }}`, and the
+`dynamicSecret` function needs its 6th `principals` argument:
+
+```go
+{{ with dynamicSecret "my-project" "dev" "/" "my-ssh-secret" "1h" "root,deploy" }}
+{{ .PRIVATE_KEY }}
+{{ .SIGNED_KEY }}
+{{- end }}
+```
 
 ### Usage
 ```bash
@@ -160,3 +177,141 @@ rules:
 - Use short TTLs (15m–1h) for security
 - Dynamic credentials create temporary service accounts that are automatically cleaned up on lease expiry
 - Gateway auth eliminates the need to expose the cluster API server publicly
+
+---
+
+## LDAP
+
+Provider type: `ldap`
+
+Supports two credential types, and the required fields differ.
+
+**Common:**
+| Field | Required | Description |
+|-------|----------|-------------|
+| `url` | Yes | LDAP server URL |
+| `binddn` | Yes | Bind DN Infisical authenticates as |
+| `bindpass` | Yes | Bind password |
+| `ca` | No | CA certificate |
+| `sslRejectUnauthorized` | No | Verify TLS (default `true`) |
+| `credentialType` | Yes | `dynamic` (default) or `static` |
+
+**If `credentialType = "dynamic"`** — Infisical creates and deletes an LDAP entry per lease:
+| Field | Required | Description |
+|-------|----------|-------------|
+| `creationLdif` | Yes | LDIF applied to create the entry |
+| `revocationLdif` | Yes | LDIF applied to remove the entry |
+| `rollbackLdif` | No | LDIF applied if creation partially fails |
+
+**If `credentialType = "static"`** — Infisical rotates the password of an existing entry:
+| Field | Required | Description |
+|-------|----------|-------------|
+| `rotationLdif` | Yes | LDIF applied to rotate the credential |
+
+### Gotchas
+- Supply `rollbackLdif` for dynamic credentials — without it, a half-created entry can be left behind
+- Static mode does not create users; it rotates an existing one, so the lease returns credentials for a fixed DN
+
+---
+
+## GitHub App Tokens
+
+Provider type: `github`
+
+Issues short-lived GitHub App installation access tokens.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `appId` | Yes | Numeric GitHub App ID |
+| `installationId` | Yes | Numeric GitHub App installation ID |
+| `privateKey` | Yes | The GitHub App's private key (PEM) |
+
+### Gotchas
+- `appId` and `installationId` are **numbers**, not strings or slugs
+- GitHub installation tokens expire on GitHub's own schedule (max 1 hour) and cannot be renewed — request a new lease
+- The token's permissions are whatever the App installation grants; scope the App narrowly
+
+---
+
+## Tailscale
+
+Provider type: `tailscale`
+
+Issues Tailscale keys. Two independent discriminators: how Infisical authenticates
+(`auth.method`) and what kind of key it mints (`authType`).
+
+**Authentication (`auth.method`):**
+| Method | Fields |
+|--------|--------|
+| `api_key` | `apiKey` — Tailscale API access token |
+| `oauth` | `clientId`, `clientSecret` |
+
+**Key type (`authType`):** `auth_keys`, `oauth_keys`, or `federated_keys`
+
+**Common fields:**
+| Field | Required | Description |
+|-------|----------|-------------|
+| `tailnet` | No | Tailnet identifier; `-` (default) means the token owner's default tailnet |
+| `description` | No | Applied to the created key (max 50 chars) |
+| `tags` | No | ACL tags such as `tag:ci` (default `[]`) |
+
+**If `authType = "auth_keys"`:**
+| Field | Description |
+|-------|-------------|
+| `reusable` | Whether the key can register multiple devices (default `false`) |
+| `preauthorized` | Whether registered devices are pre-authorized (default `false`) |
+
+**If `authType = "oauth_keys"` or `"federated_keys"`:**
+| Field | Description |
+|-------|-------------|
+| `scopes` | OAuth scopes granted to the created client (at least one required) |
+
+### Gotchas
+- **`tags` is required when authenticating with an OAuth token**, and also when scopes include `devices:core` or `auth_keys`
+- **Privilege-escalation scopes are blocked** at both schema and provider level: `auth_keys`, `oauth_keys`, `federated_keys`, `api_access_tokens`, and `all`. A lease cannot mint credentials able to create more credentials
+- Use `-` for `tailnet` unless you are managing a tailnet other than the token owner's default
+
+---
+
+## IBM API Connect
+
+Provider type: `ibm-api-connect`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `clientId` | Yes | Client ID |
+| `clientSecret` | Yes | Client secret |
+| `instanceUrl` | Yes | API Connect instance URL |
+| `apiKey` | Yes | API key |
+| `orgId` | Yes | Organization |
+| `catalogId` | Yes | Catalog |
+| `consumerOrgId` | Yes | Consumer organization |
+| `appId` | Yes | Application |
+| `gatewayId` | No | Gateway |
+| `gatewayPoolId` | No | Gateway pool |
+
+---
+
+## TOTP
+
+Provider type: `totp`
+
+Generates time-based one-time passwords rather than credentials. Useful for automating logins
+that require an OTP. Two config types:
+
+**If `configType = "url"`:**
+| Field | Required | Description |
+|-------|----------|-------------|
+| `url` | Yes | An `otpauth://` URL. Must include a `secret` parameter |
+
+**If `configType = "manual"`:**
+| Field | Required | Description |
+|-------|----------|-------------|
+| `secret` | Yes | The TOTP shared secret (whitespace is stripped) |
+| `period` | No | Step in seconds (default 30) |
+| `algorithm` | No | Hash algorithm |
+| `digits` | No | Code length (default 6) |
+
+### Gotchas
+- TOTP leases return a **code**, not a credential pair — the underlying secret is stored once and reused
+- Unlike other providers, generating a lease does not create anything on a remote system

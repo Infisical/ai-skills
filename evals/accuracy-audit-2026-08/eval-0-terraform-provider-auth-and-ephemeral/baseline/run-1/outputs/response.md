@@ -1,0 +1,1 @@
+I'm verifying the current Infisical Terraform provider details (Universal Auth config syntax, and whether it supports Terraform's ephemeral resources so the secret value never touches state) against the official docs before writing the HCL, since getting this wrong would be misleading for a security-sensitive config. I'll follow up once that research comes back.

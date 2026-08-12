@@ -14,6 +14,29 @@ Every Infisical AI Skill is A/B tested before shipping. Each eval runs the same 
 
 **Overall Tier 1 accuracy: 98% with skills vs 46% without (+52pp)**
 
+## Accuracy audit (`accuracy-audit-2026-08/`)
+
+A separate three-arm regression eval run when the skills were re-verified against the
+Infisical codebase. It answers a different question from the tables above — not "does a skill
+help?" but **"has a skill gone stale, and did the corrections fix it?"**
+
+| Arm | Score | Pass rate |
+|-----|-------|-----------|
+| No skill | 18/35 | 51.4% |
+| Old skill (pre-audit) | 13/35 | **37.1%** |
+| New skill (post-audit) | 35/35 | **100.0%** |
+
+The important number is the middle one. **Stale skills scored below the no-skill baseline** —
+outdated specifics didn't just fail to help, they overrode correct model knowledge. In the
+secret-syncs case the base model scored 5/5 on its own and the stale skill dragged it to 2/5.
+
+Tools are disabled on all arms in that suite, so the model cannot look up the answer and the
+eval measures what the skill text itself teaches. Grading is deterministic regex rather than an
+LLM judge. See [`accuracy-audit-2026-08/benchmark.md`](accuracy-audit-2026-08/benchmark.md).
+
+**Takeaway for maintainers:** a skill that has drifted is worse than no skill at all. Re-verify
+against the codebase whenever upstream adds providers, auth methods, or API versions.
+
 ## Structure
 
 Each eval directory follows this layout:

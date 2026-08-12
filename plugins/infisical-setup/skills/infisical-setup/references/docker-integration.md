@@ -12,13 +12,18 @@ The cleanest approach — secrets are fetched fresh when the container starts. N
 # For Debian/Ubuntu-based images
 RUN apt-get update && apt-get install -y curl bash \
   && curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash \
-  && apt-get install -y infisical
+  && apt-get update && apt-get install -y infisical
 
-# For Alpine-based images
-RUN apk add --no-cache curl bash \
-  && curl -1sLf 'https://artifacts-cli.infisical.com/setup.alpine.sh' | bash \
-  && apk add --no-cache infisical
+# For Alpine-based images — note the script is setup.apk.sh, fetched with wget
+RUN apk add --no-cache bash sudo wget \
+  && wget -qO- 'https://artifacts-cli.infisical.com/setup.apk.sh' | sh \
+  && apk update && apk add --no-cache infisical
 ```
+
+The Alpine setup script is `setup.apk.sh`, not `setup.alpine.sh`, and Alpine needs `bash`,
+`sudo`, and `wget` present before the script runs.
+
+For reproducible images, pin the CLI version rather than installing latest.
 
 ### Step 2: Wrap your start command with `infisical run`
 

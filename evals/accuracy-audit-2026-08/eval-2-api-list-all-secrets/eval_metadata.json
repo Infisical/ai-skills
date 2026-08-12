@@ -1,0 +1,26 @@
+{
+  "eval_id": 2,
+  "eval_name": "api-list-all-secrets",
+  "skill": "infisical-api",
+  "skill_files": [
+    "SKILL.md",
+    "references/secrets-endpoints.md",
+    "references/pagination-and-rate-limits.md"
+  ],
+  "prompt": "I need to retrieve every secret in an Infisical project environment, including secrets in subfolders, using the REST API directly with curl. Show me the exact request and explain how to handle paging through large result sets.",
+  "assertions": [
+    "Does not invent offset/limit pagination on /api/v4/secrets",
+    "States that the list-secrets endpoint is not paginated",
+    "Uses recursive=true to include subfolders",
+    "Uses the v4 endpoint",
+    "Does not claim the response has a `total` pagination field"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

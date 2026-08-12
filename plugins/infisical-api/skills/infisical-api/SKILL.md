@@ -32,10 +32,11 @@ This skill provides guidance for working with the Infisical REST API. Use it whe
 1. **Always authenticate via machine identity Universal Auth first** — use the Universal Auth login endpoint to obtain a Bearer token before making other API calls
 2. **Use /api/v4/secrets for secret operations** — v1/v2/v3 secret endpoints are deprecated
 3. **Use /api/v1/projects, not /api/v1/workspace** — workspace endpoints are deprecated
-4. **Pagination uses offset/limit** — default limit is 20, maximum is 100
+4. **`/api/v4/secrets` is not paginated** — it returns every secret at the requested path in one response and ignores `offset`/`limit`. Scope results with `secretPath`, `recursive`, `tagSlugs`, or `metadataFilter` instead. Pagination exists on other collection endpoints (identities, memberships, certificates), which return `{ <resource>: [...], totalCount: n }`
 5. **Region selection** — US region: us.infisical.com, EU region: eu.infisical.com
 6. **Service tokens are deprecated** — use machine identities instead
-7. **Rate limits apply to cloud only** — self-hosted deployments have no rate limits; free tier: 200 reads/min, pro tier: 350 reads/min
+7. **Rate limits apply to self-hosted too** — they are not cloud-only. Instance defaults are 60 reads/min, 200 writes/min, 60 secrets-ops/min, 60 auth/min per IP; self-hosted admins can change them, and cloud limits vary by plan. On a 429, honor the `retry-after` header (seconds remaining, not a timestamp)
+8. **Batch over loop** — use `POST/PATCH/DELETE /api/v4/secrets/batch` rather than per-secret calls; batch delete takes `secrets: [{ secretKey }]`
 
 ## Reference Files
 
@@ -78,10 +79,21 @@ curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=PROJECT_ID&enviro
 
 ### List All Secrets in a Project
 
+Returns every secret at the path — there is no pagination on this endpoint.
+
 ```bash
-curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=PROJECT_ID&environment=dev&offset=0&limit=20' \
+curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=PROJECT_ID&environment=dev' \
   -H "Authorization: Bearer TOKEN"
 ```
+
+Add `recursive=true` to include subfolders:
+
+```bash
+curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=PROJECT_ID&environment=dev&secretPath=/&recursive=true' \
+  -H "Authorization: Bearer TOKEN"
+```
+
+Response is `{ "secrets": [...], "imports": [...] }` — no `total`, `offset`, or `limit` keys.
 
 ### Create a New Secret
 
@@ -128,9 +140,10 @@ curl -X DELETE 'https://us.infisical.com/api/v4/secrets/MY_SECRET?projectId=PROJ
 
 ## Important Notes
 
-- All requests must include `Content-Type: application/json` header
+- Include `Content-Type: application/json` on any request that carries a JSON body
 - Tokens expire after `expiresIn` seconds; implement refresh logic for long-running operations
 - For self-hosted deployments, replace `us.infisical.com` with your custom domain
-- Secret operations support multiple auth types (AWS, Azure, GCP, Kubernetes, OIDC, JWT, LDAP)
-- Use `viewSecretValue=true` when listing secrets if you need to see actual values
-- The `recursive` parameter on list secrets endpoint includes secrets in all subdirectories
+- Secret operations support all 13 machine identity auth methods (Universal, Token, Kubernetes, GCP, AliCloud, AWS, Azure, TLS Cert, OCI, OIDC, JWT, LDAP, SPIFFE)
+- `viewSecretValue` defaults to `true`; set it to `false` when you only need key names
+- The `recursive` parameter on list secrets includes secrets in all subdirectories
+- Beyond CRUD, `/api/v4/secrets` also exposes `/move`, `/duplicate`, `/batch` (POST, PATCH, DELETE), `/id/:secretId`, and secret-reference tree endpoints
