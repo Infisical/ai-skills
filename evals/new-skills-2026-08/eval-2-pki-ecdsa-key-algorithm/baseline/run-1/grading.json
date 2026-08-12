@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Gives the correct ECDSA P-256 wire value EC_prime256v1",
+      "passed": false,
+      "evidence": "MISSING required /EC_prime256v1/"
+    },
+    {
+      "text": "Does not offer ECDSA_P256 as the value",
+      "passed": false,
+      "evidence": "FOUND forbidden /pass\\s+`?ECDSA_P256|value[^\\n]{0,20}ECDSA_P256|use\\s+`?ECDSA_P256/ -> 'value:** `ECDSA_P256'"
+    },
+    {
+      "text": "Explains root self-signs and intermediate is signed by a parent",
+      "passed": true,
+      "evidence": "OK required /self-sign|self sign/ -> 'self-sign'"
+    },
+    {
+      "text": "Mentions pending-certificate status for an unsigned intermediate",
+      "passed": false,
+      "evidence": "MISSING required /pending-certificate|pending certificate/"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "timing": {
+    "total_duration_seconds": 46.3
+  }
+}

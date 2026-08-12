@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-kubernetes-operator",
+  "chosen": "infisical-kubernetes-operator",
+  "correct": true,
+  "confusable_with": "infisical-self-host",
+  "duration_seconds": 7.0
+}

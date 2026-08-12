@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-dynamic-secrets",
+  "chosen": "infisical-pam",
+  "correct": false,
+  "confusable_with": "infisical-pki",
+  "duration_seconds": 7.1
+}

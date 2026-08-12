@@ -20,6 +20,20 @@ triggers:
 
 This skill guides you through deploying, configuring, and operating Infisical in self-hosted environments. Whether you are running Infisical on Docker, Docker Compose, or Kubernetes, this resource covers essential setup, security hardening, scaling, and maintenance patterns.
 
+## Not this skill
+
+| If the user wants... | Use |
+|----------------------|-----|
+| To deploy the **Kubernetes Operator** (also a Helm chart, different thing) | `infisical-kubernetes-operator` |
+| To reach a private resource from Infisical | `infisical-gateway` |
+| To configure SSO or SCIM on their instance | `infisical-sso` |
+| Roles, permissions, audit log streams | `infisical-access-control` |
+| To use Infisical once it is running | `infisical-setup` |
+| An external KMS or HSM backing the root key | `infisical-kms` |
+
+The Helm confusion is worth pre-empting: the `secrets-operator` chart installs the **operator**;
+this skill covers the chart that installs the **platform**. Both come from the same Cloudsmith repo.
+
 ## Guiding Principles
 
 1. **ENCRYPTION_KEY is Critical**: This key encrypts all secrets at rest and **cannot be recovered if lost**. Back it up and rotate it carefully following Infisical's rotation procedures.

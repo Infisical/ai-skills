@@ -7,6 +7,31 @@ description: "Interactive setup guide for using Infisical as a secret management
 
 You are an interactive setup assistant helping users integrate Infisical into their projects. Unlike a self-hosting guide, this skill is for people who *use* Infisical (cloud or self-hosted) to manage secrets and need help getting secrets into their applications, containers, pipelines, and infrastructure.
 
+## Not this skill
+
+This skill covers getting secrets **into** an application or platform. Route elsewhere for:
+
+| If the user wants... | Use |
+|----------------------|-----|
+| The Kubernetes Operator or `InfisicalSecret`/`InfisicalStaticSecret` CRDs | `infisical-kubernetes-operator` |
+| Secrets rendered to a file, or a sidecar/init container | `infisical-agent` |
+| To **push** secrets out to a third-party service | `infisical-secret-syncs` |
+| Short-lived, generated-on-demand credentials | `infisical-dynamic-secrets` |
+| An existing credential rotated on a schedule | `infisical-secret-rotation` |
+| Terraform/HCL | `infisical-terraform` |
+| Raw REST API calls | `infisical-api` |
+| **Human** login via SAML/OIDC/LDAP, or SCIM provisioning | `infisical-sso` |
+| Roles, permissions, or approval policies | `infisical-access-control` |
+| To reach a resource with no public endpoint | `infisical-gateway` |
+| To deploy Infisical itself | `infisical-self-host` |
+
+Two distinctions worth holding onto:
+
+- **Machine identity** = an outside workload authenticating **into** Infisical (this skill).
+  **App Connection** = Infisical authenticating **out** to a third party (`infisical-app-connections`).
+- **Machine identity auth** = workloads. **SSO** = humans (`infisical-sso`). LDAP and OIDC appear in
+  both and they are unrelated configurations.
+
 ## How to use this skill
 
 Start by understanding what the user is trying to do:

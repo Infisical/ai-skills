@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the isDigest flag",
+      "passed": true,
+      "evidence": "OK required /isDigest/ -> 'isDigest'"
+    },
+    {
+      "text": "Explains isDigest true means data is already a hash",
+      "passed": false,
+      "evidence": "MISSING required /already a hash|already hashed|pre-computed|precomputed|already a digest/"
+    },
+    {
+      "text": "Uses a valid RSA signing algorithm value",
+      "passed": true,
+      "evidence": "OK required /RSASSA_PSS_SHA_(256|384|512)|RSASSA_PKCS1_V1_5_SHA_(256|384|512)/ -> 'RSASSA_PKCS1_V1_5_SHA_256'"
+    },
+    {
+      "text": "Notes data is base64-encoded",
+      "passed": true,
+      "evidence": "OK required /base64/ -> 'base64'"
+    },
+    {
+      "text": "Uses the sign endpoint",
+      "passed": true,
+      "evidence": "OK required //sign/ -> '/sign'"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "timing": {
+    "total_duration_seconds": 91.9
+  }
+}

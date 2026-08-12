@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "app-connection-aws-assume-role",
+  "skill": "infisical-app-connections",
+  "skill_files": [
+    "SKILL.md",
+    "references/connection-catalog.md",
+    "references/cloud-providers.md"
+  ],
+  "prompt": "Create an Infisical App Connection to AWS using role assumption rather than static keys. Show the exact API request, including the method value and credential field names.",
+  "assertions": [
+    "Uses method assume-role",
+    "Uses roleArn as the credential field",
+    "Posts to the aws connection endpoint",
+    "Mentions the External ID requirement in the trust policy"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-app-connections",
+  "chosen": "infisical-app-connections",
+  "correct": true,
+  "confusable_with": "infisical-setup",
+  "duration_seconds": 11.9
+}

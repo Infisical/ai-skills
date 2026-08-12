@@ -1,0 +1,22 @@
+{
+  "name": "infisical-sso",
+  "description": "Connect Infisical to an identity provider \u2014 SAML, OIDC, LDAP and free Google/GitHub SSO, SCIM user and group provisioning, group-to-role mapping, and SSO enforcement with break-glass access.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/sso/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "sso",
+    "saml",
+    "oidc",
+    "scim",
+    "okta",
+    "azure-ad",
+    "ldap"
+  ]
+}

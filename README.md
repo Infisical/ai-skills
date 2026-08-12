@@ -66,76 +66,45 @@ Copy skill folders from `skills/` into your project's agent skills directory:
 
 ## What's included
 
-### infisical-setup
+**17 skills** across the whole Infisical platform. Each declares what it is *not*, so an agent lands
+on the right one — see [`AGENTS.md`](AGENTS.md) for the router and disambiguation table.
 
-Interactive setup guide for integrating Infisical into your projects. Covers:
+### Secrets delivery
 
-- **CLI** — `infisical run`, `infisical init`, local development workflow
-- **SDKs** — Node.js, Python, Go, Java, .NET, Ruby, PHP, Rust, C++ (correct package names, imports, and class names)
-- **Docker** — Build-time and runtime secret injection, `infisical run` entrypoint pattern
-- **Kubernetes** — Operator installation, InfisicalSecret CRD, Kubernetes Auth setup
-- **CI/CD** — GitHub Actions (OIDC Auth), GitLab CI (`id_tokens`)
-- **Auth methods** — All 13 machine identity auth methods with a decision tree for choosing the right one
+| Skill | Covers |
+|-------|--------|
+| **infisical-setup** | CLI, all 9 SDKs (Node.js, Python, Go, Java, .NET, Ruby, PHP, Rust, C++), Docker, CI/CD, all 13 machine identity auth methods |
+| **infisical-api** | `/api/v4/secrets` CRUD and batch, projects, identities, which endpoints paginate, rate limits |
+| **infisical-terraform** | The provider's nested `auth` block, ephemeral resources, project roles, TFC OIDC |
+| **infisical-agent** | Agent YAML config, Go template functions, sinks, polling, on-change commands |
+| **infisical-kubernetes-operator** | v1beta1 CRDs and legacy v1alpha1, Helm install, `auto-reload`, push secrets |
 
-### infisical-secret-syncs
+### Moving and generating credentials
 
-Guide for pushing secrets from Infisical to all 48 supported destinations. Covers:
+| Skill | Covers |
+|-------|--------|
+| **infisical-app-connections** | All 83 connection types and their exact auth methods. The shared prerequisite for syncs, rotations, PKI, and scanning |
+| **infisical-secret-syncs** | Pushing secrets to all 48 destinations, key schemas, initial-sync enums |
+| **infisical-dynamic-secrets** | On-demand short-lived credentials across all 30 providers, leases, SSH certificates |
+| **infisical-secret-rotation** | Rotating existing credentials across 28 providers, dual-phase vs single-phase, the two-user SQL pattern |
 
-- **Cloud** — AWS Secrets Manager, AWS Parameter Store, GCP Secret Manager, Azure Key Vault, Azure App Configuration, OCI Vault, HashiCorp Vault, 1Password
-- **CI/CD** — GitHub (repo/org/repo-environment), GitLab, Bitbucket, CircleCI, Travis CI, TeamCity, Azure DevOps, Octopus Deploy, Spacelift, Terraform Cloud, Rundeck
-- **Hosting/PaaS** — Vercel, Netlify, Cloudflare Workers/Pages, Railway, Render, Fly.io, Heroku, Northflank, DigitalOcean, Qovery, Cloud 66, Laravel Forge, OVH
-- **Data** — Databricks, Snowflake, Supabase, Hasura Cloud
-- **Configuration** — App Connections, key schemas, mapping behavior (AWS SM only), exact initial-sync enum values
+### Other products
 
-### infisical-dynamic-secrets
+| Skill | Covers |
+|-------|--------|
+| **infisical-pki** | 9 CA types, Policies/Profiles/Applications, API/ACME/EST/SCEP enrollment, 12 PKI Syncs, code signing, HSM, post-quantum |
+| **infisical-kms** | Encrypt/decrypt, sign/verify, HMAC, key rotation, external KMS, KMIP, cosign |
+| **infisical-pam** | Brokered access to 13 account types for humans and AI agents, session recording, JIT approvals |
+| **infisical-secret-scanning** | GitHub/GitLab/Bitbucket data sources, `infisical scan` CLI, pre-commit hooks, honey tokens |
 
-Guide for on-demand, short-lived credentials across all 30 providers. Covers:
+### Platform and governance
 
-- **SQL databases** — PostgreSQL, MySQL, MSSQL, Oracle, SAP ASE/HANA, Snowflake, Vertica, ClickHouse, Azure SQL (custom creation statements)
-- **NoSQL, cache & search** — Redis (ACL), AWS ElastiCache, AWS MemoryDB, MongoDB, MongoDB Atlas, Elasticsearch, Couchbase, RabbitMQ, Milvus
-- **Cloud IAM** — AWS IAM Users, AWS STS, GCP service account impersonation, Azure Entra ID
-- **Infrastructure & SaaS** — CA-signed SSH certificates, K8s service account tokens, LDAP, GitHub App tokens, Tailscale, IBM API Connect, TOTP
-- **Lease lifecycle** — Generate, renew, and revoke with TTL management
-
-### infisical-agent
-
-Guide for the Infisical Agent client daemon. Covers:
-
-- **Config format** — Full YAML reference with auth, sinks, and templates sections
-- **Auth methods** — Universal Auth, Kubernetes, AWS IAM, Azure, GCP ID Token, GCP IAM
-- **Template functions** — `listSecrets`, `listSecretsByProjectSlug`, `getSecretByName`, `dynamicSecret` (incl. the SSH-required `principals` argument)
-- **Deployment patterns** — Docker Compose sidecar, AWS ECS sidecar, K8s init container, K8s sidecar
-- **Advanced** — Polling intervals, on-change commands, exit-after-auth, caching
-
-### infisical-terraform
-
-Guide for the Infisical Terraform Provider. Covers:
-
-- **Ephemeral resources** — Terraform 1.10+ secrets that never land in state files
-- **Provider setup** — `infisical/infisical` source, nested `auth = { universal = {...} }` / `auth = { oidc = {...} }` blocks
-- **Data sources** — Traditional approach for older Terraform versions (with state storage caveats)
-- **Project roles** — `permissions_v2` format with subject/action structure
-- **Terraform Cloud** — OIDC integration for zero-credential CI/CD pipelines
-
-### infisical-api
-
-Guide for the Infisical REST API. Covers:
-
-- **Authentication** — Universal Auth login, Bearer token usage, all machine identity auth methods
-- **Secrets CRUD** — `/api/v4/secrets` endpoints (v1/v2/v3 are deprecated)
-- **Projects & identities** — Project management, environments, members, groups, folders
-- **Pagination** — where it exists: `{ <resource>, totalCount }`. `/api/v4/secrets` is *not* paginated
-- **Rate limits** — apply to self-hosted too (instance defaults 60 read / 200 write / 60 secrets per min); cloud limits vary by plan
-
-### infisical-self-host
-
-Guide for self-hosting Infisical. Covers:
-
-- **Docker** — Standalone container and Docker Compose production stack
-- **Kubernetes** — Helm chart from Cloudsmith registry, secrets, scaling, security
-- **Environment variables** — `ENCRYPTION_KEY` (hex 16-byte, or base64 256-bit under FIPS), `AUTH_SECRET` (base64 32-byte), PostgreSQL, Redis
-- **Scaling & HA** — Stateless horizontal scaling, PostgreSQL read replicas, Redis standalone/Sentinel/Cluster, required `noeviction` policy
-- **FIPS compliance** — FIPS 140-3 via the separate `infisical/infisical-fips` image and `FIPS_ENABLED=true`
+| Skill | Covers |
+|-------|--------|
+| **infisical-access-control** | Roles, custom permissions, the granular secret actions, ABAC, temporary access, approvals, audit streams |
+| **infisical-sso** | SAML/OIDC/LDAP and free Google/GitHub SSO, SCIM, group-to-role mapping, enforcement and break-glass |
+| **infisical-gateway** | Private-network access with outbound-only tunnels, exact ports, Gateway Pools |
+| **infisical-self-host** | Docker, Compose, Helm, env vars, Redis `noeviction`, FIPS 140-3, scaling and HA |
 
 ## Eval results
 
@@ -184,6 +153,37 @@ the way a vendored copy can. If you do install the skills, pin a version and re-
 Infisical ships new providers or auth methods. Full data and a reproducible harness live in
 [`evals/accuracy-audit-2026-08/`](evals/accuracy-audit-2026-08/).
 
+### New skills
+
+The 10 skills added in the 7 → 17 expansion, A/B tested the same way:
+
+| Arm | Score | Pass rate |
+|-----|-------|-----------|
+| No skill | 21/46 | 45.7% |
+| With new skill | 46/46 | **100.0%** |
+
+Null results are recorded, not hidden: on App Connections the base model already scored 4/4 unaided.
+The skills matter most where the model has little knowledge — PAM and SSO scored 1/5 unaided, and the
+Kubernetes Operator **0/5**, because unaided it reaches for the legacy `v1alpha1 InfisicalSecret` CRD
+instead of current `v1beta1`. See [`evals/new-skills-2026-08/`](evals/new-skills-2026-08/).
+
+### Routing: does the right skill get picked?
+
+With 17 skills, mis-routing becomes the dominant failure mode — a skill loaded for the wrong question
+answers confidently from the wrong frame. So every skill declares what it is *not*, and
+[`AGENTS.md`](AGENTS.md) carries a router plus a disambiguation table for the pairs that get confused.
+
+Measured on 14 prompts sitting deliberately on a seam between two similar skills:
+
+| Arm | Correct | Accuracy |
+|-----|---------|----------|
+| Skill descriptions only | 13/14 | 92.9% |
+| With router + boundaries | 14/14 | **100.0%** |
+
+The case it fixed: asked about short-lived SSH certificates, descriptions alone chose
+`infisical-pam`. Plausible, but wrong — SSH certificates come from **SSH dynamic secrets**, not from
+PAM and not from the PKI product. See [`evals/routing-2026-08/`](evals/routing-2026-08/).
+
 ## Why this exists
 
 AI coding agents frequently get Infisical details wrong:
@@ -208,6 +208,14 @@ AI coding agents frequently get Infisical details wrong:
 | GitHub sync scope `environment` | `repository-environment`; visibility is `all`/`private`/`selected` |
 | `import-prioritize-infisical` | `import-prioritize-source` (values name source/destination, not the provider) |
 | FIPS via `infisical/infisical:latest-fips` | FIPS 140-3 via the separate `infisical/infisical-fips` image |
+| Kubernetes Operator uses `InfisicalSecret` | Current CRDs are `v1beta1`: `InfisicalConnection`, `InfisicalAuth`, `InfisicalStaticSecret` |
+| A synced Kubernetes Secret restarts pods | It does not — add `secrets.infisical.com/auto-reload: "true"` to the workload |
+| SQL rotation rotates one user's password | It alternates between **two** pre-existing users, `username1` and `username2` |
+| ECDSA P-256 in PKI is `ECDSA_P256` | The wire value is `EC_prime256v1` |
+| GitHub secret scanning uses a `github` connection | It requires a **`github-radar`** connection |
+| SSH certificates come from the PKI product | They come from **SSH dynamic secrets** |
+| Reaching a private database requires self-hosting | It requires a **Gateway**; Infisical Cloud works fine |
+| Any App Connection can use a Gateway | Only 16 of the 83 types accept `gatewayId` |
 
 These skills correct all of that.
 
@@ -218,9 +226,12 @@ To add a new skill:
 1. Create a directory under `skills/` with a `SKILL.md` and optional `references/` folder
 2. Create a matching plugin wrapper under `plugins/` with a `.claude-plugin/plugin.json`
 3. Add a plugin entry in `.claude-plugin/marketplace.json`
-4. Update `AGENTS.md` with the new skill
-5. Run `claude plugin validate .` to check for errors
-6. Add eval cases and run A/B benchmarks (see `evals/` for examples)
+4. Update `AGENTS.md` — add it to the router table, and add a row to the disambiguation table if it
+   sits near an existing skill
+5. Add a `## Not this skill` section to the new SKILL.md, and add reciprocal rows to the neighbours
+   it could be confused with
+6. Run `claude plugin validate .` to check for errors
+7. Add eval cases and run A/B benchmarks (see `evals/` for examples)
 
 ### Keeping skills accurate
 

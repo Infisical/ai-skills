@@ -1,0 +1,22 @@
+{
+  "name": "infisical-app-connections",
+  "description": "Create and manage Infisical App Connections \u2014 the reusable authenticated links to 83 third-party services that Secret Syncs, Secret Rotations, PKI, and Secret Scanning all depend on.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/integrations/app-connections/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "app-connections",
+    "aws",
+    "gcp",
+    "azure",
+    "github",
+    "oauth",
+    "authentication"
+  ]
+}

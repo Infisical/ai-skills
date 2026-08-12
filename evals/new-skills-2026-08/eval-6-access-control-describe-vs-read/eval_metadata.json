@@ -1,0 +1,23 @@
+{
+  "eval_id": 6,
+  "eval_name": "access-control-describe-vs-read",
+  "skill": "infisical-access-control",
+  "skill_files": [
+    "SKILL.md",
+    "references/roles-and-permissions.md"
+  ],
+  "prompt": "In Infisical, I want developers to be able to see which secrets exist in production and their metadata, but not read any secret values. Which exact permission actions do I grant and which do I withhold?",
+  "assertions": [
+    "Grants describeSecret",
+    "Withholds readValue",
+    "Explains that the legacy read action grants both",
+    "Does not tell the user to grant plain read for this"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

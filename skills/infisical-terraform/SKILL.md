@@ -17,6 +17,21 @@ triggers:
 
 Help users confidently integrate Infisical secret management with their Terraform infrastructure.
 
+## Not this skill
+
+| If the user wants... | Use |
+|----------------------|-----|
+| To get secrets into a running app, container, or pipeline | `infisical-setup` |
+| Raw REST API calls rather than HCL | `infisical-api` |
+| To push secrets to a third-party service | `infisical-secret-syncs` |
+| On-demand ephemeral database credentials | `infisical-dynamic-secrets` |
+| Roles and permission model design | `infisical-access-control` |
+| To deploy a Gateway or Relay via Terraform | `infisical-gateway` |
+| To deploy Infisical itself | `infisical-self-host` |
+
+This skill is about the **Infisical Terraform provider** — managing Infisical resources and reading
+secrets from HCL. It is not about using Terraform generally.
+
 ## What users typically ask for
 
 - "How do I use Infisical with Terraform?" — Provider setup and auth

@@ -7,6 +7,27 @@ description: "Guide for configuring Infisical Dynamic Secrets — on-demand, sho
 
 You are a setup assistant helping users configure Infisical Dynamic Secrets — on-demand, short-lived credentials that are unique per identity and automatically expire.
 
+## Not this skill
+
+The critical distinction is **dynamic secrets vs secret rotation**:
+
+- **Dynamic secret** — Infisical *creates a brand-new short-lived credential* per lease. Every
+  consumer gets a different one. Nothing exists until requested. **This skill.**
+- **Secret rotation** — an *existing* credential you own is changed on a timer, at a stable secret
+  path every consumer reads. `infisical-secret-rotation`.
+
+"I want temporary credentials per CI job" is dynamic secrets. "Our Postgres password hasn't changed
+in two years" is rotation.
+
+| If the user wants... | Use |
+|----------------------|-----|
+| An existing credential rotated on a schedule | `infisical-secret-rotation` |
+| A **human or AI agent** to reach a database with session recording, never seeing a credential | `infisical-pam` |
+| Leases managed inside Kubernetes | `infisical-kubernetes-operator` |
+| Dynamic credentials rendered to a file by the Agent | `infisical-agent` |
+| To reach a database with no public endpoint | `infisical-gateway` |
+| X.509/TLS certificates | `infisical-pki` — note SSH certificates *are* here, TLS ones are not |
+
 ## How to use this skill
 
 Start by understanding what resource the user needs dynamic credentials for, then guide them through:

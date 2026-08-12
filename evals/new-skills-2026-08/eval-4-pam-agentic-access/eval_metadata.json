@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "pam-agentic-access",
+  "skill": "infisical-pam",
+  "skill_files": [
+    "SKILL.md",
+    "references/accounts-and-access.md",
+    "references/sessions-and-agents.md"
+  ],
+  "prompt": "I want to let Claude Code query our production database through Infisical PAM without giving it a connection string. Show me the command and explain how the credential is kept away from the agent.",
+  "assertions": [
+    "Uses infisical pam agentic access",
+    "Scopes with the --account flag",
+    "Explains the Gateway injects the real credential",
+    "Mentions local ports on 127.0.0.1",
+    "Mentions the sandbox requirement (macOS or Linux with bubblewrap)"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

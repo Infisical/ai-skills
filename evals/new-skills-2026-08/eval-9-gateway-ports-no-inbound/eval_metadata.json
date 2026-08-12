@@ -1,0 +1,25 @@
+{
+  "eval_id": 9,
+  "eval_name": "gateway-ports-no-inbound",
+  "skill": "infisical-gateway",
+  "skill_files": [
+    "SKILL.md",
+    "references/deployment-and-networking.md",
+    "references/pools-and-consumers.md"
+  ],
+  "prompt": "Our security team needs the exact firewall rules to deploy an Infisical Gateway in our VPC so Infisical can reach a private RDS instance. What ports, in which direction?",
+  "assertions": [
+    "States no inbound ports are required on the gateway",
+    "Gives outbound TCP 2222 to the relay",
+    "Gives outbound TCP 443 to Infisical",
+    "Describes the connection as outbound/egress only",
+    "Mentions the auto-select relay allowlist caveat or pinning a relay"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

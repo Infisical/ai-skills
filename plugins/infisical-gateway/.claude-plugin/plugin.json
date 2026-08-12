@@ -1,0 +1,20 @@
+{
+  "name": "infisical-gateway",
+  "description": "The Infisical Gateway and Relay \u2014 reaching private network resources with outbound-only SSH reverse tunnels, gateway pools for HA, and no inbound firewall rules.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/gateways/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "gateway",
+    "relay",
+    "private-network",
+    "vpc",
+    "networking"
+  ]
+}

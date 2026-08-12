@@ -1,0 +1,25 @@
+{
+  "eval_id": 0,
+  "eval_name": "rotation-sql-two-user",
+  "skill": "infisical-secret-rotation",
+  "skill_files": [
+    "SKILL.md",
+    "references/rotation-overview.md",
+    "references/sql-databases.md"
+  ],
+  "prompt": "Set up an Infisical Secret Rotation for our production PostgreSQL application user, rotating every 30 days. Show me the API request body and tell me exactly what I need to prepare in the database beforehand.",
+  "assertions": [
+    "Requires TWO pre-existing database users via username1/username2",
+    "States both users must already exist and Infisical does not create them",
+    "rotationInterval is in days",
+    "Maps both username and password via secretsMapping",
+    "Warns the application must read the username from Infisical too, since the active user alternates"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

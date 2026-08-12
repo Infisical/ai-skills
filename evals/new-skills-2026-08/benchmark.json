@@ -1,0 +1,159 @@
+{
+  "iteration": "new-skills-2026-08",
+  "purpose": "A/B eval for the 10 skills added in this change. Tools disabled; deterministic regex grading.",
+  "ground_truth": {
+    "repo": "Infisical/infisical",
+    "commit": "caa698e100"
+  },
+  "skills_commit": "223971a",
+  "model": "claude-sonnet-5",
+  "tools": "disabled for all arms",
+  "arms": {
+    "baseline": "No skill",
+    "new_skill": "With new skill"
+  },
+  "totals": {
+    "baseline": {
+      "passed": 21,
+      "total": 46,
+      "pass_rate": 0.4565
+    },
+    "new_skill": {
+      "passed": 46,
+      "total": 46,
+      "pass_rate": 1.0
+    }
+  },
+  "per_eval": [
+    {
+      "eval_id": 0,
+      "eval_name": "rotation-sql-two-user",
+      "skill": "infisical-secret-rotation",
+      "baseline": {
+        "passed": 3,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "app-connection-aws-assume-role",
+      "skill": "infisical-app-connections",
+      "baseline": {
+        "passed": 4,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pki-ecdsa-key-algorithm",
+      "skill": "infisical-pki",
+      "baseline": {
+        "passed": 1,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "kms-sign-isdigest",
+      "skill": "infisical-kms",
+      "baseline": {
+        "passed": 4,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "pam-agentic-access",
+      "skill": "infisical-pam",
+      "baseline": {
+        "passed": 1,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "k8s-operator-v1beta1-autoreload",
+      "skill": "infisical-kubernetes-operator",
+      "baseline": {
+        "passed": 0,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "access-control-describe-vs-read",
+      "skill": "infisical-access-control",
+      "baseline": {
+        "passed": 3,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "scanning-github-radar-connection",
+      "skill": "infisical-secret-scanning",
+      "baseline": {
+        "passed": 1,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "sso-enforcement-breakglass",
+      "skill": "infisical-sso",
+      "baseline": {
+        "passed": 1,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "gateway-ports-no-inbound",
+      "skill": "infisical-gateway",
+      "baseline": {
+        "passed": 3,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    }
+  ]
+}

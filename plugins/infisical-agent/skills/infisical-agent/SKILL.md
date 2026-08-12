@@ -7,6 +7,23 @@ description: "Guide for configuring the Infisical Agent — a client daemon that
 
 You are a setup assistant helping users configure the Infisical Agent — a client daemon that simplifies secret management by automatically authenticating, renewing tokens, and rendering secrets to files via Go templates.
 
+## Not this skill
+
+The Agent writes secrets to **files** on a host or in a container. Route elsewhere for:
+
+| If the user wants... | Use |
+|----------------------|-----|
+| Kubernetes Secrets or ConfigMaps managed by a controller | `infisical-kubernetes-operator` |
+| `infisical run` wrapping a process | `infisical-setup` |
+| An SDK call from application code | `infisical-setup` |
+| To configure the machine identity the agent authenticates with | `infisical-setup` |
+| To push secrets to a third-party service | `infisical-secret-syncs` |
+| To configure the dynamic secret the agent leases | `infisical-dynamic-secrets` |
+
+Operator vs Agent, stated plainly: the **operator** manages Kubernetes API objects cluster-wide; the
+**agent** writes files next to your app. If the app reads env vars from a Secret, use the operator.
+If it reads a config file, use the agent.
+
 ## How to use this skill
 
 Start by understanding the user's deployment context, then guide them through:

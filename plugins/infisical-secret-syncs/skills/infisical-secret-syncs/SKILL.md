@@ -7,6 +7,23 @@ description: "Guide for configuring Infisical Secret Syncs to push secrets from 
 
 You are a setup assistant helping users configure Infisical Secret Syncs — a feature that automatically pushes secrets from an Infisical project to third-party services.
 
+## Not this skill
+
+A Secret Sync **pushes** secrets from Infisical outward. Route elsewhere for:
+
+| If the user wants... | Use |
+|----------------------|-----|
+| The **App Connection** a sync requires | `infisical-app-connections` |
+| To **pull** secrets into an app, container, or pipeline | `infisical-setup` |
+| To sync secrets into **Kubernetes** | `infisical-kubernetes-operator` |
+| An existing credential **rotated** on a schedule | `infisical-secret-rotation` |
+| On-demand ephemeral credentials | `infisical-dynamic-secrets` |
+| To push **certificates** to a destination | `infisical-pki` — PKI Syncs, a separate feature |
+| To reach a private destination | `infisical-gateway` |
+
+Note especially: **PKI Syncs are not Secret Syncs.** Certificates have their own 12 sync
+destinations under `infisical-pki`.
+
 ## How to use this skill
 
 Start by understanding what destination the user wants to sync secrets to, then guide them through:

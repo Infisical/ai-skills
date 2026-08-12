@@ -14,6 +14,41 @@ Every Infisical AI Skill is A/B tested before shipping. Each eval runs the same 
 
 **Overall Tier 1 accuracy: 98% with skills vs 46% without (+52pp)**
 
+## New skills (`new-skills-2026-08/`)
+
+A/B eval for the 10 skills added when coverage expanded from 7 to 17. Tools disabled, deterministic
+regex grading.
+
+| Arm | Score | Pass rate |
+|-----|-------|-----------|
+| No skill | 21/46 | 45.7% |
+| With new skill | 46/46 | **100.0%** |
+
+Honest null results are recorded alongside the wins: on App Connections the base model already scored
+4/4 unaided, and on Access Control 3/4. Where the skills matter most is product surface the model has
+little knowledge of — PAM agentic access and SSO enforcement both scored 1/5 unaided, and the
+Kubernetes Operator scored **0/5** because the model reached for the legacy `v1alpha1`
+`InfisicalSecret` CRD instead of current `v1beta1`.
+
+See [`new-skills-2026-08/benchmark.md`](new-skills-2026-08/benchmark.md).
+
+## Routing (`routing-2026-08/`)
+
+A different question from every other eval here: not "is the answer right" but **"was the right skill
+selected"**. Going from 7 to 17 skills makes mis-routing the dominant failure mode, so each case sits
+deliberately on a seam between two skills that sound alike.
+
+| Arm | Correct | Accuracy |
+|-----|---------|----------|
+| Skill descriptions only | 13/14 | 92.9% |
+| AGENTS.md router + negative boundaries | 14/14 | **100.0%** |
+
+The case the router fixed: asked about short-lived SSH certificates, descriptions alone chose
+`infisical-pam` — plausible, but SSH certificates come from **SSH dynamic secrets**, not from PAM and
+not from the PKI product.
+
+See [`routing-2026-08/benchmark.md`](routing-2026-08/benchmark.md).
+
 ## Accuracy audit (`accuracy-audit-2026-08/`)
 
 A separate three-arm regression eval run when the skills were re-verified against the

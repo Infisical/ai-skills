@@ -1,0 +1,21 @@
+{
+  "name": "infisical-kubernetes-operator",
+  "description": "The Infisical Kubernetes Operator \u2014 syncing secrets into Kubernetes Secrets and ConfigMaps via v1beta1 and legacy v1alpha1 CRDs, with auto-reload and push-secret support.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/integrations/platforms/kubernetes/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "kubernetes",
+    "operator",
+    "crd",
+    "helm",
+    "secrets",
+    "k8s"
+  ]
+}

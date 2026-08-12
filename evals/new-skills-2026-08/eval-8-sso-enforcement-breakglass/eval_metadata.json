@@ -1,0 +1,25 @@
+{
+  "eval_id": 8,
+  "eval_name": "sso-enforcement-breakglass",
+  "skill": "infisical-sso",
+  "skill_files": [
+    "SKILL.md",
+    "references/sso-setup.md",
+    "references/scim-and-groups.md"
+  ],
+  "prompt": "We want to enforce SAML SSO for our Infisical organization so nobody can log in with a password. What do we need to do first, and what are the risks?",
+  "assertions": [
+    "States email domain verification is a prerequisite",
+    "Warns password signup is blocked for verified domains",
+    "Tells them to set up a break-glass admin with a password beforehand",
+    "Gives the /login/admin bypass portal path",
+    "Notes Organization Admin is required, not Server Admin"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

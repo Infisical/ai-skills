@@ -1,0 +1,21 @@
+{
+  "name": "infisical-pam",
+  "description": "Infisical Privileged Access Manager \u2014 brokered access to databases and servers for humans and AI agents, with session recording, approvals, and no credential exposure.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/pam/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "pam",
+    "privileged-access",
+    "session-recording",
+    "ssh",
+    "databases",
+    "ai-agents"
+  ]
+}

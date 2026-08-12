@@ -1,0 +1,24 @@
+{
+  "eval_id": 7,
+  "eval_name": "scanning-github-radar-connection",
+  "skill": "infisical-secret-scanning",
+  "skill_files": [
+    "SKILL.md",
+    "references/scanning-and-findings.md",
+    "references/cli-and-honey-tokens.md"
+  ],
+  "prompt": "Set up Infisical Secret Scanning on our GitHub repositories, and also stop developers committing secrets locally in the first place. What App Connection type do I need, and what should I run locally?",
+  "assertions": [
+    "Specifies the github-radar App Connection",
+    "Warns it is not the same as a plain github connection",
+    "Recommends the pre-commit hook install command",
+    "Recommends a full scan for existing history"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

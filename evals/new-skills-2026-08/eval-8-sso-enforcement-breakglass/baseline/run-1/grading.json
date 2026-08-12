@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "States email domain verification is a prerequisite",
+      "passed": false,
+      "evidence": "MISSING required /[Ee]mail [Dd]omain [Vv]erification|verify[^.\\n]{0,30}email domain|verified domain/"
+    },
+    {
+      "text": "Warns password signup is blocked for verified domains",
+      "passed": false,
+      "evidence": "MISSING required /signup[^.\\n]{0,50}block|block[^.\\n]{0,50}signup|cannot[^.\\n]{0,60}password account/"
+    },
+    {
+      "text": "Tells them to set up a break-glass admin with a password beforehand",
+      "passed": true,
+      "evidence": "OK required /break[- ]glass/ -> 'break-glass'"
+    },
+    {
+      "text": "Gives the /login/admin bypass portal path",
+      "passed": false,
+      "evidence": "MISSING required //login/admin/"
+    },
+    {
+      "text": "Notes Organization Admin is required, not Server Admin",
+      "passed": false,
+      "evidence": "MISSING required /[Oo]rganization [Aa]dmin/"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "timing": {
+    "total_duration_seconds": 51.3
+  }
+}

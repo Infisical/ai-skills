@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-pki",
+  "chosen": "infisical-pki",
+  "correct": true,
+  "confusable_with": "infisical-secret-syncs",
+  "duration_seconds": 6.0
+}

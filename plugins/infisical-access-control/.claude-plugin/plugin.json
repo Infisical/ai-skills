@@ -1,0 +1,21 @@
+{
+  "name": "infisical-access-control",
+  "description": "Infisical access control and governance \u2014 roles and custom permissions, granular secret actions, ABAC, temporary access, approval workflows, and audit log streaming.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/access-controls/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "rbac",
+    "abac",
+    "permissions",
+    "approvals",
+    "audit-logs",
+    "governance"
+  ]
+}

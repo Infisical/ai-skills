@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the v1beta1 API version",
+      "passed": true,
+      "evidence": "OK required /secrets\\.infisical\\.com/v1beta1/ -> 'secrets.infisical.com/v1beta1'"
+    },
+    {
+      "text": "Uses InfisicalStaticSecret rather than the legacy InfisicalSecret",
+      "passed": true,
+      "evidence": "OK required /InfisicalStaticSecret/ -> 'InfisicalStaticSecret'"
+    },
+    {
+      "text": "Includes InfisicalConnection and InfisicalAuth resources",
+      "passed": true,
+      "evidence": "OK required /InfisicalConnection/ -> 'InfisicalConnection' | OK required /InfisicalAuth/ -> 'InfisicalAuth'"
+    },
+    {
+      "text": "Adds the auto-reload annotation for automatic redeployment",
+      "passed": true,
+      "evidence": "OK required /secrets\\.infisical\\.com/auto-reload/ -> 'secrets.infisical.com/auto-reload'"
+    },
+    {
+      "text": "Uses sources and targets",
+      "passed": true,
+      "evidence": "OK required /sources:/ -> 'sources:' | OK required /targets:/ -> 'targets:'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 15.5
+  }
+}

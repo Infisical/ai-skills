@@ -5,15 +5,15 @@
     "email": "support@infisical.com"
   },
   "metadata": {
-    "description": "Official Infisical skills for AI coding agents — correct SDK usage, auth methods, secret syncs, dynamic secrets, agent config, and more.",
-    "version": "1.2.0",
+    "description": "Official Infisical skills for AI coding agents \u2014 17 skills covering secrets management, App Connections, secret syncs and rotation, dynamic secrets, PKI, KMS, PAM, Kubernetes, access control, scanning, SSO, gateways, and self-hosting.",
+    "version": "2.0.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "infisical-setup",
       "source": "./infisical-setup",
-      "description": "Interactive setup guide for integrating Infisical into your projects — CLI, Docker, Kubernetes, CI/CD, SDKs, and machine identity auth.",
+      "description": "Interactive setup guide for integrating Infisical into your projects \u2014 CLI, Docker, Kubernetes, CI/CD, SDKs, and machine identity auth.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -21,9 +21,22 @@
       "homepage": "https://infisical.com/docs",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "secrets", "secret-management", "sdk", "docker", "kubernetes", "cicd"],
+      "keywords": [
+        "infisical",
+        "secrets",
+        "secret-management",
+        "sdk",
+        "docker",
+        "kubernetes",
+        "cicd"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "devops", "infrastructure"]
+      "tags": [
+        "secrets",
+        "security",
+        "devops",
+        "infrastructure"
+      ]
     },
     {
       "name": "infisical-secret-syncs",
@@ -36,14 +49,29 @@
       "homepage": "https://infisical.com/docs/integrations/secret-syncs",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "secrets", "secret-syncs", "aws", "gcp", "azure", "github", "vercel", "vault"],
+      "keywords": [
+        "infisical",
+        "secrets",
+        "secret-syncs",
+        "aws",
+        "gcp",
+        "azure",
+        "github",
+        "vercel",
+        "vault"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "devops", "integrations"]
+      "tags": [
+        "secrets",
+        "security",
+        "devops",
+        "integrations"
+      ]
     },
     {
       "name": "infisical-dynamic-secrets",
       "source": "./infisical-dynamic-secrets",
-      "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across all 30 providers.",
+      "description": "Guide for configuring Infisical Dynamic Secrets \u2014 on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across all 30 providers.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -51,14 +79,29 @@
       "homepage": "https://infisical.com/docs/documentation/platform/dynamic-secrets",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "secrets", "dynamic-secrets", "database", "postgresql", "mysql", "redis", "aws-iam", "ssh"],
+      "keywords": [
+        "infisical",
+        "secrets",
+        "dynamic-secrets",
+        "database",
+        "postgresql",
+        "mysql",
+        "redis",
+        "aws-iam",
+        "ssh"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "database", "credentials"]
+      "tags": [
+        "secrets",
+        "security",
+        "database",
+        "credentials"
+      ]
     },
     {
       "name": "infisical-agent",
       "source": "./infisical-agent",
-      "description": "Guide for configuring the Infisical Agent — a client daemon that manages auth token lifecycle and renders secrets to files via Go templates.",
+      "description": "Guide for configuring the Infisical Agent \u2014 a client daemon that manages auth token lifecycle and renders secrets to files via Go templates.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -66,14 +109,28 @@
       "homepage": "https://infisical.com/docs/infisical-agent/overview",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "secrets", "agent", "sidecar", "templates", "kubernetes", "docker", "ecs"],
+      "keywords": [
+        "infisical",
+        "secrets",
+        "agent",
+        "sidecar",
+        "templates",
+        "kubernetes",
+        "docker",
+        "ecs"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "devops", "agent"]
+      "tags": [
+        "secrets",
+        "security",
+        "devops",
+        "agent"
+      ]
     },
     {
       "name": "infisical-terraform",
       "source": "./infisical-terraform",
-      "description": "Guide for using the Infisical Terraform Provider — HCL resources, ephemeral secrets, data sources, project roles, and Terraform Cloud OIDC integration.",
+      "description": "Guide for using the Infisical Terraform Provider \u2014 HCL resources, ephemeral secrets, data sources, project roles, and Terraform Cloud OIDC integration.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -81,14 +138,27 @@
       "homepage": "https://infisical.com/docs/integrations/frameworks/terraform",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "terraform", "hcl", "ephemeral", "iac", "terraform-cloud", "oidc"],
+      "keywords": [
+        "infisical",
+        "terraform",
+        "hcl",
+        "ephemeral",
+        "iac",
+        "terraform-cloud",
+        "oidc"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "iac", "terraform"]
+      "tags": [
+        "secrets",
+        "security",
+        "iac",
+        "terraform"
+      ]
     },
     {
       "name": "infisical-api",
       "source": "./infisical-api",
-      "description": "Guide for the Infisical REST API — authentication, secrets CRUD (v4), projects, identities, pagination, and rate limits.",
+      "description": "Guide for the Infisical REST API \u2014 authentication, secrets CRUD (v4), projects, identities, pagination, and rate limits.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -96,14 +166,27 @@
       "homepage": "https://infisical.com/docs/api-reference/overview/introduction",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "api", "rest", "secrets", "endpoints", "authentication", "bearer-token"],
+      "keywords": [
+        "infisical",
+        "api",
+        "rest",
+        "secrets",
+        "endpoints",
+        "authentication",
+        "bearer-token"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "api", "rest"]
+      "tags": [
+        "secrets",
+        "security",
+        "api",
+        "rest"
+      ]
     },
     {
       "name": "infisical-self-host",
       "source": "./infisical-self-host",
-      "description": "Guide for self-hosting Infisical — Docker, Kubernetes Helm, environment variables, ENCRYPTION_KEY setup, FIPS compliance, scaling, and production hardening.",
+      "description": "Guide for self-hosting Infisical \u2014 Docker, Kubernetes Helm, environment variables, ENCRYPTION_KEY setup, FIPS compliance, scaling, and production hardening.",
       "version": "1.0.0",
       "author": {
         "name": "Infisical"
@@ -111,9 +194,301 @@
       "homepage": "https://infisical.com/docs/self-hosting/overview",
       "repository": "https://github.com/Infisical/ai-skills",
       "license": "MIT",
-      "keywords": ["infisical", "self-hosted", "docker", "kubernetes", "helm", "deployment", "fips"],
+      "keywords": [
+        "infisical",
+        "self-hosted",
+        "docker",
+        "kubernetes",
+        "helm",
+        "deployment",
+        "fips"
+      ],
       "category": "developer-tools",
-      "tags": ["secrets", "security", "deployment", "self-hosted"]
+      "tags": [
+        "secrets",
+        "security",
+        "deployment",
+        "self-hosted"
+      ]
+    },
+    {
+      "name": "infisical-app-connections",
+      "source": "./infisical-app-connections",
+      "description": "Create and manage Infisical App Connections \u2014 the reusable authenticated links to 83 third-party services that Secret Syncs, Secret Rotations, PKI, and Secret Scanning all depend on.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/integrations/app-connections/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "app-connections",
+        "aws",
+        "gcp",
+        "azure",
+        "github",
+        "oauth",
+        "authentication"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "secrets",
+        "security",
+        "integrations",
+        "infrastructure"
+      ]
+    },
+    {
+      "name": "infisical-secret-rotation",
+      "source": "./infisical-secret-rotation",
+      "description": "Configure Infisical Secret Rotation \u2014 automatically rotating existing third-party credentials on a schedule across 28 providers, with dual-phase zero-downtime rotation.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/secret-rotation/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "secret-rotation",
+        "credentials",
+        "postgres",
+        "aws",
+        "rotation"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "secrets",
+        "security",
+        "devops",
+        "databases"
+      ]
+    },
+    {
+      "name": "infisical-pki",
+      "source": "./infisical-pki",
+      "description": "Infisical Certificate Management \u2014 certificate authorities, certificate profiles and applications, ACME/EST/SCEP/API enrollment, PKI syncs, code signing, and post-quantum algorithms.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/pki/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "pki",
+        "certificates",
+        "tls",
+        "x509",
+        "acme",
+        "code-signing",
+        "ca"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "certificates",
+        "infrastructure",
+        "compliance"
+      ]
+    },
+    {
+      "name": "infisical-kms",
+      "source": "./infisical-kms",
+      "description": "Infisical KMS \u2014 managed cryptographic keys for encrypt/decrypt, sign/verify, and HMAC, plus external KMS backing, KMIP, and Sigstore cosign.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/kms/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "kms",
+        "encryption",
+        "signing",
+        "kmip",
+        "cryptography"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "encryption",
+        "compliance",
+        "infrastructure"
+      ]
+    },
+    {
+      "name": "infisical-pam",
+      "source": "./infisical-pam",
+      "description": "Infisical Privileged Access Manager \u2014 brokered access to databases and servers for humans and AI agents, with session recording, approvals, and no credential exposure.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/pam/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "pam",
+        "privileged-access",
+        "session-recording",
+        "ssh",
+        "databases",
+        "ai-agents"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "access-control",
+        "infrastructure",
+        "compliance"
+      ]
+    },
+    {
+      "name": "infisical-kubernetes-operator",
+      "source": "./infisical-kubernetes-operator",
+      "description": "The Infisical Kubernetes Operator \u2014 syncing secrets into Kubernetes Secrets and ConfigMaps via v1beta1 and legacy v1alpha1 CRDs, with auto-reload and push-secret support.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/integrations/platforms/kubernetes/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "kubernetes",
+        "operator",
+        "crd",
+        "helm",
+        "secrets",
+        "k8s"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "secrets",
+        "kubernetes",
+        "devops",
+        "infrastructure"
+      ]
+    },
+    {
+      "name": "infisical-access-control",
+      "source": "./infisical-access-control",
+      "description": "Infisical access control and governance \u2014 roles and custom permissions, granular secret actions, ABAC, temporary access, approval workflows, and audit log streaming.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/access-controls/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "rbac",
+        "abac",
+        "permissions",
+        "approvals",
+        "audit-logs",
+        "governance"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "access-control",
+        "compliance",
+        "governance"
+      ]
+    },
+    {
+      "name": "infisical-secret-scanning",
+      "source": "./infisical-secret-scanning",
+      "description": "Infisical Secret Scanning \u2014 detecting leaked credentials in GitHub/GitLab/Bitbucket repositories and locally with the `infisical scan` CLI, plus AWS honey tokens.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/secret-scanning/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "secret-scanning",
+        "leaked-secrets",
+        "pre-commit",
+        "honey-tokens",
+        "git"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "devops",
+        "scanning",
+        "compliance"
+      ]
+    },
+    {
+      "name": "infisical-sso",
+      "source": "./infisical-sso",
+      "description": "Connect Infisical to an identity provider \u2014 SAML, OIDC, LDAP and free Google/GitHub SSO, SCIM user and group provisioning, group-to-role mapping, and SSO enforcement with break-glass access.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/sso/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "sso",
+        "saml",
+        "oidc",
+        "scim",
+        "okta",
+        "azure-ad",
+        "ldap"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "security",
+        "identity",
+        "access-control",
+        "compliance"
+      ]
+    },
+    {
+      "name": "infisical-gateway",
+      "source": "./infisical-gateway",
+      "description": "The Infisical Gateway and Relay \u2014 reaching private network resources with outbound-only SSH reverse tunnels, gateway pools for HA, and no inbound firewall rules.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Infisical"
+      },
+      "homepage": "https://infisical.com/docs/documentation/platform/gateways/overview",
+      "repository": "https://github.com/Infisical/ai-skills",
+      "license": "MIT",
+      "keywords": [
+        "infisical",
+        "gateway",
+        "relay",
+        "private-network",
+        "vpc",
+        "networking"
+      ],
+      "category": "developer-tools",
+      "tags": [
+        "infrastructure",
+        "networking",
+        "security",
+        "devops"
+      ]
     }
   ]
 }

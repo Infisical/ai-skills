@@ -27,6 +27,21 @@ This skill provides guidance for working with the Infisical REST API. Use it whe
 - Handle pagination and understand rate limits
 - Choose the correct API version and region
 
+## Not this skill
+
+| If the user wants... | Use |
+|----------------------|-----|
+| The CLI, an SDK, or a platform integration | `infisical-setup` |
+| Terraform/HCL | `infisical-terraform` |
+| **Human** login via SAML/OIDC/LDAP | `infisical-sso` |
+| Roles, permissions, and approval policies | `infisical-access-control` |
+| The KMS encrypt/decrypt/sign endpoints | `infisical-kms` |
+| Certificate endpoints | `infisical-pki` |
+| Secret sync / rotation / App Connection endpoints | the matching product skill |
+
+This skill covers the core secrets, projects, and identities API. Product-specific endpoints are
+documented in their own skills, where the surrounding concepts live.
+
 ## Guiding Principles
 
 1. **Always authenticate via machine identity Universal Auth first** — use the Universal Auth login endpoint to obtain a Bearer token before making other API calls

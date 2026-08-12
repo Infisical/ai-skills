@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "pki-ecdsa-key-algorithm",
+  "skill": "infisical-pki",
+  "skill_files": [
+    "SKILL.md",
+    "references/certificate-authorities.md",
+    "references/issuance-and-enrollment.md"
+  ],
+  "prompt": "I want to create an internal Infisical certificate authority using an ECDSA P-256 key. What exact key algorithm value do I pass, and what is the difference between a root and an intermediate CA in Infisical?",
+  "assertions": [
+    "Gives the correct ECDSA P-256 wire value EC_prime256v1",
+    "Does not offer ECDSA_P256 as the value",
+    "Explains root self-signs and intermediate is signed by a parent",
+    "Mentions pending-certificate status for an unsigned intermediate"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}
