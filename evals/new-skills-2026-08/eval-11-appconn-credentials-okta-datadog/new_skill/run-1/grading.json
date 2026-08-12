@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Okta uses method api-token",
+      "passed": true,
+      "evidence": "OK required /[Oo]kta[\\s\\S]{0,300}?api-token/ -> 'Okta \u2014 slug `okta`\\n\\n**Method:** `api-token'"
+    },
+    {
+      "text": "Datadog offers token and api-key methods",
+      "passed": true,
+      "evidence": "OK required /\"?api-key\"?/ -> 'api-key'"
+    },
+    {
+      "text": "Posts to the per-connection slug endpoint",
+      "passed": true,
+      "evidence": "OK required //api/v1/app-connections/okta/ -> '/api/v1/app-connections/okta' | OK required //api/v1/app-connections/datadog/ -> '/api/v1/app-connections/datadog'"
+    },
+    {
+      "text": "Does not invent a generic credentials shape for both",
+      "passed": true,
+      "evidence": "OK absent /same credentials for both|identical credential/"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 17.9
+  }
+}

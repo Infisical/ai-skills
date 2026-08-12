@@ -16,19 +16,21 @@ Every Infisical AI Skill is A/B tested before shipping. Each eval runs the same 
 
 ## New skills (`new-skills-2026-08/`)
 
-A/B eval for the 10 skills added when coverage expanded from 7 to 17. Tools disabled, deterministic
-regex grading.
+A/B eval for the 10 skills added when coverage expanded from 7 to 17, plus the App Connection API
+surface added afterwards. Tools disabled, deterministic regex grading.
 
 | Arm | Score | Pass rate |
 |-----|-------|-----------|
-| No skill | 21/46 | 45.7% |
-| With new skill | 46/46 | **100.0%** |
+| No skill | 27/56 | 48.2% |
+| With new skill | 56/56 | **100.0%** |
 
 Honest null results are recorded alongside the wins: on App Connections the base model already scored
 4/4 unaided, and on Access Control 3/4. Where the skills matter most is product surface the model has
 little knowledge of — PAM agentic access and SSO enforcement both scored 1/5 unaided, and the
 Kubernetes Operator scored **0/5** because the model reached for the legacy `v1alpha1`
-`InfisicalSecret` CRD instead of current `v1beta1`.
+`InfisicalSecret` CRD instead of current `v1beta1`. And asked to script a call listing an AWS
+connection's KMS keys, it scored **1/3** — it writes a normal API call, but that endpoint is
+`AuthMode.JWT` only and rejects a machine identity token.
 
 See [`new-skills-2026-08/benchmark.md`](new-skills-2026-08/benchmark.md).
 

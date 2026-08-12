@@ -83,7 +83,7 @@ on the right one — see [`AGENTS.md`](AGENTS.md) for the router and disambiguat
 
 | Skill | Covers |
 |-------|--------|
-| **infisical-app-connections** | All 83 connection types and their exact auth methods. The shared prerequisite for syncs, rotations, PKI, and scanning |
+| **infisical-app-connections** | All 83 connection types, auth methods, and credential fields (generated from source). The shared prerequisite for syncs, rotations, PKI, and scanning |
 | **infisical-secret-syncs** | Pushing secrets to all 48 destinations, key schemas, initial-sync enums |
 | **infisical-dynamic-secrets** | On-demand short-lived credentials across all 30 providers, leases, SSH certificates |
 | **infisical-secret-rotation** | Rotating existing credentials across 28 providers, dual-phase vs single-phase, the two-user SQL pattern |
@@ -159,13 +159,26 @@ The 10 skills added in the 7 → 17 expansion, A/B tested the same way:
 
 | Arm | Score | Pass rate |
 |-----|-------|-----------|
-| No skill | 21/46 | 45.7% |
-| With new skill | 46/46 | **100.0%** |
+| No skill | 27/56 | 48.2% |
+| With new skill | 56/56 | **100.0%** |
 
 Null results are recorded, not hidden: on App Connections the base model already scored 4/4 unaided.
 The skills matter most where the model has little knowledge — PAM and SSO scored 1/5 unaided, and the
 Kubernetes Operator **0/5**, because unaided it reaches for the legacy `v1alpha1 InfisicalSecret` CRD
 instead of current `v1beta1`. See [`evals/new-skills-2026-08/`](evals/new-skills-2026-08/).
+
+### Generated reference files
+
+The App Connection facts — 83 connections × auth methods × credential fields, and all 94 API
+endpoints — are **generated from the Infisical source**, not hand-maintained:
+
+```bash
+python3 tools/generate-app-connection-refs.py          # regenerate
+python3 tools/generate-app-connection-refs.py --check  # CI: fail on drift
+```
+
+This is the structural answer to the drift problem above. Facts are derived; only guidance is
+written by hand. Re-verification is `regenerate && git diff`.
 
 ### Routing: does the right skill get picked?
 

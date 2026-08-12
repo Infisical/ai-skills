@@ -152,5 +152,21 @@ When re-verifying, read the **code**, not the docs prose. Counts and enum values
 | Permissions | `backend/src/ee/services/permission/{org,project}-permission.ts` |
 | API routes | `backend/src/server/routes/` |
 
-Also: `plugins/<name>/skills/<name>/` is a **copy** of `skills/<name>/`. They drift silently — diff
-them before committing.
+### Generated files
+
+The App Connection factual references are **generated**, not hand-written:
+
+```bash
+python3 tools/generate-app-connection-refs.py          # regenerate from the Infisical repo
+python3 tools/generate-app-connection-refs.py --check  # fail if the checked-in output is stale
+```
+
+Do not edit `references/api-surface.md` or `references/credentials-by-connection.md` by hand — they
+carry a generated-file banner and the next run overwrites them. Change the generator instead.
+
+Prefer extending this pattern over hand-maintaining any new enumerable fact.
+
+### Wrapper drift
+
+`plugins/<name>/skills/<name>/` is a **copy** of `skills/<name>/`. They drift silently. CI checks
+this, and so should you before committing.

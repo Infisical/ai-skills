@@ -1,11 +1,11 @@
 {
   "iteration": "new-skills-2026-08",
-  "purpose": "A/B eval for the 10 skills added in this change. Tools disabled; deterministic regex grading.",
+  "purpose": "A/B eval for the 10 skills added in the 7->17 expansion, plus the App Connection API surface added afterwards.",
   "ground_truth": {
     "repo": "Infisical/infisical",
-    "commit": "caa698e100"
+    "commit": "bbe1f02208"
   },
-  "skills_commit": "223971a",
+  "skills_commit": "da9176b",
   "model": "claude-sonnet-5",
   "tools": "disabled for all arms",
   "arms": {
@@ -14,13 +14,13 @@
   },
   "totals": {
     "baseline": {
-      "passed": 21,
-      "total": 46,
-      "pass_rate": 0.4565
+      "passed": 27,
+      "total": 56,
+      "pass_rate": 0.4821
     },
     "new_skill": {
-      "passed": 46,
-      "total": 46,
+      "passed": 56,
+      "total": 56,
       "pass_rate": 1.0
     }
   },
@@ -153,6 +153,45 @@
       "new_skill": {
         "passed": 5,
         "total": 5
+      }
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "appconn-discovery-endpoint-auth",
+      "skill": "infisical-app-connections",
+      "baseline": {
+        "passed": 1,
+        "total": 3
+      },
+      "new_skill": {
+        "passed": 3,
+        "total": 3
+      }
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "appconn-credentials-okta-datadog",
+      "skill": "infisical-app-connections",
+      "baseline": {
+        "passed": 3,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "appconn-lookup-by-name",
+      "skill": "infisical-app-connections",
+      "baseline": {
+        "passed": 2,
+        "total": 3
+      },
+      "new_skill": {
+        "passed": 3,
+        "total": 3
       }
     }
   ]

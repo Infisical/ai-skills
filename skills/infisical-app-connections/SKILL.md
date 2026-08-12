@@ -51,12 +51,17 @@ machine identities, not this skill.
 
 ## Reference files
 
-| File | When to read |
-|------|-------------|
-| `references/connection-catalog.md` | The full list of 83 connections with their exact auth-method values |
-| `references/cloud-providers.md` | AWS, GCP, Azure (all variants), and their permission requirements |
-| `references/git-and-cicd.md` | GitHub (+ GitHub Radar), GitLab, Bitbucket, Azure DevOps, CI providers |
-| `references/databases-and-infra.md` | PostgreSQL, MySQL, MSSQL, OracleDB, MongoDB, Redis, LDAP, SSH, SMB/WinRM, and Gateway + platform-managed credentials |
+Two of these are **generated from the Infisical source** — they hold facts, and
+`tools/generate-app-connection-refs.py` reproduces them. The rest are hand-written guidance.
+
+| File | Generated? | When to read |
+|------|-----------|-------------|
+| `references/api-surface.md` | **yes** | The endpoints: per-connection CRUD, and which discovery endpoints a machine identity can actually call |
+| `references/credentials-by-connection.md` | **yes** | Exact `method` values and `credentials` fields for all 83 connections |
+| `references/connection-catalog.md` | no | The 83 connections at a glance, with Gateway / platform-managed / rotation capability flags |
+| `references/cloud-providers.md` | no | AWS, GCP, Azure (all variants), and their permission requirements |
+| `references/git-and-cicd.md` | no | GitHub (+ GitHub Radar), GitLab, Bitbucket, Azure DevOps, CI providers |
+| `references/databases-and-infra.md` | no | PostgreSQL, MySQL, MSSQL, OracleDB, MongoDB, Redis, LDAP, SSH, SMB/WinRM, and Gateway + platform-managed credentials |
 
 ## Guiding principles
 
@@ -66,5 +71,7 @@ machine identities, not this skill.
 - **A connection is not a Gateway.** Only 16 connection types accept `gatewayId`. For the rest, passing one is a validation error, not a no-op.
 - **`gatewayId` and `gatewayPoolId` are mutually exclusive.** Specifying both fails.
 - **Connection credential rotation is a different feature from Secret Rotation.** Five connection types can rotate *their own* stored credential. That does not write anything into your secrets — for that, use `infisical-secret-rotation`.
+- **Most resource-discovery endpoints cannot be automated.** Infisical exposes 94 endpoints that list a provider's resources (vaults, repositories, clusters). **88 are `AuthMode.JWT` only** — a user session. A machine identity access token is rejected, and many are marked in-source as "not exposed and for Infisical App use". Only 6 accept a machine identity token. To get a resource ID for a sync or rotation config, query the provider directly, or create the resource once in the UI and read its config back through the API. See `references/api-surface.md`.
+- **Resolve a connection by name, not by UUID.** `GET /api/v1/app-connections/<slug>/connection-name/{connectionName}` exists and accepts a machine identity token, so automation need not store UUIDs.
 - **Least privilege on the third-party side.** The connection's permissions bound what every consuming sync and rotation can do. Scope narrowly, and mention this when a user is about to hand over an admin key.
 - **Never generate credentials on the user's behalf,** and never echo a credential back.
