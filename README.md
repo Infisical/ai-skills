@@ -177,12 +177,14 @@ Measured on 14 prompts sitting deliberately on a seam between two similar skills
 
 | Arm | Correct | Accuracy |
 |-----|---------|----------|
-| Skill descriptions only | 13/14 | 92.9% |
+| Skill descriptions only | 14/14 | **100.0%** |
 | With router + boundaries | 14/14 | **100.0%** |
 
-The case it fixed: asked about short-lived SSH certificates, descriptions alone chose
-`infisical-pam`. Plausible, but wrong — SSH certificates come from **SSH dynamic secrets**, not from
-PAM and not from the PKI product. See [`evals/routing-2026-08/`](evals/routing-2026-08/).
+Getting there took two passes. Initially descriptions alone scored 13/14 — asked about short-lived
+SSH certificates it chose `infisical-pam`, plausible but wrong, since SSH certificates come from
+**SSH dynamic secrets**. The fix was moving the boundaries into the `description` frontmatter, because
+that is what actually decides whether a skill loads. See
+[`evals/routing-2026-08/`](evals/routing-2026-08/).
 
 ## Why this exists
 
@@ -228,8 +230,9 @@ To add a new skill:
 3. Add a plugin entry in `.claude-plugin/marketplace.json`
 4. Update `AGENTS.md` — add it to the router table, and add a row to the disambiguation table if it
    sits near an existing skill
-5. Add a `## Not this skill` section to the new SKILL.md, and add reciprocal rows to the neighbours
-   it could be confused with
+5. Put the boundary in **two** places: a short "not for X (other-skill)" clause at the end of the
+   `description` frontmatter — that is what decides whether the skill loads — and a `## Not this
+   skill` section in the body, with reciprocal rows on the neighbours it could be confused with
 6. Run `claude plugin validate .` to check for errors
 7. Add eval cases and run A/B benchmarks (see `evals/` for examples)
 

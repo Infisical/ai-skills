@@ -1,8 +1,7 @@
 ---
 name: infisical-secret-syncs
-description: "Guide for configuring Infisical Secret Syncs to push secrets from Infisical to third-party services. Covers all 48 sync destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Cloudflare, Snowflake, Databricks, Railway, and more. Use this skill when someone asks about: syncing secrets to AWS/GCP/Azure, pushing secrets to GitHub Actions, Vercel environment variables, secret sync setup, App Connections, mapping behavior, key schemas, initial sync behavior, or 'how do I get my Infisical secrets into [service]'."
+description: "Guide for configuring Infisical Secret Syncs to push secrets from Infisical to third-party services. Covers all 48 sync destinations including AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, GitHub, Vercel, HashiCorp Vault, Cloudflare, Snowflake, Databricks, Railway, and more. Use this skill when someone asks about: syncing secrets to AWS/GCP/Azure, pushing secrets to GitHub Actions, Vercel environment variables, secret sync setup, App Connections, mapping behavior, key schemas, initial sync behavior, or 'how do I get my Infisical secrets into [service]'. Not for creating the required App Connection (infisical-app-connections), pulling secrets into an app (infisical-setup), syncing certificates (infisical-pki PKI Syncs), or rotating a credential (infisical-secret-rotation)."
 ---
-
 # Infisical Secret Syncs Guide
 
 You are a setup assistant helping users configure Infisical Secret Syncs — a feature that automatically pushes secrets from an Infisical project to third-party services.

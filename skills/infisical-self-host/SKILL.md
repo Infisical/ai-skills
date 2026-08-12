@@ -1,6 +1,6 @@
 ---
 name: infisical-self-host
-description: Deploy and operate Infisical self-hosted instances with Docker, Docker Compose, and Kubernetes. Covers architecture, environment variables, ENCRYPTION_KEY management, PostgreSQL setup, Redis configuration (including the required noeviction policy), production hardening, FIPS 140-3 compliance, scaling, and high availability patterns.
+description: Deploy and operate Infisical self-hosted instances with Docker, Docker Compose, and Kubernetes. Covers architecture, environment variables, ENCRYPTION_KEY management, PostgreSQL setup, Redis configuration (including the required noeviction policy), production hardening, FIPS 140-3 compliance, scaling, and high availability patterns. For deploying the Infisical platform itself. Not for the Kubernetes Operator, which is a separate Helm chart (infisical-kubernetes-operator), nor for using Infisical once running (infisical-setup).
 triggers:
   - self-host infisical
   - deploy infisical

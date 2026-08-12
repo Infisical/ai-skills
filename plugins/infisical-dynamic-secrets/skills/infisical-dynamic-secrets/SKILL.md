@@ -1,8 +1,7 @@
 ---
 name: infisical-dynamic-secrets
-description: "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes. Covers all 30 providers including PostgreSQL, MySQL, MSSQL, Oracle, Redis, AWS ElastiCache, AWS MemoryDB, MongoDB, Elasticsearch, Couchbase, Milvus, AWS IAM, GCP IAM, Azure Entra ID, SSH certificates, Kubernetes service accounts, LDAP, GitHub, Tailscale, IBM API Connect, and TOTP. Use this skill when someone asks about: dynamic secrets, ephemeral database credentials, short-lived tokens, rotating database users, dynamic PostgreSQL/MySQL/Redis credentials, SSH certificates, temporary AWS IAM users, lease renewal, or 'how do I generate temporary credentials with Infisical'."
+description: "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes. Covers all 30 providers including PostgreSQL, MySQL, MSSQL, Oracle, Redis, AWS ElastiCache, AWS MemoryDB, MongoDB, Elasticsearch, Couchbase, Milvus, AWS IAM, GCP IAM, Azure Entra ID, SSH certificates, Kubernetes service accounts, LDAP, GitHub, Tailscale, IBM API Connect, and TOTP. Use this skill when someone asks about: dynamic secrets, ephemeral database credentials, short-lived tokens, rotating database users, dynamic PostgreSQL/MySQL/Redis credentials, SSH certificates, temporary AWS IAM users, lease renewal, or 'how do I generate temporary credentials with Infisical'. For brand-new short-lived credentials created per request. Not for changing an existing credential on a schedule (infisical-secret-rotation), nor for recorded human/agent access without a credential (infisical-pam). Covers SSH certificates; TLS certificates are infisical-pki."
 ---
-
 # Infisical Dynamic Secrets Guide
 
 You are a setup assistant helping users configure Infisical Dynamic Secrets — on-demand, short-lived credentials that are unique per identity and automatically expire.

@@ -1,7 +1,7 @@
 {
   "iteration": "routing-2026-08",
   "purpose": "Verify the router + negative boundaries send an agent to the correct skill on prompts that sit exactly on a confusable seam. Arms: descriptions only (frontmatter descriptions, as a bare skill list would present) vs router (AGENTS.md router + disambiguation table).",
-  "skills_commit": "223971a",
+  "skills_commit": "48eae3f",
   "model": "claude-sonnet-5",
   "tools": "disabled",
   "arms": {
@@ -10,14 +10,24 @@
   },
   "totals": {
     "descriptions": {
-      "correct": 13,
+      "correct": 14,
       "total": 14,
-      "accuracy": 0.9286
+      "accuracy": 1.0
     },
     "router": {
       "correct": 14,
       "total": 14,
       "accuracy": 1.0
+    }
+  },
+  "history": {
+    "before_description_boundaries": {
+      "descriptions": "13/14",
+      "router": "14/14"
+    },
+    "after_description_boundaries": {
+      "descriptions": "14/14",
+      "router": "14/14"
     }
   },
   "per_case": [
@@ -74,7 +84,7 @@
       "name": "ssh-cert-not-pki",
       "expected": "infisical-dynamic-secrets",
       "confusable_with": "infisical-pki",
-      "descriptions": "infisical-pam",
+      "descriptions": "infisical-dynamic-secrets",
       "router": "infisical-dynamic-secrets"
     },
     {

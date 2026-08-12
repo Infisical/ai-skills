@@ -40,12 +40,15 @@ deliberately on a seam between two skills that sound alike.
 
 | Arm | Correct | Accuracy |
 |-----|---------|----------|
-| Skill descriptions only | 13/14 | 92.9% |
-| AGENTS.md router + negative boundaries | 14/14 | **100.0%** |
+| Skill descriptions only | 14/14 | **100.0%** |
+| AGENTS.md router + boundaries | 14/14 | **100.0%** |
 
-The case the router fixed: asked about short-lived SSH certificates, descriptions alone chose
-`infisical-pam` — plausible, but SSH certificates come from **SSH dynamic secrets**, not from PAM and
-not from the PKI product.
+Run 1 scored 13/14 on descriptions alone, with the router closing the gap. The failing case: asked
+about short-lived SSH certificates it chose `infisical-pam` — plausible, but SSH certificates come
+from **SSH dynamic secrets**, not PAM and not PKI.
+
+Fixing it meant moving the boundaries into the `description` frontmatter, since that is what actually
+decides whether a skill loads. Routing is now correct without the router in context.
 
 See [`routing-2026-08/benchmark.md`](routing-2026-08/benchmark.md).
 

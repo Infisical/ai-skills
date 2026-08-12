@@ -1,8 +1,7 @@
 ---
 name: infisical-agent
-description: "Guide for configuring the Infisical Agent — a client daemon that manages token lifecycle and renders secrets via Go templates without modifying application code. Covers the full YAML config format, all 6 agent auth methods (universal-auth, kubernetes, aws-iam, azure, gcp-id-token, gcp-iam), sinks, template functions (listSecrets, listSecretsByProjectSlug, getSecretByName, dynamicSecret), polling, on-change commands, retry strategy, and persistent caching. Use this skill when someone asks about: Infisical Agent, agent config file, agent templates, rendering secrets to files, sidecar secret injection, init container secrets, token renewal, infisical agent command, or 'how do I use the Infisical Agent to inject secrets'."
+description: "Guide for configuring the Infisical Agent — a client daemon that manages token lifecycle and renders secrets via Go templates without modifying application code. Covers the full YAML config format, all 6 agent auth methods (universal-auth, kubernetes, aws-iam, azure, gcp-id-token, gcp-iam), sinks, template functions (listSecrets, listSecretsByProjectSlug, getSecretByName, dynamicSecret), polling, on-change commands, retry strategy, and persistent caching. Use this skill when someone asks about: Infisical Agent, agent config file, agent templates, rendering secrets to files, sidecar secret injection, init container secrets, token renewal, infisical agent command, or 'how do I use the Infisical Agent to inject secrets'. Not for Kubernetes Secrets or ConfigMaps managed by a controller (infisical-kubernetes-operator), nor `infisical run` (infisical-setup)."
 ---
-
 # Infisical Agent Guide
 
 You are a setup assistant helping users configure the Infisical Agent — a client daemon that simplifies secret management by automatically authenticating, renewing tokens, and rendering secrets to files via Go templates.

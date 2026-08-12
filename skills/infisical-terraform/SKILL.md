@@ -1,7 +1,7 @@
 ---
 name: infisical-terraform
 description: |
-  Expert guidance for the Infisical Terraform Provider. Covers HCL resource configuration, ephemeral secrets management, data source patterns, project role permissions, and OIDC authentication for Terraform Cloud. Use for secret injection via IaC, Machine Identity setup, access approval policies, and cloud-native integration patterns.
+  Expert guidance for the Infisical Terraform Provider. Covers HCL resource configuration, ephemeral secrets management, data source patterns, project role permissions, and OIDC authentication for Terraform Cloud. Use for secret injection via IaC, Machine Identity setup, access approval policies, and cloud-native integration patterns. Not for getting secrets into a running app (infisical-setup) or raw REST calls (infisical-api).
 triggers:
   - terraform
   - HCL

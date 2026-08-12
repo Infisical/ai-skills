@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 *.log
 .env
+
+# Local working docs (not for commit)
+*.local.md

@@ -1,1 +1,1 @@
-infisical-pam
+infisical-dynamic-secrets

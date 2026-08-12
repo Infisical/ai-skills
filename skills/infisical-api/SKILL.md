@@ -1,6 +1,6 @@
 ---
 name: infisical-api
-description: Interact with the Infisical REST API to manage secrets, projects, environments, machine identities, and more. Supports secret CRUD operations, machine identity authentication, pagination, and rate limiting on cloud deployments.
+description: Interact with the Infisical REST API to manage secrets, projects, environments, machine identities, and more. Supports secret CRUD operations, machine identity authentication, pagination, and rate limiting on cloud deployments. Not for the CLI/SDKs (infisical-setup), KMS crypto endpoints (infisical-kms), certificate endpoints (infisical-pki), or human SSO login (infisical-sso).
 triggers:
   - infisical API
   - REST endpoint
