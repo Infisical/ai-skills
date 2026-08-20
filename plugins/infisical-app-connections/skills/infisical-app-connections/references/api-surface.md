@@ -1,7 +1,6 @@
 <!-- GENERATED FILE — do not edit by hand.
      Source: tools/generate-app-connection-refs.py
-     Regenerate: python3 tools/generate-app-connection-refs.py
-     Ground truth: bbe1f02208 -->
+     Regenerate: python3 tools/generate-app-connection-refs.py -->
 
 # App Connection API Surface
 

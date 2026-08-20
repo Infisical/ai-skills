@@ -39,10 +39,12 @@ SKILL_REFS = pathlib.Path("skills/infisical-app-connections/references")
 GENERIC_URLS = {"/", "/available", "/:connectionId", "/connection-name/:connectionName",
                 "/:connectionId/rotate-credentials", "/:connectionId/usage", "/options"}
 
+# Deliberately no commit hash: the output must be a pure function of the facts, so an
+# upstream commit that changes nothing we document produces no diff. The commit is
+# reported on stdout instead, where it is useful without being churn.
 BANNER = ("<!-- GENERATED FILE — do not edit by hand.\n"
           "     Source: tools/generate-app-connection-refs.py\n"
-          "     Regenerate: python3 tools/generate-app-connection-refs.py\n"
-          "     Ground truth: {commit} -->\n\n")
+          "     Regenerate: python3 tools/generate-app-connection-refs.py -->\n\n")
 
 
 # ----------------------------------------------------------------------------- parsing
@@ -304,8 +306,8 @@ def parse_consumers(root: pathlib.Path) -> dict[str, list[str]]:
 
 # ---------------------------------------------------------------------------- emitting
 
-def emit_credentials(conns, namemap, creds, commit) -> str:
-    L = [BANNER.format(commit=commit)]
+def emit_credentials(conns, namemap, creds) -> str:
+    L = [BANNER]
     L.append("# Credential Fields by Connection\n\n")
     L.append(f"Every one of the **{len(conns)}** App Connection types, with the exact `method` "
              "values it accepts and the `credentials` fields each method requires.\n\n")
@@ -344,11 +346,11 @@ def emit_credentials(conns, namemap, creds, commit) -> str:
     return "".join(L)
 
 
-def emit_api_surface(conns, namemap, routers, consumers, commit) -> str:
+def emit_api_surface(conns, namemap, routers, consumers) -> str:
     all_eps = [(s, e) for s, eps in routers.items() for e in eps]
     usable = [(s, e) for s, e in all_eps if "IDENTITY_ACCESS_TOKEN" in e["auth"]]
     ui_only = [(s, e) for s, e in all_eps if "IDENTITY_ACCESS_TOKEN" not in e["auth"]]
-    L = [BANNER.format(commit=commit)]
+    L = [BANNER]
     L.append(f"""# App Connection API Surface
 
 Two distinct groups of endpoints, and the difference decides whether you can automate against them.
@@ -499,8 +501,8 @@ def main() -> int:
     creds = {slug: parse_methods_and_credentials(root, slug) for _, slug in conns}
 
     outputs = {
-        SKILL_REFS / "credentials-by-connection.md": emit_credentials(conns, namemap, creds, commit),
-        SKILL_REFS / "api-surface.md": emit_api_surface(conns, namemap, routers, consumers, commit),
+        SKILL_REFS / "credentials-by-connection.md": emit_credentials(conns, namemap, creds),
+        SKILL_REFS / "api-surface.md": emit_api_surface(conns, namemap, routers, consumers),
     }
 
     # coverage report — surfaces anything the parser could not resolve
