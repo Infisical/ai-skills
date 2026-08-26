@@ -72,6 +72,16 @@ correctly-loaded skill where to hand off — but they are no longer load-bearing
 | 12 | `agent-not-operator` | infisical-agent | OK | OK |
 | 13 | `scanning-github-radar` | infisical-secret-scanning | OK | OK |
 
+## Reproducing
+
+```bash
+python3 run_routing.py          # all cases, all arms
+python3 run_routing.py 3        # a single case
+```
+
+Runs from any checkout — `REPO` is derived from this file's location. Set
+`INFISICAL_SKILLS_REPO` if you run the script from outside the repo.
+
 ## Limitations
 
 - Single run per cell.

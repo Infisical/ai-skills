@@ -54,6 +54,9 @@ python3 run_evals.py 3          # single eval
 python3 run_evals.py --regrade  # re-grade saved responses, no model calls
 ```
 
+Runs from any checkout — `REPO` is derived from this file's location. Set
+`INFISICAL_SKILLS_REPO` if you run the script from outside the repo.
+
 `old_skill` is read via `git show main:<path>`, so the comparison stays reproducible as long as the pre-audit state is reachable on `main`.
 
 ## Limitations

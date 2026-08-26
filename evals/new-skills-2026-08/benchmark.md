@@ -51,6 +51,16 @@ agentic access, and the SSO enforcement / break-glass interaction.
 **eval-6 (Access Control) — baseline 3/4.** The model already knows `describeSecret` and `readValue`.
 The skill's contribution is that the legacy `read` action grants both.
 
+## Reproducing
+
+```bash
+python3 run_evals.py          # all cases, all arms
+python3 run_evals.py 3        # a single case
+```
+
+Runs from any checkout — `REPO` is derived from this file's location. Set
+`INFISICAL_SKILLS_REPO` if you run the script from outside the repo.
+
 ## Limitations
 
 - Single run per cell; no variance estimate.

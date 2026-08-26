@@ -15,6 +15,7 @@ against the response with counter-example lines stripped, because a correct answ
 legitimately quotes the wrong form in order to warn against it.
 """
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -22,10 +23,19 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-REPO = pathlib.Path("/Users/jakehulberg/Documents/infisical-ai-skills")
-SCRATCH = pathlib.Path(__file__).parent
-SPEC = json.loads((SCRATCH / "eval_spec.json").read_text())
-OUT = SCRATCH / "runs"
+# Repo root, derived from this file's location (evals/<suite>/run_*.py) so the harness
+# runs from any checkout. Override with INFISICAL_SKILLS_REPO if run from elsewhere.
+REPO = pathlib.Path(
+    os.environ.get("INFISICAL_SKILLS_REPO") or pathlib.Path(__file__).resolve().parents[2]
+)
+if not (REPO / "skills").is_dir():
+    sys.exit(
+        f"error: {REPO} is not an infisical-ai-skills checkout "
+        "(no skills/ directory). Set INFISICAL_SKILLS_REPO."
+    )
+HERE = pathlib.Path(__file__).parent
+SPEC = json.loads((HERE / "eval_spec.json").read_text())
+OUT = HERE / "runs"
 OUT.mkdir(exist_ok=True)
 MODEL = "sonnet"
 BASE_REF = "main"
