@@ -10,16 +10,24 @@ All Terraform configurations using Infisical must specify the official provider 
 terraform {
   required_providers {
     infisical = {
-      source  = "infisical/infisical"
-      version = "~> 0.13" # Use latest stable version
+      source = "infisical/infisical"
+      # Pin a version for reproducible plans; check the registry for the current release.
     }
   }
 }
 
 provider "infisical" {
-  # Auth configuration goes here (see below)
+  host = "https://app.infisical.com" # Optional for cloud, required for self-hosted
+
+  auth = {
+    # Exactly one of `universal` or `oidc` (see below)
+  }
 }
 ```
+
+> **Critical:** credentials go inside a nested `auth = { ... }` attribute, keyed by method.
+> Setting `client_id`/`client_secret`/`identity_id` directly on the provider block is not valid
+> for this provider and will fail with an unsupported-argument error.
 
 ## Authentication Methods
 
@@ -36,12 +44,18 @@ Universal Auth uses a `client_id` and `client_secret` to authenticate the provid
 
 ```hcl
 provider "infisical" {
-  client_id     = var.infisical_client_id
-  client_secret = var.infisical_client_secret
+  host = "https://app.infisical.com" # Optional for cloud, required for self-hosted
+
+  auth = {
+    universal = {
+      client_id     = var.infisical_client_id
+      client_secret = var.infisical_client_secret
+    }
+  }
 }
 ```
 
-Or use environment variables:
+Or omit the values and let the provider read them from the environment:
 
 ```hcl
 provider "infisical" {
@@ -72,8 +86,16 @@ OIDC (OpenID Connect) is the recommended authentication method for CI/CD platfor
 
 ```hcl
 provider "infisical" {
-  identity_id                   = var.infisical_identity_id
-  token_environment_variable_name = "INFISICAL_TOKEN"  # Variable containing OIDC token
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id = var.infisical_identity_id
+      # Name of the env var your platform puts the OIDC token in.
+      # Set this explicitly to match whatever your CI injects.
+      token_environment_variable_name = "INFISICAL_TOKEN"
+    }
+  }
 }
 ```
 
@@ -81,8 +103,15 @@ Or for Terraform Cloud with automatic token injection:
 
 ```hcl
 provider "infisical" {
-  identity_id                   = var.infisical_machine_identity_id
-  token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id = var.infisical_machine_identity_id
+      # Must match the variable Terraform Cloud injects
+      token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+    }
+  }
 }
 ```
 
@@ -95,21 +124,35 @@ variable "infisical_machine_identity_id" {
 }
 
 provider "infisical" {
-  identity_id                   = var.infisical_machine_identity_id
-  token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+  host = "https://app.infisical.com"
+
+  auth = {
+    oidc = {
+      identity_id                     = var.infisical_machine_identity_id
+      token_environment_variable_name = "TFC_WORKLOAD_IDENTITY_TOKEN"
+    }
+  }
 }
 ```
 
+If you configure multiple workload identity tokens in TFC, point
+`token_environment_variable_name` at the specific one you want (e.g.
+`TFC_WORKLOAD_IDENTITY_TOKEN_INFISICAL`).
+
 See [Terraform Cloud OIDC Setup](/references/terraform-cloud-oidc.md) for complete step-by-step guide.
 
-### 3. Service Token (Deprecated — Do Not Use)
+### 3. Service Token (Legacy — Do Not Use)
 
-Service tokens are deprecated and should not be used in new configurations. Use Universal Auth or OIDC instead.
+Service tokens are legacy and will be removed in a future release. Use Universal Auth or OIDC instead.
+
+Note the attribute is `service_token`, and unlike machine identity auth it sits at the top level
+of the provider block rather than inside `auth`:
 
 ```hcl
-# ⚠️ DEPRECATED — Do not use
+# ⚠️ LEGACY — Do not use in new configurations
 provider "infisical" {
-  token = var.infisical_service_token
+  host          = "https://app.infisical.com"
+  service_token = var.infisical_service_token
 }
 ```
 
@@ -119,8 +162,13 @@ provider "infisical" {
 |----------|-------------|---------|
 | `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` | Universal Auth | Client ID for authentication |
 | `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET` | Universal Auth | Client secret for authentication |
-| `INFISICAL_TOKEN` | Legacy/Custom | Deprecated service token or custom OIDC token variable |
-| `INFISICAL_SITE_URL` | All methods | Custom Infisical instance URL (e.g., `https://infisical.mycompany.com`) |
+| `INFISICAL_TOKEN` | Legacy | Legacy service token |
+
+For OIDC, the token env var has no fixed name — you name it yourself via
+`token_environment_variable_name` inside `auth.oidc`, and it must match what your CI platform
+injects.
+
+Instance URL is set with the provider's `host` attribute rather than an environment variable.
 
 ## Self-Hosted Configuration
 
@@ -128,16 +176,15 @@ If you're running a self-hosted Infisical instance, you must explicitly set the 
 
 ```hcl
 provider "infisical" {
-  host              = "https://infisical.mycompany.com"
-  client_id         = var.infisical_client_id
-  client_secret     = var.infisical_client_secret
+  host = "https://infisical.mycompany.com"
+
+  auth = {
+    universal = {
+      client_id     = var.infisical_client_id
+      client_secret = var.infisical_client_secret
+    }
+  }
 }
-```
-
-Or via environment variable:
-
-```bash
-export INFISICAL_SITE_URL="https://infisical.mycompany.com"
 ```
 
 ## Cloud Deployment Configuration
@@ -146,8 +193,12 @@ For Infisical Cloud (app.infisical.com), the `host` parameter is optional and de
 
 ```hcl
 provider "infisical" {
-  client_id     = var.infisical_client_id
-  client_secret = var.infisical_client_secret
+  auth = {
+    universal = {
+      client_id     = var.infisical_client_id
+      client_secret = var.infisical_client_secret
+    }
+  }
 }
 ```
 
@@ -167,27 +218,38 @@ variable "infisical_client_secret" {
 }
 
 provider "infisical" {
-  client_id     = var.infisical_client_id
-  client_secret = var.infisical_client_secret
+  auth = {
+    universal = {
+      client_id     = var.infisical_client_id
+      client_secret = var.infisical_client_secret
+    }
+  }
 }
 
 # Now you can use Infisical resources
 ephemeral "infisical_secret" "db_password" {
+  name         = "DB_PASSWORD"
   workspace_id = "your-workspace-id"
   env_slug     = "prod"
-  secret_key   = "DB_PASSWORD"
 }
 
+# Ephemeral values may only flow into other ephemeral contexts — another provider's
+# config, a write-only argument, or an output explicitly marked ephemeral.
 output "database_password" {
   value     = ephemeral.infisical_secret.db_password.value
   sensitive = true
+  ephemeral = true
 }
 ```
 
 ## Troubleshooting
 
+**"Error: Unsupported argument" on `client_id` / `client_secret` / `identity_id`**: These belong inside the nested `auth = { universal = {...} }` or `auth = { oidc = {...} }` attribute, not directly on the provider block.
+
 **"Error: Unauthorized"**: Check that your client ID and secret are correct and that the Machine Identity has permissions for the workspace/project you're accessing.
 
-**"Error: identity_id is required for OIDC"**: Ensure you've set the OIDC identity ID and that the token environment variable is properly set in your CI/CD platform.
+**"Error: identity_id is required for OIDC"**: Ensure you've set `identity_id` inside `auth.oidc` and that `token_environment_variable_name` matches the variable your CI/CD platform actually injects.
 
-**"Error: host is required for self-hosted"**: Self-hosted Infisical instances require explicit host configuration. Verify your `INFISICAL_SITE_URL` or `host` parameter.
+**Self-hosted returning 404 or auth failures**: Self-hosted instances require explicit `host` configuration on the provider block.
+
+**"Ephemeral value not allowed here"**: An ephemeral resource's value cannot land in state. Feed it into a provider config, a write-only argument, or an output marked `ephemeral = true`.

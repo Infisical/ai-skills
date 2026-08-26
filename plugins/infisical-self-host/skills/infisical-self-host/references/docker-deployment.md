@@ -47,17 +47,21 @@ docker pull infisical/infisical:latest
 docker pull infisical/infisical:v0.110.0  # Specific version
 ```
 
-#### FIPS 140-2 Compliant Image
-Use the FIPS image for regulated environments requiring FIPS compliance:
+#### FIPS 140-3 Compliant Image
+For regulated environments, use the FIPS image. It lives in a **separate Docker Hub repository**
+(`infisical/infisical-fips`) and is available to Enterprise customers — it is not a tag on the
+standard `infisical/infisical` repo:
 
 ```bash
-docker pull infisical/infisical:latest-fips
+docker pull infisical/infisical-fips
 ```
 
 When using the FIPS image, set:
 ```bash
 FIPS_ENABLED=true
 NODE_OPTIONS="--max-old-space-size=8192 --force-fips"
+# FIPS mode requires a 256-bit base64 ENCRYPTION_KEY, not the standard 16-byte hex one
+ENCRYPTION_KEY="$(openssl rand -base64 32)"
 ```
 
 ## Docker Compose Deployment (Production)

@@ -1,0 +1,28 @@
+{
+  "expectations": [
+    {
+      "text": "States the discovery endpoint cannot be called with a machine identity token",
+      "passed": true,
+      "evidence": "OK required /JWT[^\\n]{0,80}only|only[^\\n]{0,40}JWT|user session|cannot[^\\n]{0,60}machine identity|not[^\\n]{0,50}machine identity|rejected/ -> 'JWT-only'"
+    },
+    {
+      "text": "Does not present the kms-keys endpoint as a working machine-identity call",
+      "passed": true,
+      "evidence": "OK absent /curl[^\\n]{0,120}kms-keys/"
+    },
+    {
+      "text": "Offers a real alternative (query AWS directly, or read the config back from a UI-created sync)",
+      "passed": true,
+      "evidence": "OK required /AWS (SDK|CLI|API)|provider directly|create[^.\\n]{0,60}UI|read[^.\\n]{0,50}back/ -> 'provider directly'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 27.9
+  }
+}

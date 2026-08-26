@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Uses infisical pam agentic access",
+      "passed": true,
+      "evidence": "OK required /infisical pam agentic access/ -> 'infisical pam agentic access'"
+    },
+    {
+      "text": "Scopes with the --account flag",
+      "passed": true,
+      "evidence": "OK required /--account/ -> '--account'"
+    },
+    {
+      "text": "Explains the Gateway injects the real credential",
+      "passed": true,
+      "evidence": "OK required /[Gg]ateway[^.]{0,80}(inject|supplies|adds|holds)/ -> 'Gateway is the only thing that ever holds'"
+    },
+    {
+      "text": "Mentions local ports on 127.0.0.1",
+      "passed": true,
+      "evidence": "OK required /127\\.0\\.0\\.1|localhost port|local port/ -> 'local port'"
+    },
+    {
+      "text": "Mentions the sandbox requirement (macOS or Linux with bubblewrap)",
+      "passed": true,
+      "evidence": "OK required /bubblewrap|sandbox/ -> 'sandbox'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 13.6
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "eval_id": 3,
+  "eval_name": "secret-sync-github-env-and-vercel",
+  "skill": "infisical-secret-syncs",
+  "skill_files": [
+    "SKILL.md",
+    "references/sync-overview.md",
+    "references/github-vercel-cloudflare.md"
+  ],
+  "prompt": "Via the Infisical API, I want to create two secret syncs: one pushing to a GitHub repository *environment*'s secrets, and one pushing to a Vercel project. Give me the exact destination and options field values for each, including the initial sync behavior enum values.",
+  "assertions": [
+    "Uses repository-environment as the GitHub environment scope value",
+    "Uses the correct initial sync behavior enum values (source/destination, not provider-named)",
+    "Notes GitHub cannot import (overwrite-destination only)",
+    "Includes teamId for the Vercel sync",
+    "Does not use the long-form GitHub visibility values"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

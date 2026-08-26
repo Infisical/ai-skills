@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Uses repository-environment as the GitHub environment scope value",
+      "passed": false,
+      "evidence": "MISSING required /repository-environment/"
+    },
+    {
+      "text": "Uses the correct initial sync behavior enum values (source/destination, not provider-named)",
+      "passed": false,
+      "evidence": "OK required /import-prioritize-(source|destination)|overwrite-destination/ -> 'overwrite-destination' | FOUND forbidden /import-prioritize-infisical|import-prioritize-vercel|import-prioritize-github/ -> 'import-prioritize-infisical'"
+    },
+    {
+      "text": "Notes GitHub cannot import (overwrite-destination only)",
+      "passed": true,
+      "evidence": "OK required /overwrite-destination/ -> 'overwrite-destination'"
+    },
+    {
+      "text": "Includes teamId for the Vercel sync",
+      "passed": false,
+      "evidence": "MISSING required /teamId/"
+    },
+    {
+      "text": "Does not use the long-form GitHub visibility values",
+      "passed": true,
+      "evidence": "OK absent /all-repositories|private-repositories|selected-repositories/"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "timing": {
+    "total_duration_seconds": 92.0
+  }
+}

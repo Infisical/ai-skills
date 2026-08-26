@@ -1,6 +1,6 @@
 {
   "name": "infisical-dynamic-secrets",
-  "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across 27 providers.",
+  "description": "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes across all 30 providers.",
   "version": "1.0.0",
   "author": {
     "name": "Infisical",

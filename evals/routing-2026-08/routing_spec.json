@@ -1,0 +1,105 @@
+{
+  "iteration": "routing-2026-08",
+  "purpose": "Verify the router + negative boundaries send an agent to the correct skill on prompts that sit exactly on a confusable seam. Arms: descriptions only (frontmatter descriptions, as a bare skill list would present) vs router (AGENTS.md router + disambiguation table).",
+  "cases": [
+    {
+      "id": 0,
+      "name": "rotation-not-dynamic",
+      "prompt": "Our production Postgres password hasn't been changed in two years. I want Infisical to change it automatically every 30 days so the apps reading it keep working. Which Infisical skill covers this?",
+      "expect": "infisical-secret-rotation",
+      "confusable_with": "infisical-dynamic-secrets"
+    },
+    {
+      "id": 1,
+      "name": "dynamic-not-rotation",
+      "prompt": "I want each CI job to get its own throwaway Postgres credential that stops working when the job finishes. Which Infisical skill covers this?",
+      "expect": "infisical-dynamic-secrets",
+      "confusable_with": "infisical-secret-rotation"
+    },
+    {
+      "id": 2,
+      "name": "pam-not-dynamic",
+      "prompt": "I need our on-call engineers to be able to run queries against the production database without ever learning the password, and I need a recording of every query they run. Which Infisical skill covers this?",
+      "expect": "infisical-pam",
+      "confusable_with": "infisical-dynamic-secrets"
+    },
+    {
+      "id": 3,
+      "name": "app-connection-not-machine-identity",
+      "prompt": "We use Infisical Cloud. Infisical itself needs credentials so it can call AWS APIs on our behalf. This is Infisical authenticating outward to AWS, not our workloads authenticating into Infisical. What resource do I create in Infisical, and which skill covers it?",
+      "expect": "infisical-app-connections",
+      "confusable_with": "infisical-setup",
+      "note": "Prompt amended after the first run: the original wording named a Secret Sync, which made infisical-secret-syncs a defensible answer and tested the wrong seam. The intended seam is App Connection vs machine identity (direction of trust)."
+    },
+    {
+      "id": 4,
+      "name": "machine-identity-not-app-connection",
+      "prompt": "My Go service running on EC2 needs to authenticate to Infisical and pull its secrets at startup. Which Infisical skill covers this?",
+      "expect": "infisical-setup",
+      "confusable_with": "infisical-app-connections"
+    },
+    {
+      "id": 5,
+      "name": "sso-not-machine-identity-oidc",
+      "prompt": "I want our employees to sign in to the Infisical web UI using our Okta accounts, and I want their Okta groups to control what they can see. Which Infisical skill covers this?",
+      "expect": "infisical-sso",
+      "confusable_with": "infisical-setup"
+    },
+    {
+      "id": 6,
+      "name": "ssh-cert-not-pki",
+      "prompt": "I want short-lived SSH certificates so engineers can log into our Linux boxes without managing authorized_keys. Which Infisical skill covers this?",
+      "expect": "infisical-dynamic-secrets",
+      "confusable_with": "infisical-pki"
+    },
+    {
+      "id": 7,
+      "name": "operator-not-selfhost",
+      "prompt": "I want to install the Infisical Helm chart so that secrets from Infisical show up as Kubernetes Secrets in my cluster. Which Infisical skill covers this?",
+      "expect": "infisical-kubernetes-operator",
+      "confusable_with": "infisical-self-host"
+    },
+    {
+      "id": 8,
+      "name": "kms-not-secret-storage",
+      "prompt": "I need to encrypt some customer data in my application using a key that my application code can never read or extract. Which Infisical skill covers this?",
+      "expect": "infisical-kms",
+      "confusable_with": "infisical-setup"
+    },
+    {
+      "id": 9,
+      "name": "pki-sync-not-secret-sync",
+      "prompt": "I want the TLS certificates Infisical issues to be installed automatically onto our F5 BIG-IP load balancer. Which Infisical skill covers this?",
+      "expect": "infisical-pki",
+      "confusable_with": "infisical-secret-syncs"
+    },
+    {
+      "id": 10,
+      "name": "gateway-not-selfhost",
+      "prompt": "Our RDS instance has no public endpoint. We use Infisical Cloud. Do we have to self-host Infisical to give it dynamic credentials on that database, and which skill covers the answer?",
+      "expect": "infisical-gateway",
+      "confusable_with": "infisical-self-host"
+    },
+    {
+      "id": 11,
+      "name": "granular-secret-permission",
+      "prompt": "I want developers to be able to see which secret names exist in production so they can reference them in code, but not be able to read any of the values. Which Infisical skill covers this?",
+      "expect": "infisical-access-control",
+      "confusable_with": "infisical-setup"
+    },
+    {
+      "id": 12,
+      "name": "agent-not-operator",
+      "prompt": "My legacy app on a VM reads its config from a properties file on disk. I want Infisical to keep that file up to date and restart the app when it changes. Which Infisical skill covers this?",
+      "expect": "infisical-agent",
+      "confusable_with": "infisical-kubernetes-operator"
+    },
+    {
+      "id": 13,
+      "name": "scanning-github-radar",
+      "prompt": "I want Infisical to watch our GitHub repositories and alert us when someone commits an API key. Which Infisical skill covers this?",
+      "expect": "infisical-secret-scanning",
+      "confusable_with": "infisical-secret-syncs"
+    }
+  ]
+}

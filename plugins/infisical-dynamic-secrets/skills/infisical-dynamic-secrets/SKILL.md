@@ -1,11 +1,31 @@
 ---
 name: infisical-dynamic-secrets
-description: "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes. Covers 27 providers including PostgreSQL, MySQL, Redis, MongoDB, AWS IAM, GCP IAM, SSH certificates, Kubernetes service accounts, and more. Use this skill when someone asks about: dynamic secrets, ephemeral database credentials, short-lived tokens, rotating database users, dynamic PostgreSQL/MySQL/Redis credentials, SSH certificates, temporary AWS IAM users, or 'how do I generate temporary credentials with Infisical'."
+description: "Guide for configuring Infisical Dynamic Secrets — on-demand, short-lived credentials for databases, cloud IAM, SSH, and Kubernetes. Covers all 30 providers including PostgreSQL, MySQL, MSSQL, Oracle, Redis, AWS ElastiCache, AWS MemoryDB, MongoDB, Elasticsearch, Couchbase, Milvus, AWS IAM, GCP IAM, Azure Entra ID, SSH certificates, Kubernetes service accounts, LDAP, GitHub, Tailscale, IBM API Connect, and TOTP. Use this skill when someone asks about: dynamic secrets, ephemeral database credentials, short-lived tokens, rotating database users, dynamic PostgreSQL/MySQL/Redis credentials, SSH certificates, temporary AWS IAM users, lease renewal, or 'how do I generate temporary credentials with Infisical'. For brand-new short-lived credentials created per request. Not for changing an existing credential on a schedule (infisical-secret-rotation), nor for recorded human/agent access without a credential (infisical-pam). Covers SSH certificates; TLS certificates are infisical-pki."
 ---
-
 # Infisical Dynamic Secrets Guide
 
 You are a setup assistant helping users configure Infisical Dynamic Secrets — on-demand, short-lived credentials that are unique per identity and automatically expire.
+
+## Not this skill
+
+The critical distinction is **dynamic secrets vs secret rotation**:
+
+- **Dynamic secret** — Infisical *creates a brand-new short-lived credential* per lease. Every
+  consumer gets a different one. Nothing exists until requested. **This skill.**
+- **Secret rotation** — an *existing* credential you own is changed on a timer, at a stable secret
+  path every consumer reads. `infisical-secret-rotation`.
+
+"I want temporary credentials per CI job" is dynamic secrets. "Our Postgres password hasn't changed
+in two years" is rotation.
+
+| If the user wants... | Use |
+|----------------------|-----|
+| An existing credential rotated on a schedule | `infisical-secret-rotation` |
+| A **human or AI agent** to reach a database with session recording, never seeing a credential | `infisical-pam` |
+| Leases managed inside Kubernetes | `infisical-kubernetes-operator` |
+| Dynamic credentials rendered to a file by the Agent | `infisical-agent` |
+| To reach a database with no public endpoint | `infisical-gateway` |
+| X.509/TLS certificates | `infisical-pki` — note SSH certificates *are* here, TLS ones are not |
 
 ## How to use this skill
 
@@ -23,11 +43,11 @@ Read the relevant reference file(s) for the user's provider, then walk them thro
 
 | File | When to read |
 |------|-------------|
-| `references/overview.md` | User asks general questions about how dynamic secrets work, concepts, or lease lifecycle |
-| `references/sql-databases.md` | User wants dynamic credentials for PostgreSQL, MySQL, MSSQL, Cassandra, Oracle, or other SQL databases |
-| `references/nosql-and-cache.md` | User wants dynamic credentials for Redis, MongoDB, or Elasticsearch |
-| `references/cloud-iam.md` | User wants dynamic AWS IAM users/credentials or GCP service account tokens |
-| `references/ssh-and-kubernetes.md` | User wants SSH certificates or Kubernetes service account tokens |
+| `references/overview.md` | User asks general questions about how dynamic secrets work, concepts, lease lifecycle, or which providers exist |
+| `references/sql-databases.md` | User wants dynamic credentials for PostgreSQL, MySQL, MSSQL, Cassandra, Oracle, SAP ASE/HANA, Snowflake, Vertica, ClickHouse, or Azure SQL |
+| `references/nosql-and-cache.md` | User wants dynamic credentials for Redis, AWS ElastiCache, AWS MemoryDB, MongoDB, MongoDB Atlas, Elasticsearch, Couchbase, RabbitMQ, or Milvus |
+| `references/cloud-iam.md` | User wants dynamic AWS IAM users/credentials, GCP service account tokens, or Azure Entra ID credentials |
+| `references/ssh-and-kubernetes.md` | User wants SSH certificates, Kubernetes service account tokens, LDAP, GitHub tokens, Tailscale keys, IBM API Connect, or TOTP |
 
 ## Guiding principles
 

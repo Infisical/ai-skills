@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Nests credentials inside an auth block (auth = { universal = { client_id, client_secret } })",
+      "passed": false,
+      "evidence": "MISSING required /auth\\s*=?\\s*\\{[\\s\\S]{0,200}universal/ | MISSING required /^ {4,}client_id\\s*=/ | FOUND forbidden /^ {0,3}client_id\\s*=/ -> '  client_id     ='"
+    },
+    {
+      "text": "Uses `name` as the ephemeral secret's key attribute, not `secret_key`",
+      "passed": false,
+      "evidence": "MISSING required /ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?\\bname\\s*=/ | FOUND forbidden /ephemeral\\s+\"infisical_secret\"[\\s\\S]{0,300}?secret_key\\s*=/ -> 'ephemeral \"infisical_secret\" \"db_password\" {\\n  workspace_id = var.infisical_workspace_id\\n  env_slug '"
+    },
+    {
+      "text": "Uses an ephemeral resource (not a data source) so the value stays out of state",
+      "passed": true,
+      "evidence": "OK required /ephemeral\\s+\"infisical_secret\"/ -> 'ephemeral \"infisical_secret\"'"
+    },
+    {
+      "text": "Declares the provider source as infisical/infisical",
+      "passed": true,
+      "evidence": "OK required /source\\s*=\\s*\"infisical/infisical\"/ -> 'source  = \"infisical/infisical\"'"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "total_duration_seconds": 19.9
+  }
+}

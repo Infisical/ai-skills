@@ -17,3 +17,31 @@ jobs:
 
       - name: Validate marketplace and plugins
         run: claude plugin validate .
+
+      - name: Check plugin wrappers match skills
+        # plugins/<name>/skills/<name>/ is a copy of skills/<name>/. They drift silently.
+        run: |
+          fail=0
+          for d in skills/*/; do
+            s=$(basename "$d")
+            if [ ! -d "plugins/$s/skills/$s" ]; then
+              echo "::error::plugins/$s/skills/$s is missing"; fail=1; continue
+            fi
+            if ! diff -rq "skills/$s" "plugins/$s/skills/$s" >/dev/null; then
+              echo "::error::plugins/$s/skills/$s has drifted from skills/$s"
+              diff -rq "skills/$s" "plugins/$s/skills/$s" || true
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Check every skill declares its boundaries
+        # A skill without a description and a "Not this skill" section causes mis-routing.
+        run: |
+          fail=0
+          for f in skills/*/SKILL.md; do
+            grep -q '^name:' "$f"        || { echo "::error::$f has no name:"; fail=1; }
+            grep -q '^description:' "$f" || { echo "::error::$f has no description:"; fail=1; }
+            grep -q '## Not this skill' "$f" || { echo "::error::$f has no '## Not this skill' section"; fail=1; }
+          done
+          exit $fail

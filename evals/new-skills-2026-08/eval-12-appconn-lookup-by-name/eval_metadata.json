@@ -1,0 +1,24 @@
+{
+  "eval_id": 12,
+  "eval_name": "appconn-lookup-by-name",
+  "skill": "infisical-app-connections",
+  "skill_files": [
+    "SKILL.md",
+    "references/api-surface.md",
+    "references/credentials-by-connection.md",
+    "references/connection-catalog.md"
+  ],
+  "prompt": "My automation knows an Infisical App Connection by its name, not its UUID. Can it resolve the connection ID through the API, and does that work with a machine identity token?",
+  "assertions": [
+    "Gives the connection-name lookup path",
+    "Confirms it accepts a machine identity token",
+    "Does not claim you must store the UUID"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

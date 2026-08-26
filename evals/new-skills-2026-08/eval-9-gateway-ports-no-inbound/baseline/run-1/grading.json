@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "States no inbound ports are required on the gateway",
+      "passed": true,
+      "evidence": "OK required /[Nn]o inbound/ -> 'no inbound'"
+    },
+    {
+      "text": "Gives outbound TCP 2222 to the relay",
+      "passed": false,
+      "evidence": "MISSING required /2222/"
+    },
+    {
+      "text": "Gives outbound TCP 443 to Infisical",
+      "passed": true,
+      "evidence": "OK required /443/ -> '443'"
+    },
+    {
+      "text": "Describes the connection as outbound/egress only",
+      "passed": true,
+      "evidence": "OK required /outbound|egress/ -> 'egress'"
+    },
+    {
+      "text": "Mentions the auto-select relay allowlist caveat or pinning a relay",
+      "passed": false,
+      "evidence": "MISSING required /[Aa]uto[- ][Ss]elect|pin[^\\n]{0,30}relay|failover between/"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "timing": {
+    "total_duration_seconds": 78.4
+  }
+}

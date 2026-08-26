@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Grants describeSecret",
+      "passed": true,
+      "evidence": "OK required /describeSecret/ -> 'describeSecret'"
+    },
+    {
+      "text": "Withholds readValue",
+      "passed": true,
+      "evidence": "OK required /readValue/ -> 'readValue'"
+    },
+    {
+      "text": "Explains that the legacy read action grants both",
+      "passed": true,
+      "evidence": "OK required /`?read`?[^.\\n]{0,80}both|both[^.\\n]{0,60}`?read`?|read[^\\n]{0,60}(grants|includes)[^\\n]{0,40}value/ -> '`read` \u2014 this is the legacy action and grants both'"
+    },
+    {
+      "text": "Does not tell the user to grant plain read for this",
+      "passed": true,
+      "evidence": "OK absent /grant (the )?`?read`? (action|permission)/"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 6.9
+  }
+}

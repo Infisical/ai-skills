@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Requires TWO pre-existing database users via username1/username2",
+      "passed": true,
+      "evidence": "OK required /username1/ -> 'username1' | OK required /username2/ -> 'username2'"
+    },
+    {
+      "text": "States both users must already exist and Infisical does not create them",
+      "passed": false,
+      "evidence": "MISSING required /already exist|must exist|pre-exist|does not create|Infisical does not/"
+    },
+    {
+      "text": "rotationInterval is in days",
+      "passed": true,
+      "evidence": "OK required /rotationInterval[^\\n]{0,60}30|30[^\\n]{0,40}day|interval[^\\n]{0,30}day/ -> '30 day'"
+    },
+    {
+      "text": "Maps both username and password via secretsMapping",
+      "passed": true,
+      "evidence": "OK required /secretsMapping/ -> 'secretsMapping'"
+    },
+    {
+      "text": "Warns the application must read the username from Infisical too, since the active user alternates",
+      "passed": false,
+      "evidence": "MISSING required /alternat|active username|read the username|username changes|both.*username.*password/"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "timing": {
+    "total_duration_seconds": 102.8
+  }
+}

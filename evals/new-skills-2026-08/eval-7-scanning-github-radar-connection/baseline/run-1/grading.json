@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Specifies the github-radar App Connection",
+      "passed": false,
+      "evidence": "MISSING required /github-radar/"
+    },
+    {
+      "text": "Warns it is not the same as a plain github connection",
+      "passed": false,
+      "evidence": "MISSING required /not[^.\\n]{0,60}`?github`?[^.\\n]{0,40}connection|different[^.\\n]{0,60}github|separate[^.\\n]{0,60}connection/"
+    },
+    {
+      "text": "Recommends the pre-commit hook install command",
+      "passed": true,
+      "evidence": "OK required /infisical scan install[^\\n]{0,40}--pre-commit-hook/ -> 'infisical scan install --pre-commit-hook'"
+    },
+    {
+      "text": "Recommends a full scan for existing history",
+      "passed": false,
+      "evidence": "MISSING required /full[- ]scan|full scan/"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "timing": {
+    "total_duration_seconds": 35.1
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "iteration": "routing-2026-08",
+  "purpose": "Verify the router + negative boundaries send an agent to the correct skill on prompts that sit exactly on a confusable seam. Arms: descriptions only (frontmatter descriptions, as a bare skill list would present) vs router (AGENTS.md router + disambiguation table).",
+  "skills_commit": "48eae3f",
+  "model": "claude-sonnet-5",
+  "tools": "disabled",
+  "arms": {
+    "descriptions": "Skill descriptions only",
+    "router": "AGENTS.md router + boundaries"
+  },
+  "totals": {
+    "descriptions": {
+      "correct": 14,
+      "total": 14,
+      "accuracy": 1.0
+    },
+    "router": {
+      "correct": 14,
+      "total": 14,
+      "accuracy": 1.0
+    }
+  },
+  "history": {
+    "before_description_boundaries": {
+      "descriptions": "13/14",
+      "router": "14/14"
+    },
+    "after_description_boundaries": {
+      "descriptions": "14/14",
+      "router": "14/14"
+    }
+  },
+  "per_case": [
+    {
+      "id": 0,
+      "name": "rotation-not-dynamic",
+      "expected": "infisical-secret-rotation",
+      "confusable_with": "infisical-dynamic-secrets",
+      "descriptions": "infisical-secret-rotation",
+      "router": "infisical-secret-rotation"
+    },
+    {
+      "id": 1,
+      "name": "dynamic-not-rotation",
+      "expected": "infisical-dynamic-secrets",
+      "confusable_with": "infisical-secret-rotation",
+      "descriptions": "infisical-dynamic-secrets",
+      "router": "infisical-dynamic-secrets"
+    },
+    {
+      "id": 2,
+      "name": "pam-not-dynamic",
+      "expected": "infisical-pam",
+      "confusable_with": "infisical-dynamic-secrets",
+      "descriptions": "infisical-pam",
+      "router": "infisical-pam"
+    },
+    {
+      "id": 3,
+      "name": "app-connection-not-machine-identity",
+      "expected": "infisical-app-connections",
+      "confusable_with": "infisical-setup",
+      "descriptions": "infisical-app-connections",
+      "router": "infisical-app-connections"
+    },
+    {
+      "id": 4,
+      "name": "machine-identity-not-app-connection",
+      "expected": "infisical-setup",
+      "confusable_with": "infisical-app-connections",
+      "descriptions": "infisical-setup",
+      "router": "infisical-setup"
+    },
+    {
+      "id": 5,
+      "name": "sso-not-machine-identity-oidc",
+      "expected": "infisical-sso",
+      "confusable_with": "infisical-setup",
+      "descriptions": "infisical-sso",
+      "router": "infisical-sso"
+    },
+    {
+      "id": 6,
+      "name": "ssh-cert-not-pki",
+      "expected": "infisical-dynamic-secrets",
+      "confusable_with": "infisical-pki",
+      "descriptions": "infisical-dynamic-secrets",
+      "router": "infisical-dynamic-secrets"
+    },
+    {
+      "id": 7,
+      "name": "operator-not-selfhost",
+      "expected": "infisical-kubernetes-operator",
+      "confusable_with": "infisical-self-host",
+      "descriptions": "infisical-kubernetes-operator",
+      "router": "infisical-kubernetes-operator"
+    },
+    {
+      "id": 8,
+      "name": "kms-not-secret-storage",
+      "expected": "infisical-kms",
+      "confusable_with": "infisical-setup",
+      "descriptions": "infisical-kms",
+      "router": "infisical-kms"
+    },
+    {
+      "id": 9,
+      "name": "pki-sync-not-secret-sync",
+      "expected": "infisical-pki",
+      "confusable_with": "infisical-secret-syncs",
+      "descriptions": "infisical-pki",
+      "router": "infisical-pki"
+    },
+    {
+      "id": 10,
+      "name": "gateway-not-selfhost",
+      "expected": "infisical-gateway",
+      "confusable_with": "infisical-self-host",
+      "descriptions": "infisical-gateway",
+      "router": "infisical-gateway"
+    },
+    {
+      "id": 11,
+      "name": "granular-secret-permission",
+      "expected": "infisical-access-control",
+      "confusable_with": "infisical-setup",
+      "descriptions": "infisical-access-control",
+      "router": "infisical-access-control"
+    },
+    {
+      "id": 12,
+      "name": "agent-not-operator",
+      "expected": "infisical-agent",
+      "confusable_with": "infisical-kubernetes-operator",
+      "descriptions": "infisical-agent",
+      "router": "infisical-agent"
+    },
+    {
+      "id": 13,
+      "name": "scanning-github-radar",
+      "expected": "infisical-secret-scanning",
+      "confusable_with": "infisical-secret-syncs",
+      "descriptions": "infisical-secret-scanning",
+      "router": "infisical-secret-scanning"
+    }
+  ]
+}

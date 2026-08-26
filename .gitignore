@@ -2,3 +2,10 @@ node_modules/
 .DS_Store
 *.log
 .env
+
+# Local working docs (not for commit)
+*.local.md
+
+# Local Claude Code session settings (machine-specific paths)
+.claude/settings.local.json
+.claude/settings.json

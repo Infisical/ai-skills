@@ -1,0 +1,44 @@
+name: Check Skill Drift
+
+# Watches upstream Infisical for changes that make the generated skill facts stale.
+#
+# Deliberately NOT a pull-request check. A PR fixing a typo must not fail because
+# upstream added a new connector — that would train people to ignore red CI. This
+# runs on a schedule and can be triggered by hand.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Mondays, 07:00 UTC
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout skills repo
+        uses: actions/checkout@v4
+        with:
+          path: skills-repo
+
+      - name: Checkout Infisical (ground truth)
+        uses: actions/checkout@v4
+        with:
+          repository: Infisical/infisical
+          path: infisical
+          fetch-depth: 1
+
+      - name: Check generated App Connection references are current
+        working-directory: skills-repo
+        run: |
+          python3 tools/generate-app-connection-refs.py \
+            --infisical-repo ../infisical --check
+
+      - name: Show what changed, if stale
+        if: failure()
+        working-directory: skills-repo
+        run: |
+          python3 tools/generate-app-connection-refs.py --infisical-repo ../infisical
+          echo "::warning::Generated references are stale. Regenerate and commit:"
+          echo "  python3 tools/generate-app-connection-refs.py"
+          git --no-pager diff --stat
+          git --no-pager diff

@@ -32,21 +32,36 @@ Every sync requires an **App Connection** — an authenticated connection to the
 
 Controls what happens on the first sync:
 
-| Option | Behavior |
-|--------|----------|
-| **Overwrite Destination** | Removes any secrets at the destination not present in Infisical |
-| **Import (Prioritize Infisical)** | Imports existing destination secrets into Infisical first, Infisical values win on conflict |
-| **Import (Prioritize Destination)** | Imports existing destination secrets into Infisical first, destination values win on conflict |
+When configuring via the API, use these exact enum values — the UI labels differ from the wire
+values:
 
-> Not all destinations support importing. GitHub only supports "Overwrite Destination."
+| UI label | API value | Behavior |
+|----------|-----------|----------|
+| **Overwrite Destination** | `overwrite-destination` | Removes any secrets at the destination not present in Infisical |
+| **Import — Prioritize Infisical** | `import-prioritize-source` | Imports existing destination secrets into Infisical first; Infisical (source) values win on conflict |
+| **Import — Prioritize Destination** | `import-prioritize-destination` | Imports existing destination secrets into Infisical first; destination values win on conflict |
+
+The import values are named after **source/destination**, not after the provider. There is no
+`import-prioritize-infisical`, `import-prioritize-vercel`, or `import-prioritize-hashicorp-vault`.
+
+> Not all destinations support importing. GitHub and Cloudflare Workers, among others, only
+> support `overwrite-destination`.
 
 ### Key Schema
 
-A template that transforms secret names when syncing. Uses `{{secretKey}}` as a placeholder for the original name and `{{environment}}` for the environment slug.
+A template that transforms secret names when syncing. Uses handlebars-style placeholders:
+
+- `{{secretKey}}` — the secret's key. **Required, and must appear exactly once.**
+- `{{environment}}` — the environment slug (e.g. `dev`, `staging`, `prod`). Optional.
+
+Outside the placeholders, only alphanumerics (`a-z`, `A-Z`, `0-9`), dashes, underscores, and
+slashes are allowed.
 
 **Example:** Key schema `INFISICAL_{{secretKey}}` transforms Infisical key `DATABASE_URL` into `INFISICAL_DATABASE_URL` at the destination.
 
-**Why use it:** Prevents Infisical from accidentally managing secrets it didn't create. Highly recommended for all syncs.
+**Why use it:** Destination secrets that don't match the schema are never updated or deleted by
+Infisical, so the schema is what scopes Infisical's blast radius at the destination. Highly
+recommended for all syncs.
 
 When importing secrets, the key schema is stripped from keys before importing into Infisical.
 
@@ -63,15 +78,85 @@ Enabled by default. Secrets automatically sync when changes occur in the Infisic
 
 When enabled, Infisical will not remove secrets from the destination. Use this if you manage some secrets manually outside of Infisical.
 
-## Supported Destinations (38+)
+## Supported Destinations (48)
 
-Cloud Secret Managers: AWS Secrets Manager, AWS Parameter Store, GCP Secret Manager, Azure Key Vault, OCI Vault, HashiCorp Vault
+The complete list, with the API `destination` value for each:
 
-CI/CD & Platforms: GitHub, GitLab, Bitbucket, Vercel, Netlify, Cloudflare Workers, Cloudflare Pages, Railway, Render, Fly.io, Heroku, Northflank, Digital Ocean, Supabase
+**Cloud secret managers**
 
-DevOps & Monitoring: TeamCity, CircleCI, Jenkins (via Octopus Deploy), Terraform Cloud, Humanitec, Chef, Camunda, Checkly, Windmill, Zabbix, Databricks, Laravel Forge
+| Destination | API value |
+|-------------|-----------|
+| AWS Secrets Manager | `aws-secrets-manager` |
+| AWS Parameter Store | `aws-parameter-store` |
+| GCP Secret Manager | `gcp-secret-manager` |
+| Azure Key Vault | `azure-key-vault` |
+| Azure App Configuration | `azure-app-configuration` |
+| OCI Vault | `oci-vault` |
+| Hashicorp Vault | `hashicorp-vault` |
+| 1Password | `1password` |
+| Infisical (another instance) | `external-infisical` |
 
-Other: 1Password, Azure DevOps, Azure Entra ID (SCIM), External Infisical instance
+**CI/CD**
+
+| Destination | API value |
+|-------------|-----------|
+| GitHub | `github` |
+| GitLab | `gitlab` |
+| Bitbucket | `bitbucket` |
+| CircleCI | `circleci` |
+| Travis CI | `travis-ci` |
+| TeamCity | `teamcity` |
+| Azure DevOps | `azure-devops` |
+| Octopus Deploy | `octopus-deploy` |
+| Spacelift | `spacelift` |
+| Terraform Cloud | `terraform-cloud` |
+| Rundeck | `rundeck` |
+
+**Hosting and PaaS**
+
+| Destination | API value |
+|-------------|-----------|
+| Vercel | `vercel` |
+| Netlify | `netlify` |
+| Cloudflare Workers | `cloudflare-workers` |
+| Cloudflare Pages | `cloudflare-pages` |
+| Railway | `railway` |
+| Render | `render` |
+| Fly.io | `flyio` |
+| Heroku | `heroku` |
+| Northflank | `northflank` |
+| Digital Ocean App Platform | `digital-ocean-app-platform` |
+| Qovery | `qovery` |
+| Cloud 66 | `cloud-66` |
+| Laravel Forge | `laravel-forge` |
+| OVH | `ovh` |
+
+**Data and analytics**
+
+| Destination | API value |
+|-------------|-----------|
+| Databricks | `databricks` |
+| Snowflake | `snowflake` |
+| Supabase | `supabase` |
+| Hasura Cloud | `hasura-cloud` |
+
+**Platform, workflow, and monitoring**
+
+| Destination | API value |
+|-------------|-----------|
+| Humanitec | `humanitec` |
+| Camunda | `camunda` |
+| Windmill | `windmill` |
+| Chef | `chef` |
+| Checkly | `checkly` |
+| Zabbix | `zabbix` |
+| Trigger.dev | `trigger-dev` |
+| Devin | `devin` |
+| Ona | `ona` |
+| Azure Entra ID SCIM | `azure-entra-id-scim` |
+
+There is **no Jenkins sync**. Octopus Deploy is its own destination, not a Jenkins bridge. If a
+user needs Jenkins, point them at the CLI or the API rather than a sync.
 
 ## Secret Imports for Multiple Paths
 

@@ -2,205 +2,234 @@
 
 ## Pagination
 
-Infisical uses offset-based pagination for list endpoints. All responses include pagination metadata.
+**Important:** pagination is *not* universal across the Infisical API. It exists on
+collection endpoints for org- and project-level resources (identities, memberships,
+certificates, secret requests, PKI subscribers, and similar). It does **not** exist on
+`/api/v4/secrets`.
 
-### Pagination Parameters
+### `/api/v4/secrets` has no pagination
 
-| Parameter | Type | Default | Max | Description |
-|-----------|------|---------|-----|-------------|
-| offset | integer | 0 | - | Number of items to skip from the beginning |
-| limit | integer | 20 | 100 | Maximum number of items to return in this request |
+`GET /api/v4/secrets` returns every secret at the requested path in one response. It accepts
+no `offset` and no `limit`. Passing them has no effect.
 
-### Pagination Response
+Accepted query parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `projectId` | string | — | Project to read from |
+| `environment` | string | — | Environment slug |
+| `secretPath` | string | `/` | Folder path |
+| `viewSecretValue` | boolean | `true` | Return actual values rather than hidden placeholders |
+| `expandSecretReferences` | boolean | `true` | Resolve `${SECRET}` references |
+| `recursive` | boolean | `false` | Include secrets in subfolders |
+| `includeImports` | boolean | `true` | Include imported secrets |
+| `includePersonalOverrides` | boolean | `false` | Include personal overrides |
+| `tagSlugs` | string | — | Comma-separated tag slugs to filter by |
+| `metadataFilter` | string | — | `key=k1,value=v1\|key=k2,value=v2` (max 10 pairs) |
+
+Response shape:
 
 ```json
 {
-  "items": [...],
-  "total": 150,
-  "offset": 0,
-  "limit": 20
+  "secrets": [
+    {
+      "id": "...",
+      "secretKey": "DATABASE_URL",
+      "secretValue": "postgres://...",
+      "secretValueHidden": false,
+      "secretPath": "/",
+      "secretComment": "",
+      "tags": [],
+      "secretMetadata": []
+    }
+  ],
+  "imports": [
+    {
+      "secretPath": "/shared",
+      "environment": "dev",
+      "secrets": [ /* ... */ ]
+    }
+  ]
 }
 ```
 
-- **total**: Total count of all available items (ignoring pagination)
-- **offset**: Requested offset
-- **limit**: Requested limit (may be less if fewer items available)
-- **items**: Array of results for this page
+There is no `total`, `offset`, `limit`, or `items` key. To narrow the result set, use
+`secretPath`, `recursive`, `tagSlugs`, or `metadataFilter` rather than pagination.
 
-### Example: Paginating Through All Results
+This endpoint can also return `304 Not Modified` with an empty body when used with
+conditional-request headers.
+
+### Endpoints that do paginate
+
+Paginated collection endpoints take `offset` and `limit` as query parameters and return the
+collection alongside a `totalCount`:
+
+```bash
+curl -X GET 'https://us.infisical.com/api/v1/organization/identities?offset=0&limit=100' \
+  -H "Authorization: Bearer TOKEN"
+```
+
+```json
+{
+  "identities": [ /* ... */ ],
+  "totalCount": 150
+}
+```
+
+The envelope key is named after the resource (`identities`, `memberships`, `certificates`, …),
+not a generic `items`. The count field is `totalCount`, not `total`.
+
+**Limits are per-endpoint, not global.** Do not assume 100 is the ceiling everywhere:
+
+| Endpoint family | `limit` default | `limit` max |
+|-----------------|-----------------|-------------|
+| `GET /api/v1/organization/identities` | 20 | 1000 |
+| `POST /api/v1/identities/search` | 50 | 100 |
+
+Check the API reference for the endpoint you are calling. When in doubt, request a modest
+limit and follow `totalCount`.
+
+### Paginating correctly
 
 ```bash
 #!/bin/bash
-
-# Retrieve all secrets in batches of 20
+# Page through org identities using totalCount
+API_BASE="https://us.infisical.com"
+TOKEN="your_access_token"
+LIMIT=100
 offset=0
-limit=20
-total=-1
 
-while [ $offset -lt $total ] || [ $total -eq -1 ]; do
-  response=$(curl -s "https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&offset=$offset&limit=$limit" \
-    -H "Authorization: Bearer TOKEN")
-  
-  # Extract items and total from response
-  total=$(echo $response | jq '.total')
-  items=$(echo $response | jq '.secrets[]')
-  
-  # Process items
-  echo "Processing items $offset to $((offset + limit))..."
-  
-  offset=$((offset + limit))
+while :; do
+  response=$(curl -s "$API_BASE/api/v1/organization/identities?offset=$offset&limit=$LIMIT" \
+    -H "Authorization: Bearer $TOKEN")
+
+  total=$(echo "$response" | jq '.totalCount')
+  count=$(echo "$response" | jq '.identities | length')
+
+  echo "$response" | jq -r '.identities[].name'
+
+  offset=$((offset + count))
+  # Stop when a short page comes back or we've covered totalCount
+  if [ "$count" -eq 0 ] || [ "$offset" -ge "$total" ]; then
+    break
+  fi
 done
 ```
 
-### Pagination Best Practices
+Advance `offset` by the number of items actually returned, not by the requested limit — a
+short page otherwise causes you to skip records.
 
-1. **Start with offset=0**: Always begin pagination at offset 0
-2. **Use maximum limit**: Set `limit=100` for faster retrieval (unless you need fewer items)
-3. **Check total**: Use the `total` value to determine if more pages exist: `hasMore = (offset + limit) < total`
-4. **Handle edge cases**: Always check if `limit` in response is less than requested (indicates fewer items available)
-5. **Respect rate limits**: Add delays between requests if hitting rate limits
+### Reading all secrets (no pagination needed)
 
-## Rate Limits (Cloud Only)
+```bash
+curl -s 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&recursive=true' \
+  -H "Authorization: Bearer TOKEN" | jq -r '.secrets[] | "\(.secretKey)=\(.secretValue)"'
+```
 
-Infisical Cloud deployments have rate limits. Self-hosted deployments have no rate limits.
+## Rate Limits
 
-### Rate Limit Types
+Rate limits apply to **both cloud and self-hosted** deployments. The difference is that
+self-hosted instance administrators can change them; on cloud they are set by Infisical.
 
-#### Read Operations (GET, LIST)
+### Instance defaults
 
-- **Free Tier**: 200 reads per minute
-- **Pro Tier**: 350 reads per minute
-- **Enterprise**: Custom limits
+These are the built-in per-minute, per-IP defaults a self-hosted instance starts with:
 
-#### Write Operations (CREATE, UPDATE, DELETE)
+| Limit | Applies to | Default (req/min) |
+|-------|-----------|-------------------|
+| `readLimit` | GET endpoints | 60 |
+| `writeLimit` | POST, PATCH, PUT, DELETE endpoints | 200 |
+| `secretsLimit` | secrets, folders, and secret-import endpoints | 60 |
+| `authRateLimit` | auth/login endpoints | 60 |
+| global | all requests | 600 |
 
-- **Free Tier**: 90 writes per minute
-- **Pro Tier**: 200 writes per minute
-- **Enterprise**: Custom limits
+Self-hosted admins can override `readLimit`, `writeLimit`, and `secretsLimit` from the
+instance admin panel. Infisical Cloud applies its own limits, which vary by plan; check your
+plan's documentation rather than assuming a specific number.
 
-#### Secret Operations (All /api/v4/secrets/* endpoints)
+All limits use a 60-second window and are keyed on client IP.
 
-- **Free Tier**: 120 secret ops per minute
-- **Pro Tier**: 300 secret ops per minute
-- **Enterprise**: Custom limits
+### Rate limit responses
 
-### Rate Limit Response Headers
-
-When you hit a rate limit, the API returns HTTP 429 (Too Many Requests):
+Exceeding a limit returns HTTP 429 with a message stating how long to wait:
 
 ```
 HTTP/1.1 429 Too Many Requests
-X-RateLimit-Limit: 200
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1713350400
 Content-Type: application/json
 
 {
   "statusCode": 429,
-  "message": "Too many requests, please try again later."
+  "message": "Rate limit exceeded. Please try again in 34 seconds"
 }
 ```
 
-- **X-RateLimit-Limit**: Maximum requests allowed in the window
-- **X-RateLimit-Remaining**: Requests remaining in the current window
-- **X-RateLimit-Reset**: Unix timestamp when the limit resets
+The response also carries the standard `@fastify/rate-limit` headers
+(`x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset`, and `retry-after` on a
+429). Note `x-ratelimit-reset` and `retry-after` are **seconds remaining**, not a Unix
+timestamp.
 
-### Handling Rate Limits
+### Handling rate limits
 
-#### Implement Exponential Backoff
+Prefer `retry-after` over computing your own backoff:
 
 ```javascript
 async function makeRequestWithRetry(url, options, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     const response = await fetch(url, options);
-    
+
     if (response.status === 429) {
-      const resetTime = parseInt(response.headers.get('X-RateLimit-Reset')) * 1000;
-      const delayMs = Math.max(resetTime - Date.now(), 1000 * Math.pow(2, attempt - 1));
-      
-      console.log(`Rate limited. Waiting ${delayMs}ms before retry...`);
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      // retry-after is in seconds remaining
+      const retryAfter = Number(response.headers.get('retry-after'));
+      const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : 1000 * 2 ** (attempt - 1);
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
       continue;
     }
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
   throw new Error('Max retries exceeded');
 }
 ```
 
-#### Monitor Rate Limit Usage
+### Batch instead of looping
+
+Secret endpoints count against `secretsLimit`, so per-secret loops burn through it fast. Use
+the batch endpoints:
 
 ```bash
-curl -s 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&limit=1' \
-  -H "Authorization: Bearer TOKEN" \
-  -w "\nRate Limit Remaining: %{http_header{X-RateLimit-Remaining}}\n"
-```
-
-#### Batch Operations
-
-Group multiple operations to reduce request count:
-
-```bash
-# Instead of 100 DELETE requests, use one batch delete
-curl -X DELETE 'https://us.infisical.com/api/v4/secrets/batch' \
+# Create many secrets in one request
+curl -X POST 'https://us.infisical.com/api/v4/secrets/batch' \
   -H "Authorization: Bearer TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "projectId": "abc123",
     "environment": "dev",
     "secretPath": "/",
-    "secretIds": ["id1", "id2", "id3", ...]
+    "secrets": [
+      { "secretKey": "A", "secretValue": "1" },
+      { "secretKey": "B", "secretValue": "2" }
+    ]
   }'
 ```
 
-#### Request Queuing
-
-Implement a request queue to spread requests over time:
-
-```python
-import asyncio
-import aiohttp
-from collections import deque
-
-class RateLimitedClient:
-    def __init__(self, requests_per_minute=200):
-        self.requests_per_minute = requests_per_minute
-        self.min_interval = 60 / requests_per_minute
-        self.last_request_time = 0
-        self.queue = deque()
-    
-    async def request(self, session, method, url, **kwargs):
-        # Wait if necessary to maintain rate limit
-        elapsed = asyncio.get_event_loop().time() - self.last_request_time
-        if elapsed < self.min_interval:
-            await asyncio.sleep(self.min_interval - elapsed)
-        
-        async with session.request(method, url, **kwargs) as response:
-            self.last_request_time = asyncio.get_event_loop().time()
-            return await response.json()
-```
+`PATCH /api/v4/secrets/batch` and `DELETE /api/v4/secrets/batch` work the same way.
 
 ## Required Headers
 
-All API requests must include:
-
 ```
-Content-Type: application/json
 Authorization: Bearer YOUR_ACCESS_TOKEN
+Content-Type: application/json   # required on requests with a JSON body
 ```
 
-### Example: Complete Request with Headers
-
-```bash
-curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environment=dev&offset=0&limit=20' \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
-```
+`Content-Type` matters for POST/PATCH/PUT bodies. GET and DELETE requests without a body do
+not need it.
 
 ## HTTP Status Codes
 
@@ -208,80 +237,23 @@ curl -X GET 'https://us.infisical.com/api/v4/secrets?projectId=abc123&environmen
 |------|---------|----------------|
 | 200 | OK | Successful GET, PATCH, DELETE |
 | 201 | Created | Successful POST |
+| 304 | Not Modified | Conditional request on list secrets, content unchanged |
 | 400 | Bad Request | Invalid parameters or request body |
 | 401 | Unauthorized | Missing or invalid token |
 | 403 | Forbidden | Insufficient permissions |
 | 404 | Not Found | Resource doesn't exist |
 | 409 | Conflict | Duplicate secret name or resource conflict |
-| 429 | Too Many Requests | Rate limit exceeded (cloud only) |
+| 422 | Unprocessable Entity | Request failed schema validation |
+| 429 | Too Many Requests | Rate limit exceeded |
 | 500 | Internal Error | Server error |
 
 ## Performance Tips
 
-1. **Use pagination**: Limit each request to 100 items maximum
-2. **Cache responses**: Store secret values locally to reduce API calls
-3. **Use appropriate timeouts**: Set 30-second timeouts for API calls
-4. **Batch operations**: Combine multiple operations into single requests where possible
-5. **Monitor headers**: Check X-RateLimit-Remaining to anticipate throttling
-6. **Implement exponential backoff**: Automatically retry failed requests with increasing delays
-7. **Use webhooks**: Subscribe to changes instead of polling for updates (if available)
-
-## Example: Comprehensive Pagination with Error Handling
-
-```bash
-#!/bin/bash
-
-PROJECT_ID="abc123"
-ENVIRONMENT="dev"
-API_BASE="https://us.infisical.com"
-TOKEN="your_access_token"
-BATCH_SIZE=100
-
-offset=0
-total_processed=0
-
-while true; do
-  # Make request with error handling
-  response=$(curl -s -w "\n%{http_code}" \
-    "$API_BASE/api/v4/secrets?projectId=$PROJECT_ID&environment=$ENVIRONMENT&offset=$offset&limit=$BATCH_SIZE" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json")
-  
-  # Extract body and status code
-  http_code=$(echo "$response" | tail -n1)
-  body=$(echo "$response" | head -n-1)
-  
-  # Check for errors
-  if [ "$http_code" = "429" ]; then
-    reset_time=$(curl -s -I "$API_BASE/api/v4/secrets?projectId=$PROJECT_ID&environment=$ENVIRONMENT" \
-      -H "Authorization: Bearer $TOKEN" | grep X-RateLimit-Reset | awk '{print $2}')
-    echo "Rate limited. Waiting until $reset_time..."
-    sleep 60
-    continue
-  elif [ "$http_code" != "200" ]; then
-    echo "Error: HTTP $http_code"
-    echo "$body" | jq .
-    exit 1
-  fi
-  
-  # Process response
-  total=$(echo "$body" | jq '.total')
-  count=$(echo "$body" | jq '.secrets | length')
-  
-  echo "Processing items $offset-$((offset + count)) of $total..."
-  
-  # Do something with the secrets
-  echo "$body" | jq '.secrets[] | .secretName'
-  
-  total_processed=$((total_processed + count))
-  
-  # Check if we've retrieved all items
-  if [ $total_processed -ge $total ]; then
-    break
-  fi
-  
-  offset=$((offset + BATCH_SIZE))
-done
-
-echo "Processed $total_processed items total"
-```
+1. **Don't paginate secrets** — fetch a path once, and scope with `secretPath` / `recursive`
+2. **Batch writes** — one `/batch` call instead of N single-secret calls
+3. **Cache locally** — the official SDKs cache and fall back to cache on failure; do the same if hand-rolling
+4. **Honor `retry-after`** — it tells you exactly how long to wait
+5. **Advance offset by items returned** — not by requested limit
+6. **Use `viewSecretValue=false`** when you only need key names, to avoid handling values you don't need
+</content>
+</invoke>

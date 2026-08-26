@@ -1,0 +1,24 @@
+{
+  "eval_id": 6,
+  "eval_name": "alicloud-machine-identity-auth",
+  "skill": "infisical-setup",
+  "skill_files": [
+    "SKILL.md",
+    "references/machine-identity-auth.md"
+  ],
+  "prompt": "My workload runs on Alibaba Cloud. Which Infisical machine identity auth method should I use, what do I configure on the identity, and what is the login endpoint? Also, how many machine identity auth methods does Infisical support in total?",
+  "assertions": [
+    "Recommends AliCloud Auth",
+    "Gives the correct login endpoint",
+    "Mentions Allowed ARNs as the configured allowlist",
+    "States there are 13 auth methods"
+  ],
+  "arms": [
+    "baseline",
+    "old_skill",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

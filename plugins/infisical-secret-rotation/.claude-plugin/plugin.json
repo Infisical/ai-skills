@@ -1,0 +1,20 @@
+{
+  "name": "infisical-secret-rotation",
+  "description": "Configure Infisical Secret Rotation \u2014 automatically rotating existing third-party credentials on a schedule across 28 providers, with dual-phase zero-downtime rotation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/secret-rotation/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "secret-rotation",
+    "credentials",
+    "postgres",
+    "aws",
+    "rotation"
+  ]
+}

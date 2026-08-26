@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Confirms AWS ElastiCache is a supported provider",
+      "passed": true,
+      "evidence": "OK required /aws-elasticache|AWS ElastiCache/ -> 'AWS ElastiCache' | OK absent /(not|isn't|does not|doesn't) support(ed)?[^.]{0,40}ElastiCache/"
+    },
+    {
+      "text": "Confirms Tailscale is a supported provider",
+      "passed": true,
+      "evidence": "OK required /tailscale|Tailscale/ -> 'Tailscale' | OK absent /(not|isn't|does not|doesn't) support(ed)?[^.]{0,40}Tailscale/"
+    },
+    {
+      "text": "Notes ElastiCache needs creation/revocation statements and clusterName",
+      "passed": false,
+      "evidence": "MISSING required /creationStatement|creation statement/"
+    },
+    {
+      "text": "Notes Tailscale blocks privilege-escalation scopes",
+      "passed": false,
+      "evidence": "MISSING required /blocked|block|escalat|not allowed|prohibit/"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "total_duration_seconds": 80.8
+  }
+}

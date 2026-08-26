@@ -1,0 +1,574 @@
+{
+  "iteration": "new-skills-2026-08",
+  "ground_truth_commit": "bbe1f02208",
+  "evals": [
+    {
+      "eval_id": 0,
+      "eval_name": "rotation-sql-two-user",
+      "skill": "infisical-secret-rotation",
+      "skill_files": [
+        "SKILL.md",
+        "references/rotation-overview.md",
+        "references/sql-databases.md"
+      ],
+      "prompt": "Set up an Infisical Secret Rotation for our production PostgreSQL application user, rotating every 30 days. Show me the API request body and tell me exactly what I need to prepare in the database beforehand.",
+      "assertions": [
+        {
+          "text": "Requires TWO pre-existing database users via username1/username2",
+          "must_match": [
+            "username1",
+            "username2"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "States both users must already exist and Infisical does not create them",
+          "must_match": [
+            "already exist|must exist|pre-exist|does not create|Infisical does not"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "rotationInterval is in days",
+          "must_match": [
+            "rotationInterval[^\\n]{0,60}30|30[^\\n]{0,40}day|interval[^\\n]{0,30}day"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Maps both username and password via secretsMapping",
+          "must_match": [
+            "secretsMapping"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Warns the application must read the username from Infisical too, since the active user alternates",
+          "must_match": [
+            "alternat|active username|read the username|username changes|both.*username.*password"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "app-connection-aws-assume-role",
+      "skill": "infisical-app-connections",
+      "skill_files": [
+        "SKILL.md",
+        "references/connection-catalog.md",
+        "references/cloud-providers.md"
+      ],
+      "prompt": "Create an Infisical App Connection to AWS using role assumption rather than static keys. Show the exact API request, including the method value and credential field names.",
+      "assertions": [
+        {
+          "text": "Uses method assume-role",
+          "must_match": [
+            "\"?assume-role\"?"
+          ],
+          "must_not_match": [
+            "\"assume_role\"|\"assumeRole\""
+          ]
+        },
+        {
+          "text": "Uses roleArn as the credential field",
+          "must_match": [
+            "roleArn"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Posts to the aws connection endpoint",
+          "must_match": [
+            "/api/v1/app-connections/aws"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions the External ID requirement in the trust policy",
+          "must_match": [
+            "External ID|ExternalId|external ID"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pki-ecdsa-key-algorithm",
+      "skill": "infisical-pki",
+      "skill_files": [
+        "SKILL.md",
+        "references/certificate-authorities.md",
+        "references/issuance-and-enrollment.md"
+      ],
+      "prompt": "I want to create an internal Infisical certificate authority using an ECDSA P-256 key. What exact key algorithm value do I pass, and what is the difference between a root and an intermediate CA in Infisical?",
+      "assertions": [
+        {
+          "text": "Gives the correct ECDSA P-256 wire value EC_prime256v1",
+          "must_match": [
+            "EC_prime256v1"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not offer ECDSA_P256 as the value",
+          "must_match": [],
+          "must_not_match": [
+            "pass\\s+`?ECDSA_P256|value[^\\n]{0,20}ECDSA_P256|use\\s+`?ECDSA_P256"
+          ]
+        },
+        {
+          "text": "Explains root self-signs and intermediate is signed by a parent",
+          "must_match": [
+            "self-sign|self sign"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions pending-certificate status for an unsigned intermediate",
+          "must_match": [
+            "pending-certificate|pending certificate"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "kms-sign-isdigest",
+      "skill": "infisical-kms",
+      "skill_files": [
+        "SKILL.md",
+        "references/keys-and-operations.md"
+      ],
+      "prompt": "Using Infisical KMS, I need to sign a large file with an RSA key. Show me how, and explain how to avoid sending the whole file over the network.",
+      "assertions": [
+        {
+          "text": "Uses the isDigest flag",
+          "must_match": [
+            "isDigest"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Explains isDigest true means data is already a hash",
+          "must_match": [
+            "already a hash|already hashed|pre-computed|precomputed|already a digest"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses a valid RSA signing algorithm value",
+          "must_match": [
+            "RSASSA_PSS_SHA_(256|384|512)|RSASSA_PKCS1_V1_5_SHA_(256|384|512)"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Notes data is base64-encoded",
+          "must_match": [
+            "base64"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses the sign endpoint",
+          "must_match": [
+            "/sign"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "pam-agentic-access",
+      "skill": "infisical-pam",
+      "skill_files": [
+        "SKILL.md",
+        "references/accounts-and-access.md",
+        "references/sessions-and-agents.md"
+      ],
+      "prompt": "I want to let Claude Code query our production database through Infisical PAM without giving it a connection string. Show me the command and explain how the credential is kept away from the agent.",
+      "assertions": [
+        {
+          "text": "Uses infisical pam agentic access",
+          "must_match": [
+            "infisical pam agentic access"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Scopes with the --account flag",
+          "must_match": [
+            "--account"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Explains the Gateway injects the real credential",
+          "must_match": [
+            "[Gg]ateway[^.]{0,80}(inject|supplies|adds|holds)"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions local ports on 127.0.0.1",
+          "must_match": [
+            "127\\.0\\.0\\.1|localhost port|local port"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions the sandbox requirement (macOS or Linux with bubblewrap)",
+          "must_match": [
+            "bubblewrap|sandbox"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "k8s-operator-v1beta1-autoreload",
+      "skill": "infisical-kubernetes-operator",
+      "skill_files": [
+        "SKILL.md",
+        "references/install-and-auth.md",
+        "references/syncing-secrets.md"
+      ],
+      "prompt": "Using the current Infisical Kubernetes Operator CRDs, sync secrets from Infisical into a Kubernetes Secret and make my Deployment pick up changes automatically. Show the manifests.",
+      "assertions": [
+        {
+          "text": "Uses the v1beta1 API version",
+          "must_match": [
+            "secrets\\.infisical\\.com/v1beta1"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses InfisicalStaticSecret rather than the legacy InfisicalSecret",
+          "must_match": [
+            "InfisicalStaticSecret"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Includes InfisicalConnection and InfisicalAuth resources",
+          "must_match": [
+            "InfisicalConnection",
+            "InfisicalAuth"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Adds the auto-reload annotation for automatic redeployment",
+          "must_match": [
+            "secrets\\.infisical\\.com/auto-reload"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Uses sources and targets",
+          "must_match": [
+            "sources:",
+            "targets:"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "access-control-describe-vs-read",
+      "skill": "infisical-access-control",
+      "skill_files": [
+        "SKILL.md",
+        "references/roles-and-permissions.md"
+      ],
+      "prompt": "In Infisical, I want developers to be able to see which secrets exist in production and their metadata, but not read any secret values. Which exact permission actions do I grant and which do I withhold?",
+      "assertions": [
+        {
+          "text": "Grants describeSecret",
+          "must_match": [
+            "describeSecret"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Withholds readValue",
+          "must_match": [
+            "readValue"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Explains that the legacy read action grants both",
+          "must_match": [
+            "`?read`?[^.\\n]{0,80}both|both[^.\\n]{0,60}`?read`?|read[^\\n]{0,60}(grants|includes)[^\\n]{0,40}value"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not tell the user to grant plain read for this",
+          "must_match": [],
+          "must_not_match": [
+            "grant (the )?`?read`? (action|permission)"
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "scanning-github-radar-connection",
+      "skill": "infisical-secret-scanning",
+      "skill_files": [
+        "SKILL.md",
+        "references/scanning-and-findings.md",
+        "references/cli-and-honey-tokens.md"
+      ],
+      "prompt": "Set up Infisical Secret Scanning on our GitHub repositories, and also stop developers committing secrets locally in the first place. What App Connection type do I need, and what should I run locally?",
+      "assertions": [
+        {
+          "text": "Specifies the github-radar App Connection",
+          "must_match": [
+            "github-radar"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Warns it is not the same as a plain github connection",
+          "must_match": [
+            "not[^.\\n]{0,60}`?github`?[^.\\n]{0,40}connection|different[^.\\n]{0,60}github|separate[^.\\n]{0,60}connection"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Recommends the pre-commit hook install command",
+          "must_match": [
+            "infisical scan install[^\\n]{0,40}--pre-commit-hook"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Recommends a full scan for existing history",
+          "must_match": [
+            "full[- ]scan|full scan"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "sso-enforcement-breakglass",
+      "skill": "infisical-sso",
+      "skill_files": [
+        "SKILL.md",
+        "references/sso-setup.md",
+        "references/scim-and-groups.md"
+      ],
+      "prompt": "We want to enforce SAML SSO for our Infisical organization so nobody can log in with a password. What do we need to do first, and what are the risks?",
+      "assertions": [
+        {
+          "text": "States email domain verification is a prerequisite",
+          "must_match": [
+            "[Ee]mail [Dd]omain [Vv]erification|verify[^.\\n]{0,30}email domain|verified domain"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Warns password signup is blocked for verified domains",
+          "must_match": [
+            "signup[^.\\n]{0,50}block|block[^.\\n]{0,50}signup|cannot[^.\\n]{0,60}password account"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Tells them to set up a break-glass admin with a password beforehand",
+          "must_match": [
+            "break[- ]glass"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Gives the /login/admin bypass portal path",
+          "must_match": [
+            "/login/admin"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Notes Organization Admin is required, not Server Admin",
+          "must_match": [
+            "[Oo]rganization [Aa]dmin"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "gateway-ports-no-inbound",
+      "skill": "infisical-gateway",
+      "skill_files": [
+        "SKILL.md",
+        "references/deployment-and-networking.md",
+        "references/pools-and-consumers.md"
+      ],
+      "prompt": "Our security team needs the exact firewall rules to deploy an Infisical Gateway in our VPC so Infisical can reach a private RDS instance. What ports, in which direction?",
+      "assertions": [
+        {
+          "text": "States no inbound ports are required on the gateway",
+          "must_match": [
+            "[Nn]o inbound"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Gives outbound TCP 2222 to the relay",
+          "must_match": [
+            "2222"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Gives outbound TCP 443 to Infisical",
+          "must_match": [
+            "443"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Describes the connection as outbound/egress only",
+          "must_match": [
+            "outbound|egress"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Mentions the auto-select relay allowlist caveat or pinning a relay",
+          "must_match": [
+            "[Aa]uto[- ][Ss]elect|pin[^\\n]{0,30}relay|failover between"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "appconn-discovery-endpoint-auth",
+      "skill": "infisical-app-connections",
+      "skill_files": [
+        "SKILL.md",
+        "references/api-surface.md",
+        "references/credentials-by-connection.md",
+        "references/connection-catalog.md"
+      ],
+      "prompt": "I'm writing a script that authenticates to Infisical with a machine identity and needs to list the KMS keys available on our AWS App Connection, so it can fill in a secret sync's config. Show me how.",
+      "assertions": [
+        {
+          "text": "States the discovery endpoint cannot be called with a machine identity token",
+          "must_match": [
+            "JWT[^\\n]{0,80}only|only[^\\n]{0,40}JWT|user session|cannot[^\\n]{0,60}machine identity|not[^\\n]{0,50}machine identity|rejected"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not present the kms-keys endpoint as a working machine-identity call",
+          "must_match": [],
+          "must_not_match": [
+            "curl[^\\n]{0,120}kms-keys"
+          ]
+        },
+        {
+          "text": "Offers a real alternative (query AWS directly, or read the config back from a UI-created sync)",
+          "must_match": [
+            "AWS (SDK|CLI|API)|provider directly|create[^.\\n]{0,60}UI|read[^.\\n]{0,50}back"
+          ],
+          "must_not_match": []
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "appconn-credentials-okta-datadog",
+      "skill": "infisical-app-connections",
+      "skill_files": [
+        "SKILL.md",
+        "references/api-surface.md",
+        "references/credentials-by-connection.md",
+        "references/connection-catalog.md"
+      ],
+      "prompt": "Create Infisical App Connections for Okta and for Datadog via the API. Give me the exact method value and credentials field names for each.",
+      "assertions": [
+        {
+          "text": "Okta uses method api-token",
+          "must_match": [
+            "[Oo]kta[\\s\\S]{0,300}?api-token"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Datadog offers token and api-key methods",
+          "must_match": [
+            "\"?api-key\"?"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Posts to the per-connection slug endpoint",
+          "must_match": [
+            "/api/v1/app-connections/okta",
+            "/api/v1/app-connections/datadog"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not invent a generic credentials shape for both",
+          "must_match": [],
+          "must_not_match": [
+            "same credentials for both|identical credential"
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "appconn-lookup-by-name",
+      "skill": "infisical-app-connections",
+      "skill_files": [
+        "SKILL.md",
+        "references/api-surface.md",
+        "references/credentials-by-connection.md",
+        "references/connection-catalog.md"
+      ],
+      "prompt": "My automation knows an Infisical App Connection by its name, not its UUID. Can it resolve the connection ID through the API, and does that work with a machine identity token?",
+      "assertions": [
+        {
+          "text": "Gives the connection-name lookup path",
+          "must_match": [
+            "connection-name/"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Confirms it accepts a machine identity token",
+          "must_match": [
+            "identity|machine identity"
+          ],
+          "must_not_match": []
+        },
+        {
+          "text": "Does not claim you must store the UUID",
+          "must_match": [],
+          "must_not_match": [
+            "must store the UUID|no way to look up|only by (its )?UUID"
+          ]
+        }
+      ]
+    }
+  ]
+}

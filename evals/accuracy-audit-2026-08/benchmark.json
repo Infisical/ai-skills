@@ -1,0 +1,172 @@
+{
+  "iteration": "accuracy-audit-2026-08",
+  "purpose": "Regression eval for the skill accuracy audit. Verifies that corrections made against the Infisical codebase actually change model output.",
+  "ground_truth": {
+    "repo": "Infisical/infisical",
+    "commit": "caa698e100"
+  },
+  "skills_commit": "ec7528c",
+  "model": "claude-sonnet-5",
+  "tools": "disabled for all arms (knowledge + provided context only)",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines",
+  "arms": {
+    "baseline": "No skill",
+    "old_skill": "Old skill (main)",
+    "new_skill": "New skill (this branch)"
+  },
+  "totals": {
+    "baseline": {
+      "passed": 18,
+      "total": 35,
+      "pass_rate": 0.5143
+    },
+    "old_skill": {
+      "passed": 13,
+      "total": 35,
+      "pass_rate": 0.3714
+    },
+    "new_skill": {
+      "passed": 35,
+      "total": 35,
+      "pass_rate": 1.0
+    }
+  },
+  "per_eval": [
+    {
+      "eval_id": 0,
+      "eval_name": "terraform-provider-auth-and-ephemeral",
+      "skill": "infisical-terraform",
+      "baseline": {
+        "passed": 0,
+        "total": 4
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "ruby-sdk-fetch-secret",
+      "skill": "infisical-setup",
+      "baseline": {
+        "passed": 1,
+        "total": 5
+      },
+      "old_skill": {
+        "passed": 1,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "api-list-all-secrets",
+      "skill": "infisical-api",
+      "baseline": {
+        "passed": 3,
+        "total": 5
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "secret-sync-github-env-and-vercel",
+      "skill": "infisical-secret-syncs",
+      "baseline": {
+        "passed": 5,
+        "total": 5
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 5
+      },
+      "new_skill": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "agent-ssh-dynamic-secret-template",
+      "skill": "infisical-agent",
+      "baseline": {
+        "passed": 2,
+        "total": 4
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "self-host-fips-deployment",
+      "skill": "infisical-self-host",
+      "baseline": {
+        "passed": 3,
+        "total": 4
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "alicloud-machine-identity-auth",
+      "skill": "infisical-setup",
+      "baseline": {
+        "passed": 2,
+        "total": 4
+      },
+      "old_skill": {
+        "passed": 0,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "dynamic-secrets-elasticache-tailscale",
+      "skill": "infisical-dynamic-secrets",
+      "baseline": {
+        "passed": 2,
+        "total": 4
+      },
+      "old_skill": {
+        "passed": 2,
+        "total": 4
+      },
+      "new_skill": {
+        "passed": 4,
+        "total": 4
+      }
+    }
+  ]
+}

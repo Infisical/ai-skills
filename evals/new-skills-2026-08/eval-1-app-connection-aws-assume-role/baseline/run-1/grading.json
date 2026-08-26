@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Uses method assume-role",
+      "passed": true,
+      "evidence": "OK required /\"?assume-role\"?/ -> '\"assume-role\"' | OK absent /\"assume_role\"|\"assumeRole\"/"
+    },
+    {
+      "text": "Uses roleArn as the credential field",
+      "passed": true,
+      "evidence": "OK required /roleArn/ -> 'roleArn'"
+    },
+    {
+      "text": "Posts to the aws connection endpoint",
+      "passed": true,
+      "evidence": "OK required //api/v1/app-connections/aws/ -> '/api/v1/app-connections/aws'"
+    },
+    {
+      "text": "Mentions the External ID requirement in the trust policy",
+      "passed": true,
+      "evidence": "OK required /External ID|ExternalId|external ID/ -> 'external ID'"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 82.4
+  }
+}

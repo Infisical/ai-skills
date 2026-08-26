@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "kms-sign-isdigest",
+  "skill": "infisical-kms",
+  "skill_files": [
+    "SKILL.md",
+    "references/keys-and-operations.md"
+  ],
+  "prompt": "Using Infisical KMS, I need to sign a large file with an RSA key. Show me how, and explain how to avoid sending the whole file over the network.",
+  "assertions": [
+    "Uses the isDigest flag",
+    "Explains isDigest true means data is already a hash",
+    "Uses a valid RSA signing algorithm value",
+    "Notes data is base64-encoded",
+    "Uses the sign endpoint"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

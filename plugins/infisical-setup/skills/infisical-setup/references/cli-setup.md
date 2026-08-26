@@ -9,15 +9,26 @@ Guide the user based on their OS:
 | Platform | Command |
 |----------|---------|
 | macOS | `brew install infisical/get-cli/infisical` |
-| Debian/Ubuntu | `curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' \| sudo bash && sudo apt-get install -y infisical` |
-| RedHat/CentOS/Amazon | `curl -1sLf 'https://artifacts-cli.infisical.com/setup.rpm.sh' \| sudo bash && sudo yum install -y infisical` |
-| Alpine | `curl -1sLf 'https://artifacts-cli.infisical.com/setup.alpine.sh' \| sudo bash && sudo apk add --no-cache infisical` |
+| Debian/Ubuntu | `curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' \| sudo -E bash` then `sudo apt-get update && sudo apt-get install -y infisical` |
+| RedHat/CentOS/Amazon | `curl -1sLf 'https://artifacts-cli.infisical.com/setup.rpm.sh' \| sudo -E bash` then `sudo yum install infisical` |
+| Alpine | `apk add --no-cache bash sudo wget` then `wget -qO- 'https://artifacts-cli.infisical.com/setup.apk.sh' \| sudo sh` then `apk update && sudo apk add infisical` |
 | Arch Linux | `yay -S infisical-bin` |
-| Windows (Scoop) | `scoop install infisical` |
+| Windows (Scoop) | `scoop bucket add org https://github.com/Infisical/scoop-infisical.git` then `scoop install infisical` |
 | Windows (Winget) | `winget install infisical` |
 | npm (any platform) | `npm install -g @infisical/cli` |
 
-For production or CI, recommend pinning to a specific version for consistency.
+Notes that trip people up:
+- The Alpine setup script is **`setup.apk.sh`** (not `setup.alpine.sh`), and it's fetched with
+  `wget` piped to `sh`. Alpine also needs `bash`, `sudo`, and `wget` present first.
+- Scoop requires **adding the Infisical bucket first**; `scoop install infisical` alone fails.
+- Linux repos moved from Cloudsmith to `artifacts-cli.infisical.com`. The old Cloudsmith
+  repository stops serving on **September 16, 2026** — machines still pointed at it will fail to
+  install or update.
+
+For production or CI, pin to a specific version for consistency.
+
+Updating: `brew update && brew upgrade infisical`, `scoop update infisical`,
+`npm update -g @infisical/cli`.
 
 ## Login
 
@@ -86,6 +97,9 @@ infisical run --env=staging -- npm run dev
 # Specify a folder path within the project
 infisical run --path=/apps/backend -- npm run dev
 
+# Multiple paths — repeat the flag to merge secrets from several folders
+infisical run --path=/common --path=/nextjs -- npm run dev
+
 # Watch mode — auto-restarts when secrets change
 infisical run --watch -- npm run dev
 
@@ -141,12 +155,28 @@ infisical export --format=yaml > secrets.yaml
 | Flag | Purpose |
 |------|---------|
 | `--env` | Environment slug (default: `dev`) |
-| `--path` | Folder path within the project (default: `/`) |
+| `--path` | Folder path within the project (default: `/`). Repeatable — merges multiple folders |
 | `--projectId` | Override project from `.infisical.json` |
 | `--expand` | Expand `${VAR}` references (default: true) |
 | `--include-imports` | Include imported secrets (default: true) |
 | `--tags` | Filter by comma-separated tags |
 | `--token` | Machine identity token (alternative to `INFISICAL_TOKEN` env var) |
+
+## Beyond local dev
+
+The CLI covers more than `run`/`secrets`/`export`. Other command groups you may need:
+
+| Command | Purpose |
+|---------|---------|
+| `infisical dynamic-secrets` | Lease, renew, and revoke dynamic secrets |
+| `infisical gateway` / `infisical relay` | Run a Gateway or Relay for private-network access |
+| `infisical agent` | Run the Infisical Agent daemon (see the `infisical-agent` skill) |
+| `infisical agent-proxy` | Local or standalone secret-serving proxy |
+| `infisical bootstrap` | Automated instance bootstrapping for self-hosted setups |
+| `infisical vault` | Manage the local CLI credential vault backend |
+| `infisical pam` | Privileged access management sessions |
+| `infisical kmip` | KMIP client operations |
+| `infisical scan` | Secret scanning (see below) |
 
 ## Secret scanning
 

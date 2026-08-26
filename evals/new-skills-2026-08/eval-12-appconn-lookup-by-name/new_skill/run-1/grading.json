@@ -1,0 +1,28 @@
+{
+  "expectations": [
+    {
+      "text": "Gives the connection-name lookup path",
+      "passed": true,
+      "evidence": "OK required /connection-name// -> 'connection-name/'"
+    },
+    {
+      "text": "Confirms it accepts a machine identity token",
+      "passed": true,
+      "evidence": "OK required /identity|machine identity/ -> 'machine identity'"
+    },
+    {
+      "text": "Does not claim you must store the UUID",
+      "passed": true,
+      "evidence": "OK absent /must store the UUID|no way to look up|only by (its )?UUID/"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 11.8
+  }
+}

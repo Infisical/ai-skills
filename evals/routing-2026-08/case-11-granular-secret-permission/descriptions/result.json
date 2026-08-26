@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-access-control",
+  "chosen": "infisical-access-control",
+  "correct": true,
+  "confusable_with": "infisical-setup",
+  "duration_seconds": 5.8
+}

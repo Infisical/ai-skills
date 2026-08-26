@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Okta uses method api-token",
+      "passed": true,
+      "evidence": "OK required /[Oo]kta[\\s\\S]{0,300}?api-token/ -> 'okta`, `datadog`), and the body always has `name`, `method`, `credentials`.\\n\\n**My best recollection '"
+    },
+    {
+      "text": "Datadog offers token and api-key methods",
+      "passed": true,
+      "evidence": "OK required /\"?api-key\"?/ -> 'api-key'"
+    },
+    {
+      "text": "Posts to the per-connection slug endpoint",
+      "passed": false,
+      "evidence": "MISSING required //api/v1/app-connections/okta/ | MISSING required //api/v1/app-connections/datadog/"
+    },
+    {
+      "text": "Does not invent a generic credentials shape for both",
+      "passed": true,
+      "evidence": "OK absent /same credentials for both|identical credential/"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "timing": {
+    "total_duration_seconds": 90.3
+  }
+}

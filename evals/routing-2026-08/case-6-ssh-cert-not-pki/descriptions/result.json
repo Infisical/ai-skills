@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-dynamic-secrets",
+  "chosen": "infisical-dynamic-secrets",
+  "correct": true,
+  "confusable_with": "infisical-pki",
+  "duration_seconds": 5.8
+}

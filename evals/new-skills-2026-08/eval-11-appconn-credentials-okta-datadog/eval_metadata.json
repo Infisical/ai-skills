@@ -1,0 +1,25 @@
+{
+  "eval_id": 11,
+  "eval_name": "appconn-credentials-okta-datadog",
+  "skill": "infisical-app-connections",
+  "skill_files": [
+    "SKILL.md",
+    "references/api-surface.md",
+    "references/credentials-by-connection.md",
+    "references/connection-catalog.md"
+  ],
+  "prompt": "Create Infisical App Connections for Okta and for Datadog via the API. Give me the exact method value and credentials field names for each.",
+  "assertions": [
+    "Okta uses method api-token",
+    "Datadog offers token and api-key methods",
+    "Posts to the per-connection slug endpoint",
+    "Does not invent a generic credentials shape for both"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

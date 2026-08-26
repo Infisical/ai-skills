@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-kms",
+  "chosen": "infisical-kms",
+  "correct": true,
+  "confusable_with": "infisical-setup",
+  "duration_seconds": 7.4
+}

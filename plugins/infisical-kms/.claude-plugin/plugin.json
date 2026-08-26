@@ -1,0 +1,20 @@
+{
+  "name": "infisical-kms",
+  "description": "Infisical KMS \u2014 managed cryptographic keys for encrypt/decrypt, sign/verify, and HMAC, plus external KMS backing, KMIP, and Sigstore cosign.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/kms/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "kms",
+    "encryption",
+    "signing",
+    "kmip",
+    "cryptography"
+  ]
+}

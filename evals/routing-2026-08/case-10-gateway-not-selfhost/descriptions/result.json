@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-gateway",
+  "chosen": "infisical-gateway",
+  "correct": true,
+  "confusable_with": "infisical-self-host",
+  "duration_seconds": 5.9
+}

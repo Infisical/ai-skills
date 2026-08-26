@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Requires the correct path: require \"infisical\" (not 'infisical-sdk')",
+      "passed": true,
+      "evidence": "OK required /require\\s+[\"']infisical[\"']/ -> 'require \"infisical\"' | OK absent /require\\s+[\"']infisical-sdk[\"']/"
+    },
+    {
+      "text": "Instantiates Infisical::Client (not InfisicalSDK::InfisicalClient)",
+      "passed": true,
+      "evidence": "OK required /Infisical::Client\\.new/ -> 'Infisical::Client.new' | OK absent /InfisicalSDK::InfisicalClient/"
+    },
+    {
+      "text": "Calls universal_auth_login (not universal_auth)",
+      "passed": true,
+      "evidence": "OK required /universal_auth_login/ -> 'universal_auth_login'"
+    },
+    {
+      "text": "Passes the secret name positionally to secrets.get",
+      "passed": true,
+      "evidence": "OK required /secrets\\.get\\(\\s*[\"']API_KEY[\"']/ -> 'secrets.get(\\n  \"API_KEY\"' | OK absent /secrets\\.get\\([\\s\\S]{0,40}secret_name:/"
+    },
+    {
+      "text": "Installs the infisical-sdk gem",
+      "passed": true,
+      "evidence": "OK required /gem\\s+(install\\s+)?[\"']?infisical-sdk/ -> 'gem install infisical-sdk'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 11.9
+  }
+}

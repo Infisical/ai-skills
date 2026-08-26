@@ -1,0 +1,22 @@
+{
+  "name": "infisical-pki",
+  "description": "Infisical Certificate Management \u2014 certificate authorities, certificate profiles and applications, ACME/EST/SCEP/API enrollment, PKI syncs, code signing, and post-quantum algorithms.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Infisical",
+    "email": "support@infisical.com"
+  },
+  "homepage": "https://infisical.com/docs/documentation/platform/pki/overview",
+  "repository": "https://github.com/Infisical/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "infisical",
+    "pki",
+    "certificates",
+    "tls",
+    "x509",
+    "acme",
+    "code-signing",
+    "ca"
+  ]
+}

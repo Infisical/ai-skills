@@ -33,15 +33,126 @@ ACL SETUSER {{username}} on >{{password}} ~app:* +get +mget +scan +keys
 
 ### Gotchas
 - Requires Redis 6+ with ACL support
-- Managed Redis services (ElastiCache, Azure Cache) often require SSL — use the CA field
+- Managed Redis services (Azure Cache) often require SSL — use the CA field
+- **For AWS ElastiCache and AWS MemoryDB, use their dedicated providers** (below), not this one — they authenticate through the AWS API rather than a Redis connection
+
+---
+
+## AWS ElastiCache
+
+Provider type: `aws-elasticache`
+
+### Prerequisites
+- An AWS IAM principal permitted to manage ElastiCache users and user groups
+- The ElastiCache cluster must have RBAC/user-group support enabled
+
+### Configuration
+| Field | Required | Description |
+|-------|----------|-------------|
+| `clusterName` | Yes | ElastiCache cluster name |
+| `region` | Yes | AWS region of the cluster |
+| `auth.type` | Yes | Authentication type |
+| `auth.accessKeyId` / `auth.secretAccessKey` | Depends on auth type | AWS credentials |
+| `creationStatement` | Yes | Statement Infisical runs to create the user |
+| `revocationStatement` | Yes | Statement Infisical runs to remove the user |
+
+### Gotchas
+- This provisions ElastiCache **users** via the AWS API, not Redis `ACL SETUSER` commands
+- Creation and revocation statements are required — unlike the plain Redis provider, there is no implicit default flow to fall back on
+
+---
+
+## AWS MemoryDB
+
+Provider type: `aws-memorydb`
+
+### Configuration
+| Field | Required | Description |
+|-------|----------|-------------|
+| `clusterName` | Yes | MemoryDB cluster name |
+| `region` | Yes | AWS region of the cluster |
+| `auth.type` | Yes | Authentication type |
+| `auth.accessKeyId` / `auth.secretAccessKey` | Depends on auth type | AWS credentials |
+| `creationStatement` | Yes | Statement Infisical runs to create the user |
+| `revocationStatement` | Yes | Statement Infisical runs to remove the user |
+| `host` / `port` | Yes | MemoryDB endpoint |
+| `roles` | Yes | Roles/ACL to attach to the generated user |
+
+Same shape as ElastiCache, plus an endpoint and roles.
+
+---
+
+## MongoDB Atlas
+
+Provider type: `mongo-db-atlas`
+
+Atlas uses its own Admin API, not MongoDB commands — this is why it is a separate provider from
+plain MongoDB.
+
+### Prerequisites
+- An Atlas **API key pair** (public + private) with permission to manage database users in the project
+
+### Configuration
+| Field | Required | Description |
+|-------|----------|-------------|
+| `adminPublicKey` | Yes | Atlas API public key |
+| `adminPrivateKey` | Yes | Atlas API private key |
+| `groupId` | Yes | Atlas **project** ID (Atlas calls this the group ID) |
+| `roles` | Yes | Array of roles, each with `roleName`, `databaseName`, and optional `collectionName` |
+| `scopes` | No | Restrict the user to specific clusters or data lakes |
+
+### Lease Returns
+- `DB_USERNAME` — Generated username
+- `DB_PASSWORD` — Generated password
+
+### Gotchas
+- `groupId` is the Atlas project ID, which is not the same as the org ID — a common misconfiguration
+- Roles are objects (`roleName` + `databaseName`), not plain strings like the self-hosted MongoDB provider
+
+---
+
+## Couchbase
+
+Provider type: `couchbase`
+
+### Configuration
+| Field | Required | Description |
+|-------|----------|-------------|
+| `url` | Yes | Couchbase Capella API URL |
+| `orgId` | Yes | Organization ID |
+| `projectId` | Yes | Project ID |
+| `clusterId` | Yes | Cluster ID |
+| `roles` | Yes | Roles to grant the generated user |
+| `buckets` | Yes | Buckets the user may access |
+
+---
+
+## Milvus
+
+Provider type: `milvus`
+
+### Configuration
+| Field | Required | Description |
+|-------|----------|-------------|
+| `host` | Yes | Milvus host |
+| `port` | Yes | Milvus port |
+| `username` | Yes | Admin user |
+| `password` | Yes | Admin password |
+| `database` | Yes | Target database |
+| `privileges` | Yes | Array of `{ objectType, objectName, privilege }` grants |
+
+### Gotchas
+- Privileges are structured triples, not a flat list — each entry names the object type, the object, and the privilege
 
 ---
 
 ## MongoDB
 
+Provider type: `mongo-db`
+
 ### Prerequisites
 - A MongoDB user with `userAdmin` or `userAdminAnyDatabase` role
-- **Important:** For MongoDB Atlas, use the separate **MongoDB Atlas** dynamic secret provider — standard MongoDB commands are not supported by Atlas
+- **Important:** For MongoDB Atlas, use the separate **MongoDB Atlas** provider documented above — standard MongoDB commands are not supported by Atlas
 
 ### Configuration
 | Field | Required | Description |

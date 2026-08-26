@@ -1,0 +1,7 @@
+{
+  "expected": "infisical-pam",
+  "chosen": "infisical-pam",
+  "correct": true,
+  "confusable_with": "infisical-dynamic-secrets",
+  "duration_seconds": 5.9
+}

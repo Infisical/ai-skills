@@ -25,15 +25,25 @@ Every dynamic secret has two TTL settings:
 - **Default TTL** — The default duration when generating a new lease (e.g., `1h`, `30m`)
 - **Max TTL** — The absolute ceiling — leases cannot be renewed past this point (e.g., `24h`, `7d`)
 
-### Supported Providers (27)
+### Supported Providers (30)
 
 **SQL Databases:** PostgreSQL, MySQL, MSSQL, Oracle, SAP ASE, SAP HANA, Snowflake, Vertica, ClickHouse, Azure SQL Database
 
-**NoSQL & Cache:** Redis, MongoDB, MongoDB Atlas, Elasticsearch, Couchbase, Cassandra, RabbitMQ
+**NoSQL, cache & search:** Redis, AWS ElastiCache, AWS MemoryDB, MongoDB, MongoDB Atlas, Elasticsearch, Couchbase, Cassandra, RabbitMQ, Milvus
 
 **Cloud IAM:** AWS IAM (users + temporary credentials), GCP IAM (service account tokens), Azure Entra ID
 
-**Infrastructure:** SSH Certificates, Kubernetes Service Account Tokens, LDAP, GitHub (tokens), TOTP
+**Infrastructure & SaaS:** SSH Certificates, Kubernetes Service Account Tokens, LDAP, GitHub (tokens), Tailscale, IBM API Connect, TOTP
+
+The API `provider.type` values are:
+`sql-database` (covers postgres, mysql2, oracledb, mssql, sap-ase, vertica), `clickhouse`,
+`cassandra`, `aws-iam`, `redis`, `aws-elasticache`, `aws-memorydb`, `mongo-db-atlas`,
+`elastic-search`, `mongo-db`, `rabbit-mq`, `azure-entra-id`, `azure-sql-database`, `ldap`,
+`sap-hana`, `snowflake`, `totp`, `sap-ase`, `kubernetes`, `vertica`, `gcp-iam`, `github`,
+`couchbase`, `milvus`, `ssh`, `ibm-api-connect`, `tailscale`.
+
+Note `sql-database` is a single provider type that fans out to six SQL engines via its
+`client` field, which is why the docs list 30 provider pages while the API exposes 27 type values.
 
 ## Common Setup Pattern
 

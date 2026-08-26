@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the separate infisical/infisical-fips image, not a :latest-fips tag",
+      "passed": true,
+      "evidence": "OK required /infisical/infisical-fips/ -> 'infisical/infisical-fips' | OK absent /infisical/infisical:latest-fips|infisical:.*-fips\\b/"
+    },
+    {
+      "text": "States FIPS 140-3 (not 140-2)",
+      "passed": true,
+      "evidence": "OK required /FIPS 140-3/ -> 'FIPS 140-3' | OK absent /FIPS 140-2/"
+    },
+    {
+      "text": "Generates ENCRYPTION_KEY as base64 256-bit for FIPS mode",
+      "passed": true,
+      "evidence": "OK required /openssl rand -base64 32/ -> 'openssl rand -base64 32'"
+    },
+    {
+      "text": "Sets FIPS_ENABLED=true",
+      "passed": true,
+      "evidence": "OK required /FIPS_ENABLED/ -> 'FIPS_ENABLED'"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 13.0
+  }
+}

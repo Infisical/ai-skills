@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Passes principals as the 6th argument to dynamicSecret",
+      "passed": false,
+      "evidence": "MISSING required /dynamicSecret\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s+\"[^\"]*deploy[^\"]*\"/"
+    },
+    {
+      "text": "Renders PRIVATE_KEY and SIGNED_KEY fields",
+      "passed": false,
+      "evidence": "MISSING required /\\.PRIVATE_KEY/ | MISSING required /\\.SIGNED_KEY/"
+    },
+    {
+      "text": "Uses YAML agent config with the infisical: root key",
+      "passed": true,
+      "evidence": "OK required /^\\s*infisical:/ -> 'infisical:'"
+    },
+    {
+      "text": "Uses destination-path for template output",
+      "passed": true,
+      "evidence": "OK required /destination-path/ -> 'destination-path'"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "total_duration_seconds": 64.3
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "eval_id": 5,
+  "eval_name": "k8s-operator-v1beta1-autoreload",
+  "skill": "infisical-kubernetes-operator",
+  "skill_files": [
+    "SKILL.md",
+    "references/install-and-auth.md",
+    "references/syncing-secrets.md"
+  ],
+  "prompt": "Using the current Infisical Kubernetes Operator CRDs, sync secrets from Infisical into a Kubernetes Secret and make my Deployment pick up changes automatically. Show the manifests.",
+  "assertions": [
+    "Uses the v1beta1 API version",
+    "Uses InfisicalStaticSecret rather than the legacy InfisicalSecret",
+    "Includes InfisicalConnection and InfisicalAuth resources",
+    "Adds the auto-reload annotation for automatic redeployment",
+    "Uses sources and targets"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}

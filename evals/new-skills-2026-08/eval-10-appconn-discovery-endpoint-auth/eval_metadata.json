@@ -1,0 +1,24 @@
+{
+  "eval_id": 10,
+  "eval_name": "appconn-discovery-endpoint-auth",
+  "skill": "infisical-app-connections",
+  "skill_files": [
+    "SKILL.md",
+    "references/api-surface.md",
+    "references/credentials-by-connection.md",
+    "references/connection-catalog.md"
+  ],
+  "prompt": "I'm writing a script that authenticates to Infisical with a machine identity and needs to list the KMS keys available on our AWS App Connection, so it can fill in a secret sync's config. Show me how.",
+  "assertions": [
+    "States the discovery endpoint cannot be called with a machine identity token",
+    "Does not present the kms-keys endpoint as a working machine-identity call",
+    "Offers a real alternative (query AWS directly, or read the config back from a UI-created sync)"
+  ],
+  "arms": [
+    "baseline",
+    "new_skill"
+  ],
+  "model": "sonnet",
+  "tools": "disabled",
+  "grading": "deterministic regex; negative assertions ignore counter-example lines"
+}
