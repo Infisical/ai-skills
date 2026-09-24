@@ -88,10 +88,13 @@ the right project before you import anything into it. The file holds no secrets,
 
 1. Take its `workspaceId` and find it in `infisical projects list --json`. If it isn't there, the
    link is stale or belongs to an org or instance you're not logged into. Tell the user and ask
-   whether to relink (`infisical init --project-id <id> --force`) or switch org or domain.
+   whether to relink or switch org or domain.
 2. If it is there, tell the user the project's name and confirm that's where they want the secrets.
-3. Note any `defaultEnvironment` or `gitBranchToEnvironmentMapping`: they decide the import's
-   default environment (see step 3).
+
+**Relinking with `--force` replaces the whole file.** `init --project-id <id> --force` writes a file
+with only `workspaceId`, dropping any `defaultEnvironment`, `gitBranchToEnvironmentMapping`,
+`defaultSecretPath`, and `domain`. Before relinking, note which of those the old file had. Afterwards,
+tell the user what was dropped and, if they want to keep it, add those fields back to the new file.
 
 Then skip to step 3.
 
@@ -113,9 +116,9 @@ To link an existing project instead of creating one, find its `id` with
 `infisical projects list --json`, then run `infisical init --project-id <id>`.
 
 `init --project-id` writes only the project ID (`workspaceId`). The file can also hold
-`defaultEnvironment`, `gitBranchToEnvironmentMapping` (auto-selects an environment from the current
-git branch), `defaultSecretPath`, and `domain`, which `infisical run` and `import` use when you don't
-pass `--env` or `--domain`. It holds no secrets, so it's safe to commit.
+`defaultEnvironment` and `gitBranchToEnvironmentMapping` (auto-selects an environment from the
+current git branch), which `infisical run` and `import` use when you don't pass `--env`, plus
+`domain` and `defaultSecretPath`. It holds no secrets, so it's safe to commit.
 
 ## Step 3: Import existing `.env` files
 
@@ -137,12 +140,13 @@ only the development ones.
 
 **Pick the target environment and always pass it with `--env`.** Without `--env`, `import` uses the
 environment mapped to the current git branch in `.infisical.json`, then its `defaultEnvironment`,
-then `dev`, and an existing project may have no `dev`.
+then `dev`. Neither is safe to rely on: a branch mapping such as `main` → `prod` would send
+development `.env` files into production, and an existing project may have no `dev`.
 
 - Project you just created: `dev` (it's in the `environments` list from `projects create --json`)
-- Existing project: use the mapped or `defaultEnvironment` value from `.infisical.json` if there is
-  one. Otherwise ask the user for the development environment's slug (shown in the dashboard's
-  project settings). Don't guess
+- Existing project: ask the user for the slug of the environment these files belong in (shown in the
+  dashboard's project settings). Don't pick one from the branch mapping or `defaultEnvironment`, and
+  don't guess. If the answer looks like production (`prod`, `production`), confirm again
 
 **Ask before uploading.** Importing sends secret values to a remote service, and `--yes` skips the
 CLI's own confirmation, so the approval has to come from you. Tell the user which files you found,
@@ -206,13 +210,15 @@ terminal and paste the JSON summary back. Then continue with step 4 using that s
 ## Step 4: Run the app with secrets
 
 Find the command the user starts the app with (`package.json` scripts, `Makefile`, `Procfile`, or
-equivalent) and give them the wrapped version:
+equivalent) and give them the wrapped version, with the same `--env` you imported into:
 
 ```bash
-infisical run -- <start command>
+infisical run --env=<slug> -- <start command>
 ```
 
-For example, `infisical run -- npm run dev`. Mention that:
+For example, `infisical run --env=dev -- npm run dev`. Keep `--env` even when the slug is `dev`:
+without it, `run` picks the branch-mapped environment or `defaultEnvironment` from `.infisical.json`,
+which may not be where the secrets went. Mention that:
 
 - `infisical secrets` lists the project's secrets, and `infisical secrets set KEY=value` adds one
 - `--env <slug>` switches environments, e.g. `infisical run --env=staging -- npm start`
