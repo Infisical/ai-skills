@@ -52,13 +52,25 @@ Otherwise, **run `infisical login` yourself.** Don't ask the user to run it.
 4. If the command errors or times out (for example, no display server to open a browser), ask the
    user to run the same command in their own terminal, then continue once they confirm.
 
-**The organization is chosen in the browser.** If the user belongs to more than one organization,
-the browser shows an org picker during login, and every later command acts in the org they pick.
-There is no CLI flag to switch orgs afterwards. To use a different org, run `infisical login` again
-and have the user pick that org.
+**Pick the organization.** If the user belongs to more than one organization, the browser shows an
+org picker during login, and the CLI uses the org they pick. Before you create a project, check
+which org is in use:
 
-`infisical org list --json` lists the user's orgs (`id` and `name`). Use it to tell the user which
-orgs exist, not to select one.
+```bash
+infisical org list --json
+```
+
+Each entry has `id`, `name`, `slug`, and `current`, which is `true` for the org the CLI is using.
+Sub-organizations are nested under `subOrganizations`. If there's more than one org, confirm with
+the user which one the project belongs in. To change it:
+
+```bash
+infisical org switch <org>
+```
+
+`<org>` can be the org's name, slug, or `id`. Always pass it: without it, `org switch` opens an
+interactive picker. If the org requires MFA, the command prompts for a code, so ask the user to run
+it in their own terminal.
 
 If the user is on a self-hosted instance and sees no sign-up option, their admin has disabled
 sign-up. They need an invite from their admin.
@@ -71,16 +83,18 @@ Otherwise, create a project and link it:
 
 ```bash
 infisical projects create --name <project-name> --json
-infisical init --yes --project-id <id>
+infisical init --project-id <id>
 ```
 
 - Name the project after the repository directory unless the user asked for another name
 - `projects create --json` prints the new project, including `id`, `name`, `slug`, and its
   `environments` (`dev`, `staging`, and `prod` by default)
-- `init --yes` requires `--project-id`; without it, `init` falls back to the interactive pickers
+- `--project-id` skips the interactive org and project pickers; without it, `init` opens them
+- If the directory is already linked, `init` refuses to overwrite `.infisical.json` unless you add
+  `--force`. Only add it if the user asked to relink the directory
 
 To link an existing project instead of creating one, find its `id` with
-`infisical projects list --json`, then run `infisical init --yes --project-id <id>`.
+`infisical projects list --json`, then run `infisical init --project-id <id>`.
 
 `.infisical.json` holds only the project ID. It's safe to commit.
 
