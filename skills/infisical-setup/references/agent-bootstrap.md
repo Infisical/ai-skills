@@ -27,7 +27,8 @@ Check for an existing session first:
 infisical login status --json
 ```
 
-If it reports an authenticated session for the right instance, skip to step 2.
+If it reports an authenticated session for the right instance, skip to step 2. Note the session's
+`domain`: you need it for the dashboard link in step 5.
 
 Otherwise, **run `infisical login` yourself.** Don't ask the user to run it.
 
@@ -50,7 +51,12 @@ Otherwise, **run `infisical login` yourself.** Don't ask the user to run it.
    | Self-hosted | Their instance URL, e.g. `https://infisical.example.com` |
 
 4. If the command errors or times out (for example, no display server to open a browser), ask the
-   user to run the same command in their own terminal, then continue once they confirm.
+   user to run it so it logs in **your** session, not just theirs. In Claude Code, they can type
+   `! infisical login --domain <domain>`, which runs in this session. In other agents, their terminal
+   only helps if it shares your machine and user account.
+5. Whoever ran it, **re-run `infisical login status --json` before continuing.** If it still reports
+   no session, the login landed somewhere else (a different machine, container, or user). Stop and
+   tell the user; don't continue with steps 2 to 5.
 
 **Pick the organization.** If the user belongs to more than one organization, the browser shows an
 org picker during login, and the CLI uses the org they pick. Before you create a project, check
@@ -77,7 +83,17 @@ sign-up. They need an invite from their admin.
 
 ## Step 2: Link the directory to a project
 
-If `.infisical.json` already exists in the directory, it's already linked. Skip to step 3.
+If `.infisical.json` already exists in the directory, it's already linked, but check it's linked to
+the right project before you import anything into it. The file holds no secrets, so you can read it:
+
+1. Take its `workspaceId` and find it in `infisical projects list --json`. If it isn't there, the
+   link is stale or belongs to an org or instance you're not logged into. Tell the user and ask
+   whether to relink (`infisical init --project-id <id> --force`) or switch org or domain.
+2. If it is there, tell the user the project's name and confirm that's where they want the secrets.
+3. Note any `defaultEnvironment` or `gitBranchToEnvironmentMapping`: they decide the import's
+   default environment (see step 3).
+
+Then skip to step 3.
 
 Otherwise, create a project and link it:
 
@@ -96,7 +112,10 @@ infisical init --project-id <id>
 To link an existing project instead of creating one, find its `id` with
 `infisical projects list --json`, then run `infisical init --project-id <id>`.
 
-`.infisical.json` holds only the project ID. It's safe to commit.
+`init --project-id` writes only the project ID (`workspaceId`). The file can also hold
+`defaultEnvironment`, `gitBranchToEnvironmentMapping` (auto-selects an environment from the current
+git branch), `defaultSecretPath`, and `domain`, which `infisical run` and `import` use when you don't
+pass `--env` or `--domain`. It holds no secrets, so it's safe to commit.
 
 ## Step 3: Import existing `.env` files
 
@@ -111,32 +130,59 @@ These are the only names `infisical import` looks for. It ignores `.envrc` and o
 
 **`import` sends every file it finds into one environment.** It doesn't map `.env.production` to
 `prod`. If the same key appears in two files, the file imported later overwrites the earlier value,
-and `.env.production` is imported last. So:
+and `.env.production` is imported last. If `.env.staging` or `.env.production` exist, don't import
+yet. Tell the user those files would be merged into a single environment, and ask how they want to
+proceed. For example, they can temporarily move the staging and production files aside and import
+only the development ones.
 
-- **Only `.env`, `.env.local`, or `.env.development` exist:** import them into `dev`:
+**Pick the target environment and always pass it with `--env`.** Without `--env`, `import` uses the
+environment mapped to the current git branch in `.infisical.json`, then its `defaultEnvironment`,
+then `dev`, and an existing project may have no `dev`.
 
-  ```bash
-  infisical import --yes --add-gitignore --json
-  ```
+- Project you just created: `dev` (it's in the `environments` list from `projects create --json`)
+- Existing project: use the mapped or `defaultEnvironment` value from `.infisical.json` if there is
+  one. Otherwise ask the user for the development environment's slug (shown in the dashboard's
+  project settings). Don't guess
 
-- **`.env.staging` or `.env.production` also exist:** don't run the import yet. Tell the user those
-  files would be merged into a single environment, and ask how they want to proceed. For example,
-  they can temporarily move the staging and production files aside and import only the development
-  ones.
+**Ask before uploading.** Importing sends secret values to a remote service, and `--yes` skips the
+CLI's own confirmation, so the approval has to come from you. Tell the user which files you found,
+the project, and the environment, and wait for an explicit yes. Asking for "setup" or "the CLI" is
+not a yes to uploading. If they decline, skip to step 4.
+
+Once they agree:
+
+```bash
+infisical import --env <slug> --yes --add-gitignore --json
+```
 
 Flags:
 
 | Flag | Effect |
 |------|--------|
-| `--yes` | Skips the confirmation prompt. Required when you run it |
+| `--yes` | Skips the CLI confirmation prompt. Required when you run it, and why you ask first |
 | `--add-gitignore` | Adds each imported file to `.gitignore` if it isn't already covered |
-| `--env <slug>` | Target environment (default: `dev`) |
+| `--env <slug>` | Target environment (default: branch mapping, then `defaultEnvironment` from `.infisical.json`, then `dev`). Always pass it |
 | `--path <dir>` | Directory to scan (default: current directory) |
 | `--json` | Machine-readable summary |
 
 The `--json` summary lists each file with its target `env`, the key **names** found, and the
 `uploaded` count, plus which files were added to `.gitignore`. Report that summary to the user. It
 never includes values. The source files are left in place.
+
+Check the summary for **key names that appear in more than one file**. Only the value from the file
+imported last survived, even though every file reports a full `uploaded` count. List those keys and
+files for the user.
+
+**Check whether the imported files are tracked by git:**
+
+```bash
+git ls-files -- <file> ...
+```
+
+`.gitignore` only stops untracked files from being added. If a file is listed, its values are
+already in the repository's history, and ignoring or deleting it now doesn't remove them. Tell the
+user plainly: they should untrack it with `git rm --cached <file>`, and treat those secrets as
+exposed and rotate them, especially if the repository has been pushed anywhere.
 
 If no files exist, skip this step.
 
@@ -150,10 +196,10 @@ as `infisical secrets set --file=.env`.
 Instead, give the user the exact command and ask them to run it:
 
 ```bash
-infisical import --yes --add-gitignore --json
+infisical import --env <slug> --yes --add-gitignore --json
 ```
 
-In Claude Code, the user can type `! infisical import --yes --add-gitignore --json` so the command
+In Claude Code, the user can type `! infisical import --env <slug> --yes --add-gitignore --json` so the command
 runs in the session and you can read its output. In other agents, ask the user to run it in their
 terminal and paste the JSON summary back. Then continue with step 4 using that summary.
 
@@ -183,10 +229,11 @@ If you imported secrets, tell the user they now live in their Infisical project,
 <domain>/organizations/<orgId>/projects/secret-management/<projectId>/secrets/<env>
 ```
 
-- `<domain>` is the value you passed to `infisical login --domain`
+- `<domain>` is the session's `domain` from `infisical login status --json` (without a trailing
+  `/api`). That covers both a fresh login and a reused session
 - `<orgId>` and `<projectId>` are the `orgId` and `id` fields from `projects create --json` (or the
   matching entry in `projects list --json`, if you linked an existing project)
-- `<env>` is the environment the import used, usually `dev`
+- `<env>` is the environment you passed to `--env`
 
 Then **strongly recommend deleting the imported `.env` files.** Infisical is now the source of
 truth for those values, and `infisical run` injects them. A plaintext copy on disk is one more place
@@ -197,9 +244,17 @@ Make the recommendation specific:
 
 - Name only files the import summary shows as fully uploaded (no `error`, and `uploaded` matches the
   number of `keys`). If any file failed, say so and don't recommend deleting it
+- Don't recommend deleting a file that shares a key with a file imported after it. Its value for
+  that key was overwritten, so the file may be the only copy. The user resolves the conflict first
 - Suggest they first confirm the app starts with the `infisical run` command from step 4
-- Check whether anything reads those files directly, not through the environment. Look for the file
-  names in `docker-compose.yml` (`env_file:`), `Dockerfile`, and scripts that load them explicitly.
+- A working start command doesn't prove nothing else needs the file. Search for the file names
+  everywhere they might be loaded directly:
+  - `docker-compose.yml` (`env_file:`), `docker compose --env-file`, `docker run --env-file`, and
+    `Dockerfile`
+  - Test setup and config (for example, a `dotenv` or `dotenv-flow` load in a test helper, or a test
+    runner option pointing at a `.env` file)
+  - CI workflows and scripts that load or `source` the file
+
   If something does, tell the user it needs to switch to `infisical run` (or `infisical export`)
   before they delete the file
 
