@@ -210,15 +210,30 @@ terminal and paste the JSON summary back. Then continue with step 4 using that s
 ## Step 4: Run the app with secrets
 
 Find the command the user starts the app with (`package.json` scripts, `Makefile`, `Procfile`, or
-equivalent) and give them the wrapped version, with the same `--env` you imported into:
+equivalent) and give them the wrapped version. Without `--env`, `run` uses the environment mapped
+to the current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Whether
+to pass `--env` depends on what happened in step 3:
 
-```bash
-infisical run --env=<slug> -- <start command>
-```
+- **You imported secrets:** pass the same slug you imported into, even if it's `dev`. Otherwise the
+  branch mapping or `defaultEnvironment` may pick a different environment from where the secrets
+  went:
 
-For example, `infisical run --env=dev -- npm run dev`. Keep `--env` even when the slug is `dev`:
-without it, `run` picks the branch-mapped environment or `defaultEnvironment` from `.infisical.json`,
-which may not be where the secrets went. Mention that:
+  ```bash
+  infisical run --env=<slug> -- <start command>
+  ```
+
+- **No import** (no `.env` files, or the user declined): don't add `--env`. Leave the project's own
+  selection in charge, so a branch mapping keeps working:
+
+  ```bash
+  infisical run -- <start command>
+  ```
+
+  If `.infisical.json` has no mapping or `defaultEnvironment`, this uses `dev`. For an existing
+  project, check with the user that `dev` exists and is the right environment. If it isn't, pass
+  the slug they give you
+
+For example, `infisical run --env=dev -- npm run dev` after importing into `dev`. Mention that:
 
 - `infisical secrets` lists the project's secrets, and `infisical secrets set KEY=value` adds one
 - `--env <slug>` switches environments, e.g. `infisical run --env=staging -- npm start`
