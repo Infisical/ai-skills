@@ -4,9 +4,9 @@ Read this when **you are the one running the CLI**: an AI agent executing `infis
 subprocess, with no terminal the user can type into. For a human following along in their own
 terminal, use `cli-setup.md` instead.
 
-Several CLI commands prompt interactively by default. The `infisical init` org and project pickers
-and the `infisical import` confirmation hang or fail without a terminal. Every command below has a
-non-interactive form. Use it.
+Several CLI commands prompt interactively by default. The `infisical init` org and project pickers,
+for example, hang or fail without a terminal. Every command below has a non-interactive form. Use
+it.
 
 ## Before you start
 
@@ -117,7 +117,7 @@ To link an existing project instead of creating one, find its `id` with
 
 `init --project-id` writes only the project ID (`workspaceId`). The file can also hold
 `defaultEnvironment` and `gitBranchToEnvironmentMapping` (auto-selects an environment from the
-current git branch), which `infisical run` and `import` use when you don't pass `--env`, plus
+current git branch), which `infisical run` and `infisical secrets set` use when you don't pass `--env`, plus
 `domain` and `defaultSecretPath`. It holds no secrets, so it's safe to commit.
 
 ## Step 3: Import existing `.env` files
@@ -129,83 +129,115 @@ First check which of these files exist, by name only:
 
 `.env` · `.env.local` · `.env.development` · `.env.staging` · `.env.production`
 
-These are the only names `infisical import` looks for. It ignores `.envrc` and other dotfiles.
+Leave out templates such as `.env.example` or `.env.sample`. They hold placeholders, not secrets.
+If no files exist, skip to step 4.
 
-**`import` sends every file it finds into one environment.** It doesn't map `.env.production` to
-`prod`. If the same key appears in two files, the file imported later overwrites the earlier value,
-and `.env.production` is imported last. If `.env.staging` or `.env.production` exist, don't import
-yet. Tell the user those files would be merged into a single environment, and ask how they want to
-proceed. For example, they can temporarily move the staging and production files aside and import
-only the development ones.
+### Pick an environment for each file
 
-**Pick the target environment and always pass it with `--env`.** Without `--env`, `import` uses the
-environment mapped to the current git branch in `.infisical.json`, then its `defaultEnvironment`,
-then `dev`. Neither is safe to rely on: a branch mapping such as `main` → `prod` would send
-development `.env` files into production, and an existing project may have no `dev`.
+You upload each file separately with `infisical secrets set --file`, so each file can go to its own
+environment. **Always pass `--env`.** Without it, `secrets set` uses the environment mapped to the
+current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Neither is safe
+to rely on: a branch mapping such as `main` → `prod` would send development values into production,
+and an existing project may have no `dev`.
 
-- Project you just created: `dev` (it's in the `environments` list from `projects create --json`)
-- Existing project: ask the user for the slug of the environment these files belong in (shown in the
-  dashboard's project settings). Don't pick one from the branch mapping or `defaultEnvironment`, and
-  don't guess. If the answer looks like production (`prod`, `production`), confirm again
+For a project you just created (its `environments` from `projects create --json` are `dev`,
+`staging`, and `prod`):
 
-**Ask before uploading.** Importing sends secret values to a remote service, and `--yes` skips the
-CLI's own confirmation, so the approval has to come from you. Tell the user which files you found,
-the project, and the environment, and wait for an explicit yes. Asking for "setup" or "the CLI" is
-not a yes to uploading. If they decline, skip to step 4.
+| File | `--env` |
+|------|---------|
+| `.env`, `.env.development`, `.env.local` | `dev` |
+| `.env.staging` | `staging` |
+| `.env.production` | `prod` |
 
-Once they agree:
+For an existing project, ask the user for the environment slug for each file (shown in the
+dashboard's project settings). Don't pick one from the branch mapping or `defaultEnvironment`, and
+don't guess. Confirm again before sending anything to an environment that looks like production
+(`prod`, `production`).
 
-```bash
-infisical import --env <slug> --yes --add-gitignore --json
-```
+**Files that share an environment overwrite each other.** If two files set the same key, the file
+you upload later wins. Upload the `dev` files in the order `.env`, `.env.development`, `.env.local`,
+so the most specific file wins, the same way most tools that load `.env` files layer them.
 
-Flags:
+### Ask before uploading
 
-| Flag | Effect |
-|------|--------|
-| `--yes` | Skips the CLI confirmation prompt. Required when you run it, and why you ask first |
-| `--add-gitignore` | Adds each imported file to `.gitignore` if it isn't already covered |
-| `--env <slug>` | Target environment (default: branch mapping, then `defaultEnvironment` from `.infisical.json`, then `dev`). Always pass it |
-| `--path <dir>` | Directory to scan (default: current directory) |
-| `--json` | Machine-readable summary |
+Uploading sends secret values to a remote service, and `secrets set` doesn't ask for confirmation,
+so the approval has to come from you. Tell the user which files you found, the project, and the
+environment for each file, and wait for an explicit yes. Asking for "setup" or "the CLI" is not a
+yes to uploading. If they decline, skip to step 4.
 
-The `--json` summary lists each file with its target `env`, the key **names** found, and the
-`uploaded` count, plus which files were added to `.gitignore`. Report that summary to the user. It
-never includes values. The source files are left in place.
+### Upload each file
 
-Check the summary for **key names that appear in more than one file**. Only the value from the file
-imported last survived, even though every file reports a full `uploaded` count. List those keys and
-files for the user.
-
-**Check whether the imported files are tracked by git:**
+Once they agree, run one command per file, in the order above:
 
 ```bash
-git ls-files -- <file> ...
+infisical secrets set --file=<file> --env=<slug>
 ```
 
-`.gitignore` only stops untracked files from being added. If a file is listed, its values are
-already in the repository's history, and ignoring or deleting it now doesn't remove them. Tell the
-user plainly: they should untrack it with `git rm --cached <file>`, and treat those secrets as
-exposed and rotate them, especially if the repository has been pushed anywhere.
+- **Never add `--output` or `--show-values`.** Both print the secret values, and `--output json`
+  prints them unmasked. The default table masks every value as `******`
+- **Don't pass `--path` expecting a directory.** On `secrets set`, `--path` is the folder inside
+  Infisical to write to, not a local directory. Leave it out to write to the root folder
 
-If no files exist, skip this step.
+The table lists each key with a status:
 
-### If your permission system blocks the import
+| Status | Meaning |
+|--------|---------|
+| `SECRET CREATED` | The key didn't exist in that environment |
+| `SECRET VALUE MODIFIED` | The key existed and now has this file's value |
+| `SECRET VALUE UNCHANGED` | The key already had this value |
+
+Report the key names and statuses to the user, per file. Two statuses need a closer look:
+
+- **`SECRET VALUE MODIFIED` for a key an earlier file in this run created:** that earlier file's
+  value was overwritten. List those keys and files for the user
+- **`SECRET VALUE MODIFIED` in an existing project:** the upload replaced a value that was already in
+  Infisical. Tell the user which keys changed so they can check the old values weren't needed
+
+**If a file fails, nothing from that file is uploaded.** The CLI checks the whole file first. Common
+errors:
+
+- `Secret key '<KEY>' has an empty value`: the file has a line like `DEBUG=`. Ask the user to give
+  the key a value or remove it, then upload the file again. Don't edit the file yourself
+- `secret key 'export <KEY>' cannot contain spaces`: the file uses `export KEY=value` lines. Ask the
+  user to remove the `export` prefixes, or skip the file
+- `invalid format, expected key=value in line: ...`: usually a value that spans several lines, such
+  as a private key. **This error prints the line from the file, which may be part of a secret. Don't
+  repeat it.** Tell the user which file has a line the CLI can't parse, and suggest adding that value
+  in the dashboard instead
+
+### Keep the files out of git
+
+Skip this if the directory isn't a git repository (`git rev-parse --is-inside-work-tree` fails).
+Otherwise, for each file you uploaded, check whether git ignores it and whether it's tracked:
+
+```bash
+git check-ignore -q <file> || echo "not ignored"
+git ls-files -- <file>
+```
+
+- **Not ignored:** add the file name to `.gitignore` (create the file if it doesn't exist), and tell
+  the user you did
+- **Listed by `git ls-files`:** the file is already committed. `.gitignore` only stops untracked
+  files from being added, so its values are already in the repository's history, and ignoring or
+  deleting the file now doesn't remove them. Tell the user plainly: they should untrack it with
+  `git rm --cached <file>`, and treat those secrets as exposed and rotate them, especially if the
+  repository has been pushed anywhere
+
+### If your permission system blocks the upload
 
 Some agents block commands that send the contents of a secrets file to a remote service unless the
 user explicitly asked for it. Claude Code's auto mode does this. That check is doing its job, so
-**don't retry the import, and don't substitute another command that uploads the same files**, such
-as `infisical secrets set --file=.env`.
+**don't retry, and don't try another command that uploads the same file.**
 
-Instead, give the user the exact command and ask them to run it:
+Instead, give the user the exact commands and ask them to run them:
 
 ```bash
-infisical import --env <slug> --yes --add-gitignore --json
+infisical secrets set --file=<file> --env=<slug>
 ```
 
-In Claude Code, the user can type `! infisical import --env <slug> --yes --add-gitignore --json` so the command
-runs in the session and you can read its output. In other agents, ask the user to run it in their
-terminal and paste the JSON summary back. Then continue with step 4 using that summary.
+In Claude Code, the user can type `! infisical secrets set --file=<file> --env=<slug>` so the
+command runs in the session and you can read the table. In other agents, ask the user to run the
+commands in their terminal and paste the tables back. Then continue with the checks above.
 
 ## Step 4: Run the app with secrets
 
@@ -214,9 +246,9 @@ equivalent) and give them the wrapped version. Without `--env`, `run` uses the e
 to the current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Whether
 to pass `--env` depends on what happened in step 3:
 
-- **You imported secrets:** pass the same slug you imported into, even if it's `dev`. Otherwise the
-  branch mapping or `defaultEnvironment` may pick a different environment from where the secrets
-  went:
+- **You imported secrets:** pass the slug the development files went to, even if it's `dev`.
+  Otherwise the branch mapping or `defaultEnvironment` may pick a different environment from where
+  the secrets went:
 
   ```bash
   infisical run --env=<slug> -- <start command>
@@ -240,7 +272,7 @@ For example, `infisical run --env=dev -- npm run dev` after importing into `dev`
 - They can view and edit everything in the Infisical dashboard
 
 Don't run `infisical secrets` yourself to "check" the import. It prints secret values into your
-context. The import summary already tells you what was uploaded.
+context. The `secrets set` tables already tell you what was uploaded.
 
 ## Step 5: Tell the user where their secrets are now
 
@@ -254,7 +286,8 @@ If you imported secrets, tell the user they now live in their Infisical project,
   `/api`). That covers both a fresh login and a reused session
 - `<orgId>` and `<projectId>` are the `orgId` and `id` fields from `projects create --json` (or the
   matching entry in `projects list --json`, if you linked an existing project)
-- `<env>` is the environment you passed to `--env`
+- `<env>` is the environment you passed to `--env`. If files went to more than one environment, give
+  a link for each
 
 Then **strongly recommend deleting the imported `.env` files.** Infisical is now the source of
 truth for those values, and `infisical run` injects them. A plaintext copy on disk is one more place
@@ -263,10 +296,11 @@ Infisical.
 
 Make the recommendation specific:
 
-- Name only files the import summary shows as fully uploaded (no `error`, and `uploaded` matches the
-  number of `keys`). If any file failed, say so and don't recommend deleting it
-- Don't recommend deleting a file that shares a key with a file imported after it. Its value for
-  that key was overwritten, so the file may be the only copy. The user resolves the conflict first
+- Name only files whose `secrets set` command succeeded. If a file failed, say so and don't
+  recommend deleting it
+- Don't recommend deleting a file that shares a key with a file uploaded after it to the same
+  environment. Its value for that key was overwritten, so the file may be the only copy. The user
+  resolves the conflict first
 - Suggest they first confirm the app starts with the `infisical run` command from step 4
 - A working start command doesn't prove nothing else needs the file. Search for the file names
   everywhere they might be loaded directly:
