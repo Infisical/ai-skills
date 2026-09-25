@@ -69,6 +69,9 @@ cd /path/to/your/project
 infisical init
 ```
 
+`infisical init` opens interactive org and project pickers. If you're an agent running the command
+yourself, use `infisical init --project-id <id>` instead (see `agent-bootstrap.md`).
+
 This creates `.infisical.json` — a non-sensitive file that links the directory to an Infisical project. Safe to commit to git.
 
 ```json
