@@ -176,7 +176,11 @@ infisical secrets set --file=<file> --env=<slug>
 - **Never add `--output` or `--show-values`.** Both print the secret values, and `--output json`
   prints them unmasked. The default table masks every value as `******`
 - **Don't pass `--path` expecting a directory.** On `secrets set`, `--path` is the folder inside
-  Infisical to write to, not a local directory. Leave it out to write to the root folder
+  Infisical to write to, not a local directory. Leave it out to write to the root folder (`/`)
+- **`defaultSecretPath` in `.infisical.json` doesn't apply here.** Neither `secrets set` nor
+  `infisical run` reads it: both use `/` unless you pass `--path`. If the file sets it, ask the user
+  whether the secrets belong in that folder. If they do, pass `--path=<folder>` on every upload and on
+  the `infisical run` command in step 4
 
 The table lists each key with a status:
 
@@ -246,13 +250,17 @@ equivalent) and give them the wrapped version. Without `--env`, `run` uses the e
 to the current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Whether
 to pass `--env` depends on what happened in step 3:
 
-- **You imported secrets:** pass the slug the development files went to, even if it's `dev`.
-  Otherwise the branch mapping or `defaultEnvironment` may pick a different environment from where
-  the secrets went:
+- **You imported a development file** (`.env`, `.env.development`, or `.env.local`): pass the slug
+  those files went to, even if it's `dev`. Otherwise the branch mapping or `defaultEnvironment` may
+  pick a different environment from where the secrets went:
 
   ```bash
   infisical run --env=<slug> -- <start command>
   ```
+
+- **You imported only `.env.staging` or `.env.production`:** no local development environment
+  received secrets, so `dev` may be empty. Ask the user which environment to run against locally,
+  and pass that slug with `--env`. Warn them if they pick production
 
 - **No import** (no `.env` files, or the user declined): don't add `--env`. Leave the project's own
   selection in charge, so a branch mapping keeps working:
@@ -264,6 +272,8 @@ to pass `--env` depends on what happened in step 3:
   If `.infisical.json` has no mapping or `defaultEnvironment`, this uses `dev`. For an existing
   project, check with the user that `dev` exists and is the right environment. If it isn't, pass
   the slug they give you
+
+If you passed `--path` to `secrets set`, pass the same `--path` to `run`.
 
 For example, `infisical run --env=dev -- npm run dev` after importing into `dev`. Mention that:
 
