@@ -13,11 +13,13 @@ it.
 Check the CLI supports this flow:
 
 ```bash
-infisical projects --help
+infisical sm projects create --help
 ```
 
-If that command is unknown, the installed CLI is too old. Upgrade it with the same package manager
-it was installed with (see `cli-setup.md`), then check again.
+If the output doesn't mention a `--name` flag, the installed CLI is too old. Older versions either
+report an unknown command or print the general `sm` help instead, and both still exit successfully,
+so check the output rather than the exit code. Upgrade the CLI with the same package manager it was
+installed with (see `cli-setup.md`), then check again.
 
 ## Step 1: Log in
 
@@ -63,12 +65,13 @@ org picker during login, and the CLI uses the org they pick. Before you create a
 which org is in use:
 
 ```bash
-infisical org list --json
+infisical org list
 ```
 
-Each entry has `id`, `name`, `slug`, and `current`, which is `true` for the org the CLI is using.
-Sub-organizations are nested under `subOrganizations`. If there's more than one org, confirm with
-the user which one the project belongs in. To change it:
+It prints a table with `CURRENT`, `NAME`, `SLUG`, and `ID` columns. The org the CLI is using is
+marked with `*` in the `CURRENT` column, and sub-organizations are listed under their parent with a
+`└─` prefix. If there's more than one org, confirm with the user which one the project belongs in.
+To change it:
 
 ```bash
 infisical org switch <org>
@@ -83,42 +86,48 @@ sign-up. They need an invite from their admin.
 
 ## Step 2: Link the directory to a project
 
-If `.infisical.json` already exists in the directory, it's already linked, but check it's linked to
-the right project before you import anything into it. The file holds no secrets, so you can read it:
+The link lives in `.infisical.yaml`. Older CLIs wrote `.infisical.json` instead, which the CLI still
+reads when there's no `.infisical.yaml`.
 
-1. Take its `workspaceId` and find it in `infisical projects list --json`. If it isn't there, the
-   link is stale or belongs to an org or instance you're not logged into. Tell the user and ask
-   whether to relink or switch org or domain.
-2. If it is there, tell the user the project's name and confirm that's where they want the secrets.
+If either file already exists in the directory, it's already linked, but check it's linked to the
+right project before you import anything into it:
 
-**Relinking with `--force` replaces the whole file.** `init --project-id <id> --force` writes a file
-with only `workspaceId`, dropping any `defaultEnvironment`, `gitBranchToEnvironmentMapping`,
-`defaultSecretPath`, and `domain`. Before relinking, note which of those the old file had. Afterwards,
-tell the user what was dropped and, if they want to keep it, add those fields back to the new file.
+```bash
+infisical sm projects get -o json
+```
+
+1. If it fails, the link is stale or belongs to an org or instance you're not logged into. Tell the
+   user and ask whether to relink or switch org or domain.
+2. If it succeeds, tell the user the project's `name` and confirm that's where they want the secrets.
+
+**`init` won't relink a directory without a terminal.** If the directory is already linked, it exits
+with an error instead of overwriting the file. Only relink if the user asks you to: change
+`project-id` under `secrets-management` in `.infisical.yaml` to the new project's `id`, keeping
+the rest of the file. If the directory only has a legacy `.infisical.json`, change its `workspaceId`
+instead. The file holds no secrets, so it's safe to read and edit.
 
 Then skip to step 3.
 
 Otherwise, create a project and link it:
 
 ```bash
-infisical projects create --name <project-name> --json
+infisical sm projects create --name <project-name> -o json
 infisical init --project-id <id>
 ```
 
 - Name the project after the repository directory unless the user asked for another name
-- `projects create --json` prints the new project, including `id`, `name`, `slug`, and its
-  `environments` (`dev`, `staging`, and `prod` by default)
+- `sm projects create -o json` prints the new project, including `id`, `name`, `slug`, `orgId`, and
+  its `environments` (`dev`, `staging`, and `prod` by default)
 - `--project-id` skips the interactive org and project pickers; without it, `init` opens them
-- If the directory is already linked, `init` refuses to overwrite `.infisical.json` unless you add
-  `--force`. Only add it if the user asked to relink the directory
 
 To link an existing project instead of creating one, find its `id` with
-`infisical projects list --json`, then run `infisical init --project-id <id>`.
+`infisical sm projects list -o json`, then run `infisical init --project-id <id>`.
 
-`init --project-id` writes only the project ID (`workspaceId`). The file can also hold
-`defaultEnvironment` and `gitBranchToEnvironmentMapping` (auto-selects an environment from the
-current git branch), which `infisical run` and `infisical secrets set` use when you don't pass `--env`, plus
-`domain` and `defaultSecretPath`. It holds no secrets, so it's safe to commit.
+`init --project-id` writes a `.infisical.yaml` with only `project-id` under `secrets-management`.
+That section can also hold `default-environment` and `mappings.git-branch-to-environment`
+(auto-selects an environment from the current git branch), which `infisical run` and
+`infisical secrets set` use when you don't pass `--env`, plus `default-secret-path`. It holds no
+secrets, so it's safe to commit.
 
 ## Step 3: Import existing `.env` files
 
@@ -135,12 +144,13 @@ If no files exist, skip to step 4.
 ### Pick an environment for each file
 
 You upload each file separately with `infisical secrets set --file`, so each file can go to its own
-environment. **Always pass `--env`.** Without it, `secrets set` uses the environment mapped to the
-current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Neither is safe
-to rely on: a branch mapping such as `main` → `prod` would send development values into production,
-and an existing project may have no `dev`.
+environment. **Always pass `--env`.** Without it, `secrets set` uses the `INFISICAL_ENVIRONMENT`
+variable, then the environment mapped to the current git branch in `.infisical.yaml`, then its
+`default-environment`, then `dev`. None of these is safe to rely on: a branch mapping such as
+`main` → `prod` would send development values into production, and an existing project may have
+no `dev`.
 
-For a project you just created (its `environments` from `projects create --json` are `dev`,
+For a project you just created (its `environments` from `sm projects create -o json` are `dev`,
 `staging`, and `prod`):
 
 | File | `--env` |
@@ -150,7 +160,7 @@ For a project you just created (its `environments` from `projects create --json`
 | `.env.production` | `prod` |
 
 For an existing project, ask the user for the environment slug for each file (shown in the
-dashboard's project settings). Don't pick one from the branch mapping or `defaultEnvironment`, and
+dashboard's project settings). Don't pick one from the branch mapping or `default-environment`, and
 don't guess. Confirm again before sending anything to an environment that looks like production
 (`prod`, `production`).
 
@@ -177,10 +187,11 @@ infisical secrets set --file=<file> --env=<slug>
   prints them unmasked. The default table masks every value as `******`
 - **Don't pass `--path` expecting a directory.** On `secrets set`, `--path` is the folder inside
   Infisical to write to, not a local directory. Leave it out to write to the root folder (`/`)
-- **`defaultSecretPath` in `.infisical.json` doesn't apply here.** Neither `secrets set` nor
-  `infisical run` reads it: both use `/` unless you pass `--path`. If the file sets it, ask the user
-  whether the secrets belong in that folder. If they do, pass `--path=<folder>` on every upload and on
-  the `infisical run` command in step 4
+- **A `default-secret-path` in `.infisical.yaml` applies here.** Without `--path`, both
+  `secrets set` and `infisical run` use the `INFISICAL_SECRET_PATH` variable, then
+  `default-secret-path` (`defaultSecretPath` in a legacy `.infisical.json`), then `/`. If either is
+  set, tell the user which folder the secrets will go to and confirm that's right. If it isn't,
+  pass `--path=<folder>` on every upload and on the `infisical run` command in step 4
 
 The table lists each key with a status:
 
@@ -246,12 +257,13 @@ commands in their terminal and paste the tables back. Then continue with the che
 ## Step 4: Run the app with secrets
 
 Find the command the user starts the app with (`package.json` scripts, `Makefile`, `Procfile`, or
-equivalent) and give them the wrapped version. Without `--env`, `run` uses the environment mapped
-to the current git branch in `.infisical.json`, then its `defaultEnvironment`, then `dev`. Whether
-to pass `--env` depends on what happened in step 3:
+equivalent) and give them the wrapped version. Without `--env`, `run` picks the environment the same
+way `secrets set` does in step 3: `INFISICAL_ENVIRONMENT`, then the branch mapping in
+`.infisical.yaml`, then its `default-environment`, then `dev`. Whether to pass `--env` depends on
+what happened in step 3:
 
 - **You imported a development file** (`.env`, `.env.development`, or `.env.local`): pass the slug
-  those files went to, even if it's `dev`. Otherwise the branch mapping or `defaultEnvironment` may
+  those files went to, even if it's `dev`. Otherwise the branch mapping or `default-environment` may
   pick a different environment from where the secrets went:
 
   ```bash
@@ -269,11 +281,12 @@ to pass `--env` depends on what happened in step 3:
   infisical run -- <start command>
   ```
 
-  If `.infisical.json` has no mapping or `defaultEnvironment`, this uses `dev`. For an existing
+  If `.infisical.yaml` has no mapping or `default-environment`, this uses `dev`. For an existing
   project, check with the user that `dev` exists and is the right environment. If it isn't, pass
   the slug they give you
 
-If you passed `--path` to `secrets set`, pass the same `--path` to `run`.
+If you passed `--path` to `secrets set`, pass the same `--path` to `run`. If you relied on
+`default-secret-path`, `run` picks it up too.
 
 For example, `infisical run --env=dev -- npm run dev` after importing into `dev`. Mention that:
 
@@ -294,8 +307,8 @@ If you imported secrets, tell the user they now live in their Infisical project,
 
 - `<domain>` is the session's `domain` from `infisical login status --json` (without a trailing
   `/api`). That covers both a fresh login and a reused session
-- `<orgId>` and `<projectId>` are the `orgId` and `id` fields from `projects create --json` (or the
-  matching entry in `projects list --json`, if you linked an existing project)
+- `<orgId>` and `<projectId>` are the `orgId` and `id` fields from `sm projects create -o json` (or
+  `sm projects get -o json`, if you linked an existing project)
 - `<env>` is the environment you passed to `--env`. If files went to more than one environment, give
   a link for each
 
