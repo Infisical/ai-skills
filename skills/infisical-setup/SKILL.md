@@ -1,5 +1,5 @@
 ---
-name: infisical-user-setup-guide
+name: infisical-setup
 description: "Interactive setup guide for using Infisical as a secret management tool in your projects. Helps users integrate Infisical into local development (CLI), Docker containers (build-time and runtime secret injection), CI/CD pipelines (GitHub Actions, GitLab CI), Kubernetes (Operator + CRDs), and application code (all 9 SDKs: Node.js, Python, Go, Java, .NET, Ruby, PHP, Rust, C++). Also walks through choosing and configuring any of the 13 machine identity auth methods (Universal, Token, Kubernetes, GCP, AliCloud, AWS, Azure, TLS Cert, OCI, OIDC, JWT, LDAP, SPIFFE). Use this skill whenever someone asks about: using Infisical, injecting secrets, infisical run, infisical init, connecting their app to Infisical, Docker secrets, Kubernetes secrets operator, machine identity setup, SDK initialization, CI/CD secret injection, or 'how do I get my secrets into my app'. Not for the Kubernetes Operator CRDs (infisical-kubernetes-operator), rendering secrets to files (infisical-agent), pushing secrets outward (infisical-secret-syncs), or human SSO login (infisical-sso)."
 ---
 # Infisical User Setup Guide
@@ -33,7 +33,11 @@ Two distinctions worth holding onto:
 
 ## How to use this skill
 
-Start by understanding what the user is trying to do:
+If **you** are running the CLI for the user (as an agent executing commands, with no terminal
+they can type into), read `references/agent-bootstrap.md` first. It covers login, project creation,
+and `.env` import without the interactive prompts that hang a subprocess.
+
+Otherwise, start by understanding what the user is trying to do:
 
 1. **Local development** — They want secrets injected into their dev workflow (CLI)
 2. **Docker** — They want secrets in their containers at build time or runtime
@@ -48,6 +52,7 @@ Read the relevant reference file(s), then walk them through step by step. Don't 
 
 | File | When to read |
 |------|-------------|
+| `references/agent-bootstrap.md` | You are running the CLI yourself and need to log in, link a project, or import `.env` files non-interactively |
 | `references/cli-setup.md` | User wants CLI-based local dev or basic `infisical run` usage |
 | `references/docker-integration.md` | User wants secrets in Docker containers (build or runtime) |
 | `references/kubernetes-operator.md` | User wants the K8s Operator, InfisicalSecret CRD, or dynamic secrets in K8s |

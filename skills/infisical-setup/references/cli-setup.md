@@ -69,21 +69,23 @@ cd /path/to/your/project
 infisical init
 ```
 
-This creates `.infisical.json` — a non-sensitive file that links the directory to an Infisical project. Safe to commit to git.
+`infisical init` opens interactive org and project pickers. If you're an agent running the command
+yourself, use `infisical init --project-id <id>` instead (see `agent-bootstrap.md`).
 
-```json
-{
-  "workspaceId": "63ee5410a45f7a1ed39ba118",
-  "defaultEnvironment": "dev",
-  "gitBranchToEnvironmentMapping": {
-    "main": "prod",
-    "staging": "staging",
-    "develop": "dev"
-  }
-}
+This creates `.infisical.yaml`, a non-sensitive file that links the directory to an Infisical project. Safe to commit to git. Older CLIs wrote `.infisical.json` instead; the CLI still reads it when there's no `.infisical.yaml`, and `infisical migrate-config` converts it.
+
+```yaml
+secrets-management:
+  project-id: 63ee5410a45f7a1ed39ba118
+  default-environment: dev
+  mappings:
+    git-branch-to-environment:
+      main: prod
+      staging: staging
+      develop: dev
 ```
 
-The `gitBranchToEnvironmentMapping` is optional but convenient — it auto-selects the environment based on the current git branch.
+The `git-branch-to-environment` mapping is optional but convenient: it auto-selects the environment based on the current git branch.
 
 ## Run your app with secrets
 
@@ -156,7 +158,7 @@ infisical export --format=yaml > secrets.yaml
 |------|---------|
 | `--env` | Environment slug (default: `dev`) |
 | `--path` | Folder path within the project (default: `/`). Repeatable — merges multiple folders |
-| `--projectId` | Override project from `.infisical.json` |
+| `--projectId` | Override project from `.infisical.yaml` |
 | `--expand` | Expand `${VAR}` references (default: true) |
 | `--include-imports` | Include imported secrets (default: true) |
 | `--tags` | Filter by comma-separated tags |
