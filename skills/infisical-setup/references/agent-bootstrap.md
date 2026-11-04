@@ -25,10 +25,15 @@ with (see `cli-setup.md`), then check again.
 own help and suggested commands use.
 
 **Use `-o json` on the `secrets-manager` commands below**, except `secrets create` and
-`secrets update`, whose `-o json` output prints secret values (see step 3). Data goes to stdout. A failure goes to
-stderr as `{"error": {"code": "...", "message": "...", "next": ["<command>"]}}` and exits `1`. Act on
-`code`, not the message text. `next` lists complete commands that fix the error, with any secret
-value written as `<value>`.
+`secrets update`, whose `-o json` output prints secret values (see step 3). Data goes to stdout. A
+failure the CLI recognizes goes to stderr as
+`{"error": {"code": "...", "message": "...", "next": ["<command>"]}}` and exits `1`. Act on `code`,
+not the message text. `next` lists complete commands that fix the error, with any secret value
+written as `<value>`.
+
+**Not every failure has a code.** An API error the CLI doesn't recognize still prints as plain text
+on stderr, even with `-o json`: a `Response Code:` line and the server's `Message:`. Treat stderr
+that isn't JSON as an error without a code: tell the user what the message says, and don't retry.
 
 ## Step 1: Log in
 
@@ -127,11 +132,17 @@ infisical secrets-manager projects get <project-id> -o json
 **Pass the ID.** Without an argument, `projects get` lists every project in the org instead. It
 doesn't read `.infisical.yaml`.
 
-1. If it fails, read the error `code`. `project_not_found` means the project doesn't exist or you
-   aren't a member: the link is stale, or belongs to an org or instance you're not logged into.
-   `auth_required` means the session expired, so go back to step 1. `project_type_not_supported` means
-   the ID belongs to another product's project. For those two, tell the user and ask whether to
-   relink or switch org or domain.
+1. If it fails, read the error `code`:
+   - `project_not_found`: the project doesn't exist in your org, or you aren't a member of it. The
+     link is stale, or belongs to an instance you're not logged into
+   - `auth_required`: the session expired. Go back to step 1
+   - `project_type_not_supported`: the ID belongs to another product's project
+   - **No `code`**: stderr is plain text with `Response Code: 403 Forbidden` and
+     `This project does not belong to your selected organization`. The project exists, but in
+     another org: check `infisical org list`
+
+   In every case except `auth_required`, tell the user and ask whether to relink, or to switch org
+   (`infisical org switch <org>`) or domain.
 2. If it succeeds, tell the user the project's `name` and confirm that's where they want the secrets.
 
 **`init` won't relink a directory without a terminal.** If the directory is already linked, it exits

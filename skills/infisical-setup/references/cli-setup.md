@@ -217,7 +217,9 @@ infisical secrets-manager folders delete api --env prod --path /backend --projec
   `--description` (`nothing_to_update` otherwise); `--description ""` clears it
 - `folders delete` removes the folder **and everything inside it**
 - Projects and environments reject service tokens (`service_token_not_supported`). Use a login
-  session or a machine identity access token (`--token`)
+  session or a machine identity access token (`--token`). The one exception is
+  `projects get <project-id>` by ID, which accepts a service token. Listing, lookup by slug,
+  `create`, `update`, and `delete` don't
 - The older `infisical secrets folders get|create|delete` still works. Its copy under
   `secrets-manager secrets folders` is hidden; use `secrets-manager folders`
 
@@ -255,7 +257,7 @@ commands that need a project then fail with `project_config_invalid` instead of 
 ## Errors in scripts
 
 `secrets-manager` CRUD commands take `-o json` or `-o yaml`. Data goes to stdout; tips and errors go
-to stderr. With `-o json`, an error is JSON on stderr and the exit code is `1`:
+to stderr. With `-o json`, an error the CLI recognizes is JSON on stderr and the exit code is `1`:
 
 ```json
 {"error": {"code": "environment_not_found", "message": "...", "next": ["infisical secrets-manager environments get --projectId 6f1c2a3e-..."]}}
@@ -283,7 +285,12 @@ error. Suggested commands never contain a token or secret value (they show `<val
 | `project_delete_protected` | `projects delete` on a delete-protected project |
 | `confirmation_required` / `confirmation_declined` | A delete ran without a terminal and without `--yes` / the typed answer didn't match |
 
-Errors from the legacy top-level commands still print as free text.
+Errors from the legacy top-level commands still print as free text. So does an API error the CLI
+doesn't recognize, even under `secrets-manager` with `-o json`: a `Response Code:` line and the
+server's `Message:`. For example, a project in another org is a plain-text
+`403 Forbidden: This project does not belong to your selected organization`, not
+`project_not_found`. A script should treat stderr that doesn't parse as JSON as an error without a
+code.
 
 ## Export secrets to files
 
