@@ -13,7 +13,7 @@ The Agent writes secrets to **files** on a host or in a container. Route elsewhe
 | If the user wants... | Use |
 |----------------------|-----|
 | Kubernetes Secrets or ConfigMaps managed by a controller | `infisical-kubernetes-operator` |
-| `infisical run` wrapping a process | `infisical-setup` |
+| `infisical secrets-manager run` (legacy `infisical run`) wrapping a process | `infisical-setup` |
 | An SDK call from application code | `infisical-setup` |
 | To configure the machine identity the agent authenticates with | `infisical-setup` |
 | To push secrets to a third-party service | `infisical-secret-syncs` |

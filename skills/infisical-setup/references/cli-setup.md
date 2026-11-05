@@ -91,22 +91,22 @@ The `git-branch-to-environment` mapping is optional but convenient: it auto-sele
 
 ```bash
 # Basic — injects all secrets from the project as env vars
-infisical run -- npm run dev
+infisical secrets-manager run -- npm run dev
 
 # Specify environment
-infisical run --env=staging -- npm run dev
+infisical secrets-manager run --env=staging -- npm run dev
 
 # Specify a folder path within the project
-infisical run --path=/apps/backend -- npm run dev
+infisical secrets-manager run --path=/apps/backend -- npm run dev
 
 # Multiple paths — repeat the flag to merge secrets from several folders
-infisical run --path=/common --path=/nextjs -- npm run dev
+infisical secrets-manager run --path=/common --path=/nextjs -- npm run dev
 
 # Watch mode — auto-restarts when secrets change
-infisical run --watch -- npm run dev
+infisical secrets-manager run --watch -- npm run dev
 
 # Multiple chained commands
-infisical run --command="npm run build && npm run start"
+infisical secrets-manager run --command="npm run build && npm run start"
 ```
 
 This works with any framework or language — the secrets appear as standard environment variables in the child process.
@@ -123,12 +123,19 @@ and `projects`. Actions are `get`, `create`, `update`, and `delete`:
 - What you act on is positional (`environments delete qa`). Where you act is a flag: `--projectId`,
   `--env`, `--path`, each falling back to its environment variable (`INFISICAL_PROJECT_ID`,
   `INFISICAL_ENVIRONMENT`, `INFISICAL_SECRET_PATH`) and then `.infisical.yaml`
-- **Exception for machine identities:** `secrets get`, `run`, and `export` take the project only
-  from `--projectId` or `INFISICAL_PROJECT_ID`, never from `.infisical.yaml` (`secrets create` and
-  `update` do read the file). In CI, pass `--projectId`. A service token always uses its own project
+- **Exception for machine identities:** `secrets get`, `run`, and `secrets export` take the project
+  only from `--projectId` or `INFISICAL_PROJECT_ID`, never from `.infisical.yaml` (`secrets create`
+  and `update` do read the file). In CI, pass `--projectId`. A service token always uses its own
+  project
 
-`run` and `export` also work as `infisical secrets-manager run` / `export`. The legacy top-level
-`infisical secrets`, `run`, `export`, and `dynamic-secrets` commands keep working unchanged.
+Two workflow commands act on a whole environment: `infisical secrets-manager run` sits directly under
+the product, and `infisical secrets-manager secrets export` under the secrets it writes out.
+
+**Legacy forms.** The top-level `infisical secrets`, `infisical run`, `infisical export`, and
+`infisical dynamic-secrets`, and `infisical secrets-manager export`, are hidden from `--help` but
+keep working, so existing scripts don't break. Use the `secrets-manager` forms in anything new. If
+`infisical secrets-manager run --help` reports an unknown command, the CLI predates the namespace:
+upgrade it, or fall back to `infisical run` and `infisical export`.
 
 ## Manage secrets from the CLI
 
@@ -250,7 +257,7 @@ Prints the profile, org, and domain, then the Secrets Management defaults with w
 `Secret path via:`, and the `Project config:` file path. Each `via:` line ends with the flag that
 overrides it, e.g. `Environment via: default (override with --env)`. When the project comes from
 the config file, the hint adds `machine identities may ignore it`: with a machine identity, `run`,
-`export`, and `secrets get` don't read the project from the file. Use it before a write to confirm
+`secrets export`, and `secrets get` don't read the project from the file. Use it before a write to confirm
 secrets will land in the right place. `Project: unknown` means `.infisical.yaml` exists but can't be read;
 commands that need a project then fail with `project_config_invalid` instead of running unlinked.
 
@@ -296,16 +303,16 @@ code.
 
 ```bash
 # .env format (default)
-infisical export > .env
+infisical secrets-manager secrets export > .env
 
 # Shell-ready (with export keyword)
-infisical export --format=dotenv-export > .env
+infisical secrets-manager secrets export --format=dotenv-export > .env
 
 # JSON
-infisical export --format=json > secrets.json
+infisical secrets-manager secrets export --format=json > secrets.json
 
 # YAML
-infisical export --format=yaml > secrets.yaml
+infisical secrets-manager secrets export --format=yaml > secrets.yaml
 ```
 
 ## Useful flags (apply to most commands)
@@ -314,7 +321,7 @@ infisical export --format=yaml > secrets.yaml
 |------|---------|
 | `--env` | Environment slug (default: `dev`) |
 | `--path` | Folder path within the project (default: `/`). Repeatable — merges multiple folders |
-| `--projectId` | Project ID (default: `INFISICAL_PROJECT_ID`, then `.infisical.yaml`; with a machine identity, `run`/`export`/`secrets` skip the file, so pass it) |
+| `--projectId` | Project ID (default: `INFISICAL_PROJECT_ID`, then `.infisical.yaml`; with a machine identity, `run`, `secrets get`, and `secrets export` skip the file, so pass it) |
 | `--expand` | Expand `${VAR}` references (default: true) |
 | `--include-imports` | Include imported secrets (default: true) |
 | `--tags` | Filter by comma-separated tags |
@@ -322,13 +329,13 @@ infisical export --format=yaml > secrets.yaml
 
 ## Beyond local dev
 
-The CLI covers more than `run`/`secrets`/`export`. Other command groups you may need:
+The CLI covers more than `run` and `secrets`. Other command groups you may need:
 
 | Command | Purpose |
 |---------|---------|
-| `infisical secrets-manager` (`sm`) | Secrets, folders, environments, projects, dynamic secrets, `run`, `export` (see above) |
+| `infisical secrets-manager` (`sm`) | Secrets (including `secrets export`), folders, environments, projects, dynamic secrets, `run` (see above) |
 | `infisical profile current` | Show the profile, org, project, environment, and path commands here use |
-| `infisical dynamic-secrets` | Lease, renew, and revoke dynamic secrets |
+| `infisical secrets-manager dynamic-secrets` | Lease, renew, and revoke dynamic secrets |
 | `infisical gateway` / `infisical relay` | Run a Gateway or Relay for private-network access |
 | `infisical agent` | Run the Infisical Agent daemon (see the `infisical-agent` skill) |
 | `infisical agent-proxy` | Local or standalone secret-serving proxy |
@@ -355,7 +362,7 @@ infisical scan install --pre-commit-hook
 
 ## Offline support
 
-The CLI caches previously fetched secrets. If the Infisical server is unreachable, `infisical run` falls back to the cache automatically.
+The CLI caches previously fetched secrets. If the Infisical server is unreachable, `infisical secrets-manager run` falls back to the cache automatically.
 
 ## Terminal security tip
 

@@ -80,7 +80,7 @@ build:
         --client-id=$INFISICAL_CLIENT_ID
         --client-secret=$INFISICAL_CLIENT_SECRET
         --plain --silent)
-    - infisical run --projectId=$INFISICAL_PROJECT_ID --env=prod -- npm run build
+    - infisical secrets-manager run --projectId=$INFISICAL_PROJECT_ID --env=prod -- npm run build
 ```
 
 Store `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` as GitLab CI/CD variables (Settings > CI/CD > Variables).
@@ -96,7 +96,7 @@ For any CI platform, the pattern is:
 1. **Create a machine identity** with an appropriate auth method
 2. **Install the CLI** in the pipeline
 3. **Authenticate**: `infisical login --method=universal-auth --client-id=... --client-secret=... --plain --silent`
-4. **Inject secrets**: `infisical run -- <your-build-command>`
+4. **Inject secrets**: `infisical secrets-manager run -- <your-build-command>`
 
 If the CI platform supports OIDC (e.g., CircleCI, Bitbucket), prefer OIDC Auth for zero-secret integration. Otherwise, use Universal Auth with Client ID/Secret stored as CI variables.
 

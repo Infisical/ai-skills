@@ -46,7 +46,7 @@ static secret syncing has moved to v1beta1. Do not assume every CRD has a v1beta
 | If the user wants... | Use |
 |----------------------|-----|
 | Secrets rendered to a **file** in a pod, or a sidecar/init container | `infisical-agent` |
-| The CLI wrapping a process (`infisical run`) | `infisical-setup` |
+| The CLI wrapping a process (`infisical secrets-manager run`, legacy `infisical run`) | `infisical-setup` |
 | To set up **Kubernetes Auth** for a machine identity in general | `infisical-setup` |
 | To encrypt **etcd** with an Infisical key | `infisical-kms` |
 | To self-host Infisical itself on Kubernetes | `infisical-self-host` |

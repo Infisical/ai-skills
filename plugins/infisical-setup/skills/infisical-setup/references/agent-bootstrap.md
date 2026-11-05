@@ -137,12 +137,15 @@ doesn't read `.infisical.yaml`.
      link is stale, or belongs to an instance you're not logged into
    - `auth_required`: the session expired. Go back to step 1
    - `project_type_not_supported`: the ID belongs to another product's project
-   - **No `code`**: stderr is plain text with `Response Code: 403 Forbidden` and
-     `This project does not belong to your selected organization`. The project exists, but in
-     another org: check `infisical org list`
+   - **No `code`, and stderr has both `Response Code: 403 Forbidden` and
+     `This project does not belong to your selected organization`**: the project exists, but in
+     another org. Check `infisical org list`
+   - **No `code`, anything else** (another status or message, such as a server error): don't treat it
+     as a linking problem. Tell the user the `Response Code:` and `Message:` lines and stop. Don't
+     relink or switch org because of it
 
-   In every case except `auth_required`, tell the user and ask whether to relink, or to switch org
-   (`infisical org switch <org>`) or domain.
+   For `project_not_found`, `project_type_not_supported`, and the other-org 403, tell the user and
+   ask whether to relink, or to switch org (`infisical org switch <org>`) or domain.
 2. If it succeeds, tell the user the project's `name` and confirm that's where they want the secrets.
 
 **`init` won't relink a directory without a terminal.** If the directory is already linked, it exits
@@ -171,7 +174,7 @@ To link an existing project instead of creating one, list the org's projects wit
 
 `init --project-id` writes a `.infisical.yaml` with only `project-id` under `secrets-management`.
 That section can also hold `default-environment` and `mappings.git-branch-to-environment`
-(auto-selects an environment from the current git branch), which `infisical run` and
+(auto-selects an environment from the current git branch), which `infisical secrets-manager run` and
 `infisical secrets-manager secrets create` use when you don't pass `--env`, plus
 `default-secret-path`. It holds no
 secrets, so it's safe to commit.
@@ -245,12 +248,12 @@ saying so. Don't use `infisical secrets set` instead: it silently overwrites.
 - **Don't pass `--path` expecting a directory.** On `secrets create`, `--path` is the folder inside
   Infisical to write to, not a local directory. Leave it out to write to the root folder (`/`)
 - **A `default-secret-path` in `.infisical.yaml` applies here.** Without `--path`, both
-  `secrets create` and `infisical run` use the `INFISICAL_SECRET_PATH` variable, then
+  `secrets create` and `infisical secrets-manager run` use the `INFISICAL_SECRET_PATH` variable, then
   `default-secret-path` (`defaultSecretPath` in a legacy `.infisical.json`), then `/`.
   `infisical profile current` prints the result as `Secret path:` and `Secret path via:`. If the
   `via:` line doesn't start with `default`, tell the user which folder the secrets will go to and
   confirm that's right. If it isn't, pass `--path=<folder>` on every upload (`create` and `update`)
-  and on the `infisical run` command in step 4
+  and on the `infisical secrets-manager run` command in step 4
 
 On success the table lists every key in the file as `SECRET CREATED`. Report the key names to the
 user, per file.
@@ -356,7 +359,7 @@ what happened in step 3:
   pick a different environment from where the secrets went:
 
   ```bash
-  infisical run --env=<slug> -- <start command>
+  infisical secrets-manager run --env=<slug> -- <start command>
   ```
 
 - **You imported only `.env.staging` or `.env.production`:** no local development environment
@@ -367,7 +370,7 @@ what happened in step 3:
   selection in charge, so a branch mapping keeps working:
 
   ```bash
-  infisical run -- <start command>
+  infisical secrets-manager run -- <start command>
   ```
 
   If `.infisical.yaml` has no mapping or `default-environment`, this uses `dev`. For an existing
@@ -377,12 +380,12 @@ what happened in step 3:
 If you passed `--path` to the uploads, pass the same `--path` to `run`. If you relied on
 `default-secret-path`, `run` picks it up too.
 
-For example, `infisical run --env=dev -- npm run dev` after importing into `dev`. Mention that:
+For example, `infisical secrets-manager run --env=dev -- npm run dev` after importing into `dev`. Mention that:
 
 - `infisical secrets-manager secrets get` lists the project's secrets,
   `infisical secrets-manager secrets create KEY=value` adds one, and `secrets update KEY=value`
   changes one
-- `--env <slug>` switches environments, e.g. `infisical run --env=staging -- npm start`
+- `--env <slug>` switches environments, e.g. `infisical secrets-manager run --env=staging -- npm start`
 - They can view and edit everything in the Infisical dashboard
 
 Don't run `infisical secrets` or `secrets-manager secrets get` yourself to "check" the import. It
@@ -405,7 +408,7 @@ If you imported secrets, tell the user they now live in their Infisical project,
   a link for each
 
 Then **strongly recommend deleting the imported `.env` files.** Infisical is now the source of
-truth for those values, and `infisical run` injects them. A plaintext copy on disk is one more place
+truth for those values, and `infisical secrets-manager run` injects them. A plaintext copy on disk is one more place
 the secrets can leak from, and it drifts out of date as soon as someone changes a value in
 Infisical.
 
@@ -416,7 +419,7 @@ Make the recommendation specific:
 - Don't recommend deleting a file whose keys a later file's `update` replaced in the same
   environment. Its value for those keys is no longer in Infisical, so the file may be the only copy.
   The user resolves the conflict first
-- Suggest they first confirm the app starts with the `infisical run` command from step 4
+- Suggest they first confirm the app starts with the `infisical secrets-manager run` command from step 4
 - A working start command doesn't prove nothing else needs the file. Search for the file names
   everywhere they might be loaded directly:
   - `docker-compose.yml` (`env_file:`), `docker compose --env-file`, `docker run --env-file`, and
@@ -425,7 +428,7 @@ Make the recommendation specific:
     runner option pointing at a `.env` file)
   - CI workflows and scripts that load or `source` the file
 
-  If something does, tell the user it needs to switch to `infisical run` (or `infisical export`)
+  If something does, tell the user it needs to switch to `infisical secrets-manager run` (or `infisical secrets-manager secrets export`)
   before they delete the file
 
 Let the user decide. If they ask you to delete the files, remove them with `rm` without opening them.

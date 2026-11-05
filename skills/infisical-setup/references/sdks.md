@@ -364,7 +364,7 @@ are returned as classes with getter methods.
 
 | Scenario | Use |
 |----------|-----|
-| Local dev, any framework | CLI (`infisical run -- ...`) |
+| Local dev, any framework | CLI (`infisical secrets-manager run -- ...`) |
 | Docker containers | CLI (see `docker-integration.md`) |
 | Need secrets in application logic (not just env vars) | SDK |
 | Dynamic secrets / leases | SDK |
