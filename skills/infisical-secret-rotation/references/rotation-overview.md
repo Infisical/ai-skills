@@ -195,7 +195,7 @@ Rotation changes the secret; it does not restart anything. Pair it with one of:
 - **Infisical Agent** — template the secret to a file and use `execute.command` to reload the app on change (see `infisical-agent`)
 - **Kubernetes Operator** — the operator updates the target Secret/ConfigMap; add a reloader or set the operator to trigger a rollout (see `infisical-kubernetes-operator`)
 - **SDK with a short cache TTL** — must be well under 2× `rotationInterval`
-- **CLI `infisical run`** — picks up current values at process start, so it benefits from a restart
+- **CLI `infisical secrets-manager run`**: picks up current values at process start, so it benefits from a restart
 
 An app that reads a secret once at boot and runs for months will break at the second rotation, not
 the first. That surprises people.

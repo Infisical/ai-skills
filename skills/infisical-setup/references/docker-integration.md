@@ -2,7 +2,7 @@
 
 How to get Infisical secrets into Docker containers. There are two main patterns: runtime injection (recommended) and build-time injection.
 
-## Pattern 1: Runtime injection with `infisical run` (Recommended)
+## Pattern 1: Runtime injection with `infisical secrets-manager run` (Recommended)
 
 The cleanest approach — secrets are fetched fresh when the container starts. Nothing is baked into the image.
 
@@ -25,7 +25,7 @@ The Alpine setup script is `setup.apk.sh`, not `setup.alpine.sh`, and Alpine nee
 
 For reproducible images, pin the CLI version rather than installing latest.
 
-### Step 2: Wrap your start command with `infisical run`
+### Step 2: Wrap your start command with `infisical secrets-manager run`
 
 ```dockerfile
 CMD ["infisical", "run", "--projectId", "<project-id>", "--", "node", "server.js"]
@@ -63,7 +63,7 @@ export INFISICAL_TOKEN=$(infisical login \
   --plain --silent)
 
 # Run the app with secrets injected
-exec infisical run \
+exec infisical secrets-manager run \
   --token $INFISICAL_TOKEN \
   --projectId $INFISICAL_PROJECT_ID \
   --env $INFISICAL_ENV \
@@ -94,7 +94,7 @@ Useful with Docker Compose or when you need an env file:
 
 ```bash
 # Export secrets to a file
-infisical export --env=prod --format=dotenv > .env
+infisical secrets-manager secrets export --env=prod --format=dotenv > .env
 
 # Use with docker run
 docker run --env-file .env my-app:latest
@@ -105,12 +105,12 @@ docker compose --env-file .env up
 
 **Caveat**: This writes secrets to disk. Make sure `.env` is in `.gitignore` and `.dockerignore`.
 
-## Pattern 3: Docker Compose with infisical run
+## Pattern 3: Docker Compose with infisical secrets-manager run
 
 Wrap the entire compose command:
 
 ```bash
-infisical run -- docker compose up
+infisical secrets-manager run -- docker compose up
 ```
 
 This injects secrets as environment variables into the `docker compose` process, which then passes them to containers via `environment:` directives in your compose file.

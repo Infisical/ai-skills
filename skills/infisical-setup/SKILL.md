@@ -1,6 +1,6 @@
 ---
 name: infisical-setup
-description: "Interactive setup guide for using Infisical as a secret management tool in your projects. Helps users integrate Infisical into local development (CLI), Docker containers (build-time and runtime secret injection), CI/CD pipelines (GitHub Actions, GitLab CI), Kubernetes (Operator + CRDs), and application code (all 9 SDKs: Node.js, Python, Go, Java, .NET, Ruby, PHP, Rust, C++). Also walks through choosing and configuring any of the 13 machine identity auth methods (Universal, Token, Kubernetes, GCP, AliCloud, AWS, Azure, TLS Cert, OCI, OIDC, JWT, LDAP, SPIFFE). Use this skill whenever someone asks about: using Infisical, injecting secrets, infisical run, infisical init, connecting their app to Infisical, Docker secrets, Kubernetes secrets operator, machine identity setup, SDK initialization, CI/CD secret injection, or 'how do I get my secrets into my app'. Not for the Kubernetes Operator CRDs (infisical-kubernetes-operator), rendering secrets to files (infisical-agent), pushing secrets outward (infisical-secret-syncs), or human SSO login (infisical-sso)."
+description: "Interactive setup guide for using Infisical as a secret management tool in your projects. Helps users integrate Infisical into local development (CLI), Docker containers (build-time and runtime secret injection), CI/CD pipelines (GitHub Actions, GitLab CI), Kubernetes (Operator + CRDs), and application code (all 9 SDKs: Node.js, Python, Go, Java, .NET, Ruby, PHP, Rust, C++). Also walks through choosing and configuring any of the 13 machine identity auth methods (Universal, Token, Kubernetes, GCP, AliCloud, AWS, Azure, TLS Cert, OCI, OIDC, JWT, LDAP, SPIFFE). Use this skill whenever someone asks about: using Infisical, injecting secrets, infisical run, infisical secrets-manager run, infisical init, infisical secrets-manager (sm) commands for secrets, folders, environments, and projects, connecting their app to Infisical, Docker secrets, Kubernetes secrets operator, machine identity setup, SDK initialization, CI/CD secret injection, or 'how do I get my secrets into my app'. Not for the Kubernetes Operator CRDs (infisical-kubernetes-operator), rendering secrets to files (infisical-agent), pushing secrets outward (infisical-secret-syncs), or human SSO login (infisical-sso)."
 ---
 # Infisical User Setup Guide
 
@@ -53,7 +53,7 @@ Read the relevant reference file(s), then walk them through step by step. Don't 
 | File | When to read |
 |------|-------------|
 | `references/agent-bootstrap.md` | You are running the CLI yourself and need to log in, link a project, or import `.env` files non-interactively |
-| `references/cli-setup.md` | User wants CLI-based local dev or basic `infisical run` usage |
+| `references/cli-setup.md` | User wants CLI-based local dev, `infisical secrets-manager run`, or to manage secrets, folders, environments, or projects with `infisical secrets-manager` (including its delete confirmations and `-o json` error codes) |
 | `references/docker-integration.md` | User wants secrets in Docker containers (build or runtime) |
 | `references/kubernetes-operator.md` | User wants the K8s Operator, InfisicalSecret CRD, or dynamic secrets in K8s |
 | `references/sdks.md` | User wants to fetch secrets from application code (any language) |
@@ -64,7 +64,7 @@ Read the relevant reference file(s), then walk them through step by step. Don't 
 
 - **Start with their platform.** Ask what they're running on (AWS, GCP, K8s, local, etc.) before recommending an auth method or integration approach.
 - **Recommend zero-secret auth when possible.** If they're on AWS, recommend AWS Auth. On K8s, recommend Kubernetes Auth. In GitHub Actions, recommend OIDC Auth. Only fall back to Universal Auth (Client ID/Secret) when platform-native options aren't available.
-- **CLI-first for local dev.** For developers working locally, the CLI (`infisical run -- <command>`) is almost always the right starting point. It's the simplest path to "my app has secrets."
+- **CLI-first for local dev.** For developers working locally, the CLI (`infisical secrets-manager run -- <command>`) is almost always the right starting point. It's the simplest path to "my app has secrets."
 - **SDK for application code.** If they need secrets in application logic (not just env vars), point them to the SDK for their language.
 - **Warn about deprecated patterns.** Service Tokens (`st.*` prefix) and API Keys are deprecated. Always guide toward machine identities.
 - **Get exact package and symbol names from the reference.** Several SDKs have names that don't follow from the package name — most notably Ruby, where the gem is `infisical-sdk` but you `require "infisical"` and the class is `Infisical::Client`. Read `references/sdks.md` rather than guessing.
